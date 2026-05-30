@@ -128,3 +128,29 @@
     background: black;
   }
 }
+
+/* .nb-page {
+  background-color: #f0ebe0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  min-height: 100vh;
+  width: 100%;
+} */
+
+.card {
+  background: #ffffff;
+  border: 2.5px solid #1a1a1a;
+  padding: 14px;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  border-radius: 0;
+  transition:
+    box-shadow 0.12s ease,
+    transform 0.12s ease;
+}
+
+.card:hover {
+  box-shadow: 6px 6px 0 #1a1a1a;
+  transform: translate(-2px, -2px);
+}

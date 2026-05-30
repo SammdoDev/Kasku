@@ -1,30 +1,25 @@
 import { SignJWT, jwtVerify } from "jose";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+const SECRET = new TextEncoder().encode(
+  process.env.JWT_SECRET ?? "fallback-secret-change-in-production",
+);
 
-export interface JwtPayload {
+export interface JWTPayload {
   sub: string;
   username: string;
   iat?: number;
   exp?: number;
 }
 
-export const signToken = async (payload: JwtPayload): Promise<string> => {
-  return new SignJWT(payload as unknown as Record<string, unknown>)
+export async function signToken(payload: Omit<JWTPayload, "iat" | "exp">) {
+  return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(secret);
-};
+    .sign(SECRET);
+}
 
-export const verifyToken = async (
-  token: string,
-): Promise<JwtPayload | null> => {
-  try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload as unknown as JwtPayload; // ← lewat unknown dulu
-  } catch {
-    return null;
-  }
-};
- 
+export async function verifyToken(token: string): Promise<JWTPayload> {
+  const { payload } = await jwtVerify(token, SECRET);
+  return payload as unknown as JwtPayload;
+}

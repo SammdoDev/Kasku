@@ -1,11 +1,12 @@
+// src/app/api/auth/signin/route.ts
+
 import { NextResponse } from "next/server";
 import { signToken } from "@/lib/helper/jwt";
-import bcrypt from "bcryptjs";
 import { createServiceClient } from "@/lib/supabase/client";
+import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { username, password: encodedPassword } = body;
+  const { username, password: encodedPassword } = await req.json();
 
   if (!username || !encodedPassword) {
     return NextResponse.json(
@@ -14,21 +15,15 @@ export async function POST(req: Request) {
     );
   }
 
-  let password: string;
-  try {
-    password = Buffer.from(encodedPassword, "base64").toString("utf-8");
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid password format" },
-      { status: 400 },
-    );
-  }
+  const password = Buffer.from(encodedPassword, "base64").toString("utf-8");
 
   const supabase = createServiceClient();
 
   const { data: user, error } = await supabase
     .from("users")
-    .select("id, username, full_name, password_hash")
+    .select(
+      "id, username, full_name, password_hash, currency, avatar_url, created_at",
+    )
     .eq("username", username)
     .single();
 
@@ -41,7 +36,7 @@ export async function POST(req: Request) {
 
   if (!user.password_hash) {
     return NextResponse.json(
-      { error: "This account uses Google login" },
+      { error: "This account uses Google login. Please sign in with Google." },
       { status: 401 },
     );
   }
@@ -54,19 +49,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const token = await signToken({
-    sub: user.id,
-    username: user.username,
-  });
+  const token = await signToken({ sub: user.id, username: user.username });
 
   const res = NextResponse.json({
-    message: "Login berhasil! Selamat datang kembali.",
-    token,
+    message: "Login berhasil!",
     user: {
       id: user.id,
       username: user.username,
       full_name: user.full_name,
+      currency: user.currency,
+      avatar_url: user.avatar_url,
+      created_at: user.created_at,
     },
+    token,
   });
 
   res.cookies.set("token", token, {

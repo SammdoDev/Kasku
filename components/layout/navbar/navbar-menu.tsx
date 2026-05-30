@@ -48,10 +48,6 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
   const pathname = usePathname();
   const [user, setUser] = useState<SessionUser | null>(null);
 
-  //   useEffect(() => {
-  //     setUser(getSessionUser());
-  //   }, []);
-
   const pageLabel = getPageLabel(pathname);
   const initials = user ? getInitials(user.full_name) : "??";
   const showBadge =
