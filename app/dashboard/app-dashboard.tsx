@@ -10,10 +10,10 @@ import SummaryCardSkeleton from "@/components/ui/summary-card/summary-card-skele
 import ChartCard from "@/components/ui/chart-card/chart-card";
 import ChartCardSkeleton from "@/components/ui/chart-card/chart-card-skeleton";
 import formatIDR from "@/lib/helper/currency-format";
-import { useDashboardFilter } from "./store/dashboard-filter";
-import MonthFilter from "./components/month-filter";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import { X } from "lucide-react";
+import MonthFilter from "@/components/ui/input-component/month-filter/month-filter";
+import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
 
 interface CategorySpend {
   id: string;
@@ -60,7 +60,7 @@ interface DashboardResponse {
 }
 
 const AppDashboard = () => {
-  const { month, monthLabel } = useDashboardFilter();
+  const { month, monthLabel } = useMonthFilter();
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -154,13 +154,12 @@ const AppDashboard = () => {
     ) ?? [];
   const dailyIncome = data?.daily_trend.map((d) => d.income) ?? [];
   const dailyExpense = data?.daily_trend.map((d) => d.expense) ?? [];
-
   const hasCategory = (data?.spending_by_category.length ?? 0) > 0;
   const hasBudget = (data?.budget_summary.length ?? 0) > 0;
 
   return (
     <div
-      className="card w-full px-4 py-4 sm:px-6 sm:py-5"
+      className="card w-full px-4 py-4 sm:px-6 sm:py-6 font-mono"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5">
@@ -258,9 +257,7 @@ const AppDashboard = () => {
 
       {!loading && (
         <div
-          className={`grid grid-cols-1 gap-2.5 ${
-            hasCategory && hasBudget ? "md:grid-cols-2" : ""
-          }`}
+          className={`grid grid-cols-1 gap-2.5 ${hasCategory && hasBudget ? "md:grid-cols-2" : ""}`}
         >
           {hasCategory && (
             <div className="border-[2.5px] border-[#1a1a1a] bg-white p-3.5">
@@ -297,7 +294,6 @@ const AppDashboard = () => {
               </div>
             </div>
           )}
-
           {hasBudget && (
             <div className="border-[2.5px] border-[#1a1a1a] bg-white p-3.5">
               <div className="mb-3.5 flex items-center justify-between">
@@ -318,9 +314,7 @@ const AppDashboard = () => {
                         {b.name}
                       </span>
                       <span
-                        className={`flex items-center gap-1.5 text-[9px] font-bold ${
-                          b.over_budget ? "text-red-500" : "text-[#555]"
-                        }`}
+                        className={`flex items-center gap-1.5 text-[9px] font-bold ${b.over_budget ? "text-red-500" : "text-[#555]"}`}
                       >
                         {formatIDR(b.spent)} / {formatIDR(b.amount)}
                         {b.over_budget && (
