@@ -48,6 +48,10 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
   const pathname = usePathname();
   const [user, setUser] = useState<SessionUser | null>(null);
 
+  useEffect(() => {
+    setUser(getSessionUser());
+  }, []);
+
   const pageLabel = getPageLabel(pathname);
   const initials = user ? getInitials(user.full_name) : "??";
   const showBadge =
@@ -58,7 +62,6 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
       style={{ backgroundColor: SIDEBAR_CONFIG.bgColor }}
       className="sticky top-0 z-30 flex items-center gap-3 px-4 md:px-5 h-[71px] border-b-[3px] border-black shrink-0"
     >
-      {/* ── Hamburger (mobile) ── */}
       <button
         onClick={onMenuToggle}
         aria-label={isSidebarOpen ? "Tutup menu" : "Buka menu"}
@@ -79,16 +82,13 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
         )}
       </button>
 
-      {/* ── Page title ── */}
       <div className="flex-1 min-w-0">
         <h1 className="font-black text-[17px] md:text-lg uppercase tracking-tight text-black leading-none truncate">
           {pageLabel}
         </h1>
       </div>
 
-      {/* ── Right section ── */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Notification bell */}
         <button
           aria-label={`Notifikasi${showBadge ? `, ${NAVBAR_CONFIG.notificationCount} baru` : ""}`}
           className="relative flex items-center justify-center w-9 h-9 border-[3px] border-black bg-white shadow-[3px_3px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
@@ -106,9 +106,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
           )}
         </button>
 
-        {/* User avatar chip */}
         <div className="flex items-center gap-2 px-2 py-1 border-[3px] border-black bg-white shadow-[3px_3px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 cursor-default select-none">
-          {/* Avatar */}
           <div
             style={{ background: SIDEBAR_CONFIG.accentColor }}
             className="w-6 h-6 border-[2px] border-black flex items-center justify-center shrink-0"
@@ -116,7 +114,6 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
           >
             <span className="font-black text-[9px] text-black">{initials}</span>
           </div>
-          {/* Name — hide on very small screens */}
           <span className="hidden sm:block text-[12px] font-black text-black max-w-[100px] truncate">
             {user?.full_name ?? "—"}
           </span>

@@ -8,7 +8,7 @@ interface GoogleTokenResponse {
 }
 
 interface GoogleUserInfo {
-  sub: string; // google_id
+  sub: string;
   email: string;
   name: string;
   picture: string;
@@ -57,26 +57,23 @@ export async function GET(req: Request) {
   }
 
   const googleUser: GoogleUserInfo = await userRes.json();
-
   const supabase = createServiceClient();
 
   // 3. Cari user by google_id
   let { data: user } = await supabase
     .from("users")
-    .select("id, username")
+    .select("id, username, full_name")
     .eq("google_id", googleUser.sub)
     .single();
 
   // 4. Belum ada → buat user baru
   if (!user) {
-    // Buat username unik dari nama Google
     const baseUsername = googleUser.name
       .toLowerCase()
       .replace(/\s+/g, "_")
       .replace(/[^a-z0-9_]/g, "")
       .slice(0, 20);
 
-    // Pastikan username unik dengan tambah angka kalau perlu
     let username = baseUsername;
     let attempt = 0;
     while (true) {
@@ -99,7 +96,7 @@ export async function GET(req: Request) {
         full_name: googleUser.name,
         avatar_url: googleUser.picture,
       })
-      .select("id, username")
+      .select("id, username, full_name")
       .single();
 
     if (error || !newUser) {
@@ -111,19 +108,34 @@ export async function GET(req: Request) {
     user = newUser;
   }
 
-  // 5. Buat JWT dan set cookie
-  const token = await signToken({ sub: user.id, username: user.username });
-
-  const res = NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_APP_URL}/dashboard`,
-  );
-  res.cookies.set("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
+  // 5. Buat JWT
+  const token = await signToken({
+    sub: user.id,
+    username: user.username,
+    full_name: user.full_name ?? user.username,
   });
 
-  return res;
+  // 6. Simpan token sementara di Supabase (bukan di URL langsung)
+  //    session_id = random UUID, expire 5 menit
+  const sessionId = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+
+  const { error: insertError } = await supabase
+    .from("auth_temp_tokens")
+    .insert({
+      session_id: sessionId,
+      token,
+      expires_at: expiresAt,
+    });
+
+  if (insertError) {
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_APP_URL}/auth/login?error=google_failed`,
+    );
+  }
+
+  // 7. Redirect hanya dengan session_id (bukan token sensitif)
+  return NextResponse.redirect(
+    `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?session_id=${sessionId}`,
+  );
 }

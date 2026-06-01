@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRight, LogOut, X } from "lucide-react";
 
 import {
@@ -12,7 +12,7 @@ import {
 } from "./sidebar-menu-constant";
 import {
   clearSession,
-  //   getSessionUser,
+  getSessionUser,
   type SessionUser,
 } from "@/lib/helper/session";
 
@@ -38,9 +38,9 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const [user, setUser] = useState<SessionUser | null>(null);
 
-  //   useEffect(() => {
-  //     setUser(getSessionUser());
-  //   }, []);
+  useEffect(() => {
+    setUser(getSessionUser());
+  }, []);
 
   const initials = user ? getInitials(user.full_name) : "??";
 
@@ -83,7 +83,6 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
             </span>
           </Link>
 
-          {/* Close btn — mobile only */}
           <button
             onClick={onClose}
             className="lg:hidden p-1 border-[2px] border-black bg-white hover:bg-black hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
@@ -93,7 +92,6 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
           </button>
         </div>
 
-        {/* ── Nav groups ── */}
         <nav
           className="flex-1 overflow-y-auto py-4 px-3 space-y-5"
           aria-label="Menu utama"
@@ -157,7 +155,6 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
           ))}
         </nav>
 
-        {/* ── Bottom nav ── */}
         <div className="px-3 pt-3 pb-2 border-t-[3px] border-black space-y-[3px] shrink-0">
           {NAV_BOTTOM.map((item) => {
             const isActive = pathname === item.href;
@@ -186,10 +183,8 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
           })}
         </div>
 
-        {/* ── User profile ── */}
         <div className="px-3 pb-4 pt-2 shrink-0">
           <div className="flex items-center gap-3 p-3 border-[3px] border-black bg-white shadow-[3px_3px_0px_#000]">
-            {/* Avatar */}
             <div
               style={{ background: SIDEBAR_CONFIG.accentColor }}
               className="w-9 h-9 border-[2px] border-black flex items-center justify-center shrink-0 select-none"
@@ -199,8 +194,6 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
                 {initials}
               </span>
             </div>
-
-            {/* Info */}
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-black text-black truncate leading-tight">
                 {user?.full_name ?? "—"}
@@ -209,8 +202,6 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
                 @{user?.username ?? "—"}
               </p>
             </div>
-
-            {/* Logout */}
             <button
               onClick={handleLogout}
               title="Logout"

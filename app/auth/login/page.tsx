@@ -29,9 +29,10 @@ const LoginPage = () => {
         user: SessionUser;
         message: string;
       }>("/auth/login", { username, password: window.btoa(password) });
+
       setSession({ token: data.token, user: data.user });
       toast.success("Login berhasil!", data.message);
-      window.location.href = "/";
+      window.location.replace("/");
     } catch (err) {
       toast.error("Login gagal", getApiError(err));
     } finally {
@@ -83,6 +84,7 @@ const LoginPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Type your password"
+                  required
                 />
 
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -95,7 +97,7 @@ const LoginPage = () => {
                   className="w-full flex gap-2"
                   variant="outline"
                   type="button"
-                  onClick={() => (window.location.href = "/auth/google")}
+                  onClick={() => (window.location.href = "/api/auth/google")}
                 >
                   <svg className="h-4 w-4" viewBox="0 0 24 24">
                     <path

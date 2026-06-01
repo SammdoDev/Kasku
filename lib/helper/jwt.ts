@@ -7,12 +7,13 @@ const SECRET = new TextEncoder().encode(
 export interface JWTPayload {
   sub: string;
   username: string;
+  full_name?: string; // optional supaya sign-up lama tidak error
   iat?: number;
   exp?: number;
 }
 
 export async function signToken(payload: Omit<JWTPayload, "iat" | "exp">) {
-  return new SignJWT(payload)
+  return new SignJWT(payload as Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
@@ -21,5 +22,5 @@ export async function signToken(payload: Omit<JWTPayload, "iat" | "exp">) {
 
 export async function verifyToken(token: string): Promise<JWTPayload> {
   const { payload } = await jwtVerify(token, SECRET);
-  return payload as unknown as JwtPayload;
+  return payload as unknown as JWTPayload;
 }

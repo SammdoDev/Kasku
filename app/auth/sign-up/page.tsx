@@ -4,13 +4,11 @@ import { useState } from "react";
 import { post, getApiError } from "@/lib/helper/apiService";
 import { GradientMesh } from "@/components/ui/gradient-mesh";
 import {
-  Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/input-component/field-1";
-import { Input } from "@/components/ui/input-component/input";
 import { Button } from "@/components/ui/button-component/button";
 import Link from "next/link";
 import { toast } from "@/components/layout/toast";
@@ -43,7 +41,7 @@ const SignUpPage = () => {
       });
       setSession({ token: data.token, user: data.user });
       toast.success("Registrasi berhasil!", data.message);
-      window.location.href = "/";
+      window.location.replace("/");
     } catch (err) {
       toast.error("Registrasi gagal", getApiError(err));
     } finally {
@@ -53,11 +51,24 @@ const SignUpPage = () => {
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
-      {/* Left — Form */}
+      <div className="bg-muted relative hidden lg:block">
+        <GradientMesh
+          colors={["#bcecf6", "#00aaff", "#ffd447"]}
+          distortion={8}
+          swirl={0.2}
+          speed={1}
+          rotation={90}
+          waveAmp={0.2}
+          waveFreq={20}
+          waveSpeed={0.2}
+          grain={0.06}
+        />
+      </div>
+
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        {/* Logo */}
-        <div className="flex justify-center gap-2 md:justify-start">
+        <div className="flex justify-center gap-2 md:justify-end">
           <Link href="/" aria-label="home" className="flex gap-2 items-center">
+            <FieldLabel>KasKu</FieldLabel>
             <img
               src="/logo-wallet.png"
               alt="Logo"
@@ -65,16 +76,13 @@ const SignUpPage = () => {
               width={50}
               className="h-10 z-10 w-auto hidden dark:block object-contain rounded-full"
             />
-            <FieldLabel>KasKu</FieldLabel>
           </Link>
         </div>
 
-        {/* Form */}
         <div className="flex flex-1 w-full items-center justify-center">
           <div className="w-full max-w-sm">
             <form className="flex flex-col gap-6" onSubmit={handleSignUp}>
               <FieldGroup>
-                {/* Heading */}
                 <div className="flex flex-col items-center gap-1 text-center">
                   <h1 className="text-2xl font-bold">Create an account</h1>
                   <p className="text-muted-foreground text-sm text-balance">
@@ -132,7 +140,7 @@ const SignUpPage = () => {
                   className="w-full flex gap-2"
                   variant="outline"
                   type="button"
-                  onClick={() => (window.location.href = "/auth/google")}
+                  onClick={() => (window.location.href = "/api/auth/google")}
                 >
                   <svg className="h-4 w-4" viewBox="0 0 24 24">
                     <path
@@ -168,20 +176,6 @@ const SignUpPage = () => {
             </form>
           </div>
         </div>
-      </div>
-
-      <div className="bg-muted relative hidden lg:block">
-        <GradientMesh
-          colors={["#bcecf6", "#00aaff", "#ffd447"]}
-          distortion={8}
-          swirl={0.2}
-          speed={1}
-          rotation={90}
-          waveAmp={0.2}
-          waveFreq={20}
-          waveSpeed={0.2}
-          grain={0.06}
-        />
       </div>
     </div>
   );

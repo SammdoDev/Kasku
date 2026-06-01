@@ -62,15 +62,5 @@ export const PATCH = withAuth(async (req: AuthedRequest) => {
     );
   }
 
-  // Sync ke tabel profiles
-  await supabase
-    .from("profiles")
-    .update({
-      full_name: user.full_name,
-      avatar_url: user.avatar_url,
-      currency: user.currency,
-    })
-    .eq("id", req.user.sub);
-
   return NextResponse.json({ user });
 });
