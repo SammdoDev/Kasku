@@ -38,7 +38,7 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
 
   const sm = size === "sm";
   const h = sm ? "h-9" : "h-10";
-  const textSize = sm ? "text-[10px]" : "text-[13px]";
+  const textSize = sm ? "text-[15px]" : "text-[18px]";
   const px = sm ? "px-3" : "px-4";
   const iconSize = sm ? 14 : 16;
 

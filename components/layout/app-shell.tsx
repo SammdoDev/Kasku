@@ -8,10 +8,19 @@ import SidebarMenu from "@/components/layout/sidebar/sidebar-menu";
 import NavbarMenu from "@/components/layout/navbar/navbar-menu";
 import { SIDEBAR_CONFIG } from "@/components/layout/sidebar/sidebar-menu-constant";
 
-// Route yang tidak butuh auth
 const PUBLIC_PATHS = ["/auth/login", "/auth/sign-up", "/auth/callback"];
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+function isTokenExpired(token: string): boolean {
+  try {
+    const [, b64] = token.split(".");
+    const payload = JSON.parse(atob(b64.replace(/-/g, "+").replace(/_/g, "/")));
+    return payload.exp ? Date.now() / 1000 > payload.exp : false;
+  } catch {
+    return true;
+  }
+}
+
+const AppShell = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,7 +36,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     const session = getSession();
-    if (!session?.token) {
+    if (!session?.token || isTokenExpired(session.token)) {
+      clearSession();
       router.replace("/auth/login");
       return;
     }
@@ -39,7 +49,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isPublicPage) return;
     const interval = setInterval(() => {
-      if (!getSession()) {
+      const session = getSession();
+      if (!session?.token || isTokenExpired(session.token)) {
         clearSession();
         router.replace("/auth/login");
       }
@@ -95,4 +106,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       <ToastProvider />
     </div>
   );
-}
+};
+
+export default AppShell;
