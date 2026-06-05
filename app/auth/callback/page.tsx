@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { setSession, getSession } from "@/lib/helper/session";
 
 type Status = "loading" | "success" | "error";
 
+const STEPS = [
+  "Memeriksa session",
+  "Menghubungi server",
+  "Menyimpan sesi",
+  "Mengalihkan...",
+];
+
 export default function AuthCallbackPage() {
   const [status, setStatus] = useState<Status>("loading");
   const [msg, setMsg] = useState("Menyelesaikan login...");
+  const [step, setStep] = useState(0);
+  const [countdown, setCountdown] = useState(3);
+  const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     async function run() {
@@ -15,14 +25,17 @@ export default function AuthCallbackPage() {
         "session_id",
       );
 
+      setStep(0);
+
       if (!sessionId) {
         setStatus("error");
         setMsg("Session tidak ditemukan.");
-        setTimeout(() => (window.location.href = "/auth/login"), 2500);
+        startCountdown("/auth/login");
         return;
       }
 
       try {
+        setStep(1);
         setMsg("Menghubungi server...");
 
         const res = await fetch("/api/auth/session", {
@@ -36,19 +49,18 @@ export default function AuthCallbackPage() {
         if (!res.ok || !data.token) {
           setStatus("error");
           setMsg(data.message ?? "Login gagal.");
-          setTimeout(() => (window.location.href = "/auth/login"), 2500);
+          startCountdown("/auth/login");
           return;
         }
 
+        setStep(2);
         setMsg("Menyimpan sesi...");
 
-        // Decode JWT payload
         const [, b64] = data.token.split(".");
         const payload = JSON.parse(
           atob(b64.replace(/-/g, "+").replace(/_/g, "/")),
         );
 
-        // Simpan session
         setSession({
           token: data.token,
           user: {
@@ -58,33 +70,56 @@ export default function AuthCallbackPage() {
           },
         });
 
-        // Verifikasi storage benar-benar tersimpan sebelum redirect
-        // Poll sampai session terbaca atau timeout 3 detik
         const saved = await waitForSession(3000);
 
         if (!saved) {
           setStatus("error");
           setMsg("Gagal menyimpan sesi, coba login ulang.");
-          setTimeout(() => (window.location.href = "/auth/login"), 2500);
+          startCountdown("/auth/login");
           return;
         }
 
+        setStep(3);
         setStatus("success");
         setMsg("Login berhasil! Mengalihkan...");
         setTimeout(() => window.location.replace("/"), 600);
       } catch {
         setStatus("error");
         setMsg("Terjadi kesalahan jaringan.");
-        setTimeout(() => (window.location.href = "/auth/login"), 2500);
+        startCountdown("/auth/login");
       }
     }
 
     run();
   }, []);
 
+  function startCountdown(redirectTo: string) {
+    setCountdown(3);
+    let secs = 3;
+    countdownRef.current = setInterval(() => {
+      secs--;
+      setCountdown(secs);
+      if (secs <= 0) {
+        clearInterval(countdownRef.current!);
+        window.location.href = redirectTo;
+      }
+    }, 1000);
+  }
+
+  function handleRetry() {
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    window.location.reload();
+  }
+
+  function handleGoLogin() {
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    window.location.href = "/auth/login";
+  }
+
   return (
     <div className="min-h-svh flex items-center justify-center bg-[#f5f0e8] px-4">
       <div className="w-full max-w-sm border-[3px] border-black bg-white shadow-[6px_6px_0px_#000] p-8 flex flex-col items-center gap-6">
+        {/* Icon */}
         <div className="relative">
           {status === "loading" && (
             <div className="w-16 h-16 border-[4px] border-black border-t-[#ffd447] rounded-full animate-spin" />
@@ -123,6 +158,7 @@ export default function AuthCallbackPage() {
           )}
         </div>
 
+        {/* Label */}
         <div className="text-center space-y-1">
           <p className="font-black text-[15px] uppercase tracking-wide text-black">
             {status === "loading" && "Memproses..."}
@@ -132,18 +168,68 @@ export default function AuthCallbackPage() {
           <p className="text-[13px] font-semibold text-black/55">{msg}</p>
         </div>
 
+        {/* Step tracker — loading only */}
+        {status === "loading" && (
+          <div className="w-full flex flex-col gap-2">
+            {STEPS.map((label, i) => (
+              <div key={i} className="flex items-center gap-2.5">
+                <div
+                  className={[
+                    "w-2.5 h-2.5 border-[2px] border-black flex-shrink-0 transition-colors duration-200",
+                    i < step
+                      ? "bg-[#ffd447]"
+                      : i === step
+                        ? "bg-[#ffd447] animate-pulse"
+                        : "bg-white",
+                  ].join(" ")}
+                />
+                <span
+                  className={[
+                    "text-[11px] font-bold uppercase tracking-wide transition-colors duration-200",
+                    i <= step ? "text-black" : "text-black/30",
+                  ].join(" ")}
+                >
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Progress bar — loading only */}
         {status === "loading" && (
           <div className="w-full h-2 border-[2px] border-black bg-white overflow-hidden">
             <div className="h-full bg-[#ffd447] animate-[progress_1.5s_ease-in-out_infinite]" />
           </div>
         )}
 
-        {status !== "loading" && (
+        {/* Success hint */}
+        {status === "success" && (
           <p className="text-[11px] font-bold text-black/35 uppercase tracking-widest">
-            {status === "success"
-              ? "Mengalihkan ke dashboard..."
-              : "Mengalihkan ke login..."}
+            Mengalihkan ke dashboard...
           </p>
+        )}
+
+        {/* Error actions */}
+        {status === "error" && (
+          <div className="w-full flex flex-col gap-3">
+            <p className="text-[11px] font-bold text-black/35 uppercase tracking-widest text-center">
+              Kembali ke login dalam{" "}
+              <span className="text-[#ff4d4d]">{countdown}</span> detik
+            </p>
+            <button
+              onClick={handleRetry}
+              className="w-full py-2.5 border-[3px] border-black bg-[#ffd447] font-black text-[12px] uppercase tracking-wide shadow-[4px_4px_0px_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_#000] transition-all duration-100"
+            >
+              Coba lagi
+            </button>
+            <button
+              onClick={handleGoLogin}
+              className="w-full py-2.5 border-[3px] border-black bg-white font-bold text-[12px] uppercase tracking-wide shadow-[4px_4px_0px_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_#000] transition-all duration-100"
+            >
+              Kembali ke login
+            </button>
+          </div>
         )}
       </div>
 
@@ -158,10 +244,9 @@ export default function AuthCallbackPage() {
   );
 }
 
-/** Poll sessionStorage sampai token terbaca, atau timeout */
 function waitForSession(timeoutMs: number): Promise<boolean> {
   return new Promise((resolve) => {
-    const interval = 50; // cek tiap 50ms
+    const interval = 50;
     let elapsed = 0;
     const timer = setInterval(() => {
       const session = getSession();

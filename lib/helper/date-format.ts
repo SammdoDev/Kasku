@@ -12,3 +12,13 @@ export default function buildMonthOptions() {
   }
   return opts;
 }
+
+export function dateDisplay(date: string | Date) {
+  return new Date(date)
+    .toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "2-digit",
+    })
+    .toUpperCase();
+}

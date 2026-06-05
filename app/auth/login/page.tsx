@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/input-component/field-1";
 import { Button } from "@/components/ui/button-component/button";
 import Link from "next/link";
-import { toast } from "@/components/layout/toast";
+import { toast } from "@/components/layout/for-pages/toast";
 import { SessionUser, setSession } from "@/lib/helper/session";
 import InputText from "@/components/ui/input-component/input-text/input-text";
 

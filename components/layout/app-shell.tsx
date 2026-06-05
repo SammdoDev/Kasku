@@ -1,12 +1,15 @@
+// src/components/layout/app-shell.tsx (atau sesuai path project)
 "use client";
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { getSession, clearSession } from "@/lib/helper/session";
-import { ToastProvider } from "@/components/layout/toast";
 import SidebarMenu from "@/components/layout/sidebar/sidebar-menu";
 import NavbarMenu from "@/components/layout/navbar/navbar-menu";
 import { SIDEBAR_CONFIG } from "@/components/layout/sidebar/sidebar-menu-constant";
+import { ToastProvider } from "./for-pages/toast";
+import { ConfirmDialogProvider } from "./for-pages/confirm-dialog";
+import BottomNavbar from "./bottom-navbar/bottom-navbar";
 
 const PUBLIC_PATHS = ["/auth/login", "/auth/sign-up", "/auth/callback"];
 
@@ -31,17 +34,16 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isPublicPage) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMounted(true);
       return;
     }
-
     const session = getSession();
     if (!session?.token || isTokenExpired(session.token)) {
       clearSession();
       router.replace("/auth/login");
       return;
     }
-
     setMounted(true);
   }, [isPublicPage, router]);
 
@@ -58,10 +60,13 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(interval);
   }, [isPublicPage, router]);
 
+  // Tutup sidebar saat navigasi
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSidebarOpen(false);
   }, [pathname]);
 
+  // Tutup sidebar dengan Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") setSidebarOpen(false);
@@ -84,6 +89,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
       <>
         {children}
         <ToastProvider />
+        <ConfirmDialogProvider />
       </>
     );
   }
@@ -99,11 +105,14 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           onMenuToggle={() => setSidebarOpen((v) => !v)}
           isSidebarOpen={sidebarOpen}
         />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-[84px] lg:pb-6">
+          {" "}
           <div className="h-full">{children}</div>
         </main>
       </div>
+      <BottomNavbar />
       <ToastProvider />
+      <ConfirmDialogProvider />
     </div>
   );
 };

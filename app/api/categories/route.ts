@@ -39,8 +39,13 @@ export const GET = withAuth(async (req: AuthedRequest) => {
 
 // POST /api/categories
 // Body: { name, type, icon?, color? }
-// icon: nama icon Lucide, contoh "Wallet", "ShoppingCart", "Car", "Utensils"
-// color: hex string, contoh "#f97316"
+//
+// icon: OpenMoji hexcode string.
+//   Single codepoint  → "1F4B0"
+//   Multi-codepoint   → "1F9D1-200D-1F4BB"  (joined by hyphens)
+//   Render via: https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@15.1.0/color/svg/{HEXCODE}.svg
+//
+// color: hex string, e.g. "#f97316"
 export const POST = withAuth(async (req: AuthedRequest) => {
   let body: {
     name?: string;
@@ -61,16 +66,24 @@ export const POST = withAuth(async (req: AuthedRequest) => {
     return badRequest("type must be 'income' or 'expense'");
   if (name.trim().length < 1) return badRequest("name cannot be empty");
 
-  // icon harus string alphanumeric (nama Lucide icon), bukan emoji
+  // icon must be an OpenMoji hexcode string.
+  // Valid formats:
+  //   - Single codepoint:   "1F4B0"  (4-6 uppercase hex chars)
+  //   - Multi-codepoint:    "1F9D1-200D-1F4BB"  (segments joined by "-")
+  // Regex: one or more hex segments (4-6 chars) separated by hyphens.
   if (icon !== undefined && icon !== null) {
-    if (typeof icon !== "string" || !/^[A-Za-z0-9]+$/.test(icon)) {
+    if (
+      typeof icon !== "string" ||
+      !/^[0-9A-Fa-f]{4,6}(-[0-9A-Fa-f]{4,6})*$/.test(icon)
+    ) {
       return badRequest(
-        "icon must be a Lucide icon name (e.g. 'Wallet', 'ShoppingCart'). See https://lucide.dev/icons",
+        "icon must be an OpenMoji hexcode (e.g. '1F4B0' or '1F9D1-200D-1F4BB'). " +
+          "See https://openmoji.org/library/ for available emojis.",
       );
     }
   }
 
-  // color harus hex valid
+  // color must be a valid hex color
   if (color !== undefined && color !== null) {
     if (
       typeof color !== "string" ||
@@ -87,7 +100,8 @@ export const POST = withAuth(async (req: AuthedRequest) => {
     .insert({
       user_id: req.user.sub,
       name: name.trim(),
-      icon: icon ?? null,
+      // Normalize to uppercase for consistency with OpenMoji filenames
+      icon: icon ? icon.toUpperCase() : null,
       color: color ?? null,
       type,
     })

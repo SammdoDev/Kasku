@@ -32,10 +32,9 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: LayoutDashboard,
       },
       {
-        label: "Dompet",
-        href: "/dompet",
-        icon: Wallet,
-        badge: 3,
+        label: "Kategori",
+        href: "/kategori",
+        icon: Tag,
       },
       {
         label: "Transaksi",

@@ -1,10 +1,7 @@
-// src/app/api/auth/me/route.ts
-
 import { NextResponse } from "next/server";
 import { withAuth, AuthedRequest } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
-// GET /api/auth/me — ambil data user yang sedang login
 export const GET = withAuth(async (req: AuthedRequest) => {
   const supabase = createServiceClient();
 
@@ -23,9 +20,9 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   return NextResponse.json({ user });
 });
 
-// PATCH /api/auth/me — update profil (full_name, avatar_url, currency)
 export const PATCH = withAuth(async (req: AuthedRequest) => {
   let body: Record<string, unknown>;
+
   try {
     body = await req.json();
   } catch {
@@ -34,6 +31,7 @@ export const PATCH = withAuth(async (req: AuthedRequest) => {
 
   const allowed = ["full_name", "avatar_url", "currency"];
   const updates: Record<string, unknown> = {};
+
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];
   }
@@ -55,7 +53,6 @@ export const PATCH = withAuth(async (req: AuthedRequest) => {
     .single();
 
   if (error || !user) {
-    console.error("[me] update error:", error);
     return NextResponse.json(
       { error: "Failed to update profile" },
       { status: 500 },

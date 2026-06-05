@@ -5,9 +5,11 @@ import { verifyToken, JWTPayload } from "@/lib/helper/jwt";
 
 export type AuthedRequest = NextRequest & { user: JWTPayload };
 
-// Tipe params yang kompatibel dengan Next.js App Router
-// Record<string, string> supaya { id: string } bisa di-assign ke sini
+// Next.js 15: params is a Promise. We resolve it before passing to handler.
 export type RouteContext = { params: Record<string, string> };
+type RawRouteContext = {
+  params: Record<string, string> | Promise<Record<string, string>>;
+};
 
 /**
  * Wraps a route handler dengan JWT auth.
@@ -16,7 +18,7 @@ export type RouteContext = { params: Record<string, string> };
 export function withAuth(
   handler: (req: AuthedRequest, ctx: RouteContext) => Promise<NextResponse>,
 ) {
-  return async (req: NextRequest, ctx: RouteContext) => {
+  return async (req: NextRequest, ctx: RawRouteContext) => {
     try {
       let token = req.cookies.get("token")?.value;
 
@@ -32,7 +34,10 @@ export function withAuth(
       const user = await verifyToken(token);
       (req as AuthedRequest).user = user;
 
-      return handler(req as AuthedRequest, ctx);
+      // Await params in case Next.js 15 passes it as a Promise
+      const resolvedParams = await Promise.resolve(ctx.params);
+
+      return handler(req as AuthedRequest, { params: resolvedParams });
     } catch {
       return NextResponse.json(
         { error: "Invalid or expired token" },

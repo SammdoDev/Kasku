@@ -49,6 +49,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
   const [user, setUser] = useState<SessionUser | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(getSessionUser());
   }, []);
 
@@ -67,7 +68,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
         aria-label={isSidebarOpen ? "Tutup menu" : "Buka menu"}
         aria-expanded={isSidebarOpen}
         className={[
-          "lg:hidden flex items-center justify-center w-9 h-9 border-[3px] border-black font-black",
+          "hidden md:flex lg:hidden items-center justify-center w-9 h-9 border-[3px] border-black font-black",
           "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
           isSidebarOpen
             ? "shadow-none translate-x-[2px] translate-y-[2px]"

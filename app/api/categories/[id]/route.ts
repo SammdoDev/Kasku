@@ -10,16 +10,21 @@ import {
 } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
-type Ctx = { params: { id: string } };
+// withAuth uses RouteContext = { params: Record<string, string> }
+// We cast to get the id safely at runtime.
+function getId(params: Record<string, string>): string {
+  return params["id"] ?? "";
+}
 
 // GET /api/categories/[id]
-export const GET = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
+export const GET = withAuth(async (req: AuthedRequest, { params }) => {
+  const id = getId(params as Record<string, string>);
   const supabase = createServiceClient();
 
   const { data, error } = await supabase
     .from("categories")
     .select("id, name, icon, color, type, created_at, updated_at")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", req.user.sub)
     .single();
 
@@ -29,8 +34,10 @@ export const GET = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
 });
 
 // PATCH /api/categories/[id]
-// icon: nama Lucide icon (e.g. "Wallet"), bukan emoji
-export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
+// icon: OpenMoji hexcode (e.g. "1F4B0" or "1F9D1-200D-1F4BB")
+export const PATCH = withAuth(async (req: AuthedRequest, { params }) => {
+  const id = getId(params as Record<string, string>);
+
   let body: {
     name?: string;
     icon?: string | null;
@@ -47,10 +54,15 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
     return badRequest("type must be 'income' or 'expense'");
   }
 
+  // icon must be an OpenMoji hexcode or null (to clear it)
   if (body.icon !== undefined && body.icon !== null) {
-    if (typeof body.icon !== "string" || !/^[A-Za-z0-9]+$/.test(body.icon)) {
+    if (
+      typeof body.icon !== "string" ||
+      !/^[0-9A-Fa-f]{4,6}(-[0-9A-Fa-f]{4,6})*$/.test(body.icon)
+    ) {
       return badRequest(
-        "icon must be a Lucide icon name (e.g. 'Wallet', 'ShoppingCart'). See https://lucide.dev/icons",
+        "icon must be an OpenMoji hexcode (e.g. '1F4B0' or '1F9D1-200D-1F4BB'). " +
+          "See https://openmoji.org/library/ for available emojis.",
       );
     }
   }
@@ -67,7 +79,12 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
   const allowed = ["name", "icon", "color", "type"];
   const updates: Record<string, unknown> = {};
   for (const key of allowed) {
-    if (key in body) updates[key] = (body as Record<string, unknown>)[key];
+    if (key in body) {
+      const val = (body as Record<string, unknown>)[key];
+      // Normalize icon hexcode to uppercase for OpenMoji CDN consistency
+      updates[key] =
+        key === "icon" && typeof val === "string" ? val.toUpperCase() : val;
+    }
   }
 
   if (Object.keys(updates).length === 0)
@@ -78,7 +95,7 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
   const { data: existing } = await supabase
     .from("categories")
     .select("id")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", req.user.sub)
     .single();
 
@@ -87,7 +104,7 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
   const { data, error } = await supabase
     .from("categories")
     .update(updates)
-    .eq("id", params.id)
+    .eq("id", id)
     .select("id, name, icon, color, type, updated_at")
     .single();
 
@@ -100,22 +117,20 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
 });
 
 // DELETE /api/categories/[id]
-export const DELETE = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
+export const DELETE = withAuth(async (req: AuthedRequest, { params }) => {
+  const id = getId(params as Record<string, string>);
   const supabase = createServiceClient();
 
   const { data: existing } = await supabase
     .from("categories")
     .select("id")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", req.user.sub)
     .single();
 
   if (!existing) return notFound("Category");
 
-  const { error } = await supabase
-    .from("categories")
-    .delete()
-    .eq("id", params.id);
+  const { error } = await supabase.from("categories").delete().eq("id", id);
 
   if (error) {
     console.error("[categories] delete error:", error);
