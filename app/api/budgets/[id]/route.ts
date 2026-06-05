@@ -10,7 +10,7 @@ import {
 } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
-type Ctx = { params: { id: string } };
+type Ctx = { params: Record<string, string> };
 
 const VALID_PERIODS = ["daily", "weekly", "monthly", "yearly"];
 

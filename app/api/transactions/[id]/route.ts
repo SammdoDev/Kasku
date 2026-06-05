@@ -10,7 +10,7 @@ import {
 } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
-type Ctx = { params: { id: string } };
+type Ctx = { params: Record<string, string> };
 
 // GET /api/transactions/[id]
 export const GET = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
