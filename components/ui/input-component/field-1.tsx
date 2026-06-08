@@ -100,7 +100,7 @@ function FieldSeparator({
     >
       <Separator className="absolute inset-0 top-1/2" />
       {children && (
-        <span className="bg-transparent text-black/60 font-bold uppercase tracking-wide text-xs relative mx-auto block w-fit px-3">
+        <span className="bg-white text-black/60 font-bold uppercase tracking-wide text-xs relative mx-auto block w-fit px-3">
           {children}
         </span>
       )}
