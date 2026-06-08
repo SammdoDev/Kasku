@@ -3,6 +3,7 @@ import { withAuth, AuthedRequest } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
 export const GET = withAuth(async (req: AuthedRequest) => {
+  
   const supabase = createServiceClient();
 
   const { data: user, error } = await supabase

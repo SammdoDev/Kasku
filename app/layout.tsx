@@ -11,7 +11,9 @@ export const metadata: Metadata = {
     "Aplikasi pencatatan keuangan untuk mengatur pemasukan dan pengeluaran secara praktis.",
   icons: {
     icon: "/logo-wallet.png",
+    apple: "/icon-192.png",
   },
+  manifest: "/manifest.json",
 };
 
 const spaceGrotesk = Space_Grotesk({
@@ -26,6 +28,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body className={`${spaceGrotesk.variable} antialiased`}>
         <AppShell>{children}</AppShell>
       </body>

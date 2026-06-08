@@ -27,6 +27,7 @@ interface KategoriState {
   addCategory: (c: Category) => void;
   updateCategory: (c: Category) => void;
   removeCategory: (id: string) => void;
+  setEditTarget: (t: Category | null) => void;
 }
 
 export const useKategoriStore = create<KategoriState>((set) => ({
@@ -47,4 +48,5 @@ export const useKategoriStore = create<KategoriState>((set) => ({
     set((s) => ({ list: s.list.map((x) => (x.id === c.id ? c : x)) })),
   removeCategory: (id) =>
     set((s) => ({ list: s.list.filter((x) => x.id !== id) })),
+  setEditTarget: (t: Category | null) => set({ editTarget: t })
 }));

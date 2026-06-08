@@ -14,14 +14,14 @@ export interface QuickAccessItem {
 
 const DEFAULT_ITEMS: QuickAccessItem[] = [
   {
-    href: "/transaksi",
-    label: "Buku Besar",
+    href: "/metode-pembayaran",
+    label: "Metode Pembayaran",
     icon: "/best-seller.svg",
     bgColor: "#F9C74F",
   },
   {
-    href: "/transaksi?filter=berulang",
-    label: "Berulang",
+    href: "/tag-transaksi",
+    label: "Tag Transaksi",
     icon: "/calendar.svg",
     bgColor: "#90E0EF",
   },
@@ -38,7 +38,7 @@ const DEFAULT_ITEMS: QuickAccessItem[] = [
     bgColor: "#B7E4C7",
   },
   {
-    href: "/summary",
+    href: "/ringkasan",
     label: "Ringkasan",
     icon: "/bar-graph.svg",
     bgColor: "#C77DFF",
@@ -77,10 +77,7 @@ const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
                 href={item.href}
                 className="flex flex-col items-center gap-2 lg:gap-1 group focus-visible:outline-none"
               >
-                <div
-                  className="box"
-                  style={{ background: item.bgColor }}
-                >
+                <div className="box" style={{ background: item.bgColor }}>
                   <Image
                     src={item.icon}
                     alt=""

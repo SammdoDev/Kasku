@@ -8,7 +8,7 @@ export type AuthedRequest = NextRequest & { user: JWTPayload };
 // Next.js 15: params is a Promise. We resolve it before passing to handler.
 export type RouteContext = { params: Record<string, string> };
 type RawRouteContext = {
-  params: Record<string, string> | Promise<Record<string, string>>;
+  params: Promise<Record<string, string>>;
 };
 
 /**

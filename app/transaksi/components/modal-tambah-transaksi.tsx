@@ -8,6 +8,8 @@ import CategoryGrid, { CategoryItem } from "./category-grid";
 import TransactionBar from "./transaction-bar";
 import NumPad from "./num-pad";
 import NoteDialog from "./note-dialog";
+import ModalKategori from "@/app/kategori/components/modal-kategori"; // sesuaikan path
+import { useKategoriStore } from "@/app/kategori/store/kategori-store"; // sesuaikan path
 
 const TIPE_OPTIONS = [
   { label: "PENGELUARAN", value: "expense" },
@@ -32,41 +34,36 @@ const ModalTambahTransaksi = ({
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [paymentMethodId, setPaymentMethodId] = useState("");
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+  const [showModalKategori, setShowModalKategori] = useState(false);
 
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loadingCats, setLoadingCats] = useState(false);
 
+  const setEditTarget = useKategoriStore((s) => s.setEditTarget);
+
+  const fetchCats = async () => {
+    setLoadingCats(true);
+    setCategoryId(null);
+    try {
+      const res = await get<{ categories: CategoryItem[] }>(
+        `/categories?type=${type}`,
+      );
+      setCategories(res.categories);
+    } catch (err) {
+      toast.error("Gagal memuat kategori", getApiError(err));
+    } finally {
+      setLoadingCats(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCats = async () => {
-      setLoadingCats(true);
-      setCategoryId(null);
-      try {
-        const res = await get<{ categories: CategoryItem[] }>(
-          `/categories?type=${type}`,
-        );
-        setCategories(res.categories);
-      } catch (err) {
-        toast.error("Gagal memuat kategori", getApiError(err));
-      } finally {
-        setLoadingCats(false);
-      }
-    };
     fetchCats();
   }, [type]);
 
   const handleNumPress = (key: string) => {
-    if (key === "day") {
-      // TODO: open date picker
-      return;
-    }
-    if (key === "acc") {
-      // TODO: open account picker
-      return;
-    }
-    if (key === "bank") {
-      // TODO: open payment method picker
-      return;
-    }
+    if (key === "day") return;
+    if (key === "acc") return;
+    if (key === "bank") return;
     if (key === "." && amount.includes(".")) return;
     if (amount === "0" && key !== ".") {
       setAmount(key);
@@ -118,6 +115,11 @@ const ModalTambahTransaksi = ({
     }
   };
 
+  const handleOpenAddKategori = () => {
+    setEditTarget(null); // pastikan mode tambah, bukan edit
+    setShowModalKategori(true);
+  };
+
   return (
     <div className="flex flex-col">
       <div className="pt-5 pb-3 mb-2">
@@ -128,6 +130,7 @@ const ModalTambahTransaksi = ({
           showAll={false}
         />
       </div>
+
       <NoteDialog
         open={noteDialogOpen}
         value={note}
@@ -135,30 +138,41 @@ const ModalTambahTransaksi = ({
         onClose={() => setNoteDialogOpen(false)}
       />
 
-      <CategoryGrid
-        categories={categories}
-        selected={categoryId}
-        onSelect={setCategoryId}
-        loading={loadingCats}
-        onAddCategory={() => {
-          window.open("/kategori", "_blank");
-        }}
-      />
+      {showModalKategori ? (
+        <div className="px-4 py-3">
+          <ModalKategori
+            onClose={() => setShowModalKategori(false)}
+            onSuccess={() => {
+              setShowModalKategori(false);
+              fetchCats(); // refetch setelah tambah kategori
+            }}
+          />
+        </div>
+      ) : (
+        <>
+          <CategoryGrid
+            categories={categories}
+            selected={categoryId}
+            onSelect={setCategoryId}
+            loading={loadingCats}
+            onAddCategory={handleOpenAddKategori}
+          />
 
-      <div className="fixed bottom-0 left-0 right-0">
-        <TransactionBar
-          amount={amount}
-          note={note}
-          onNoteClick={() => setNoteDialogOpen(true)}
-        />
-
-        <NumPad
-          onPress={handleNumPress}
-          onBackspace={handleBackspace}
-          onSubmit={handleSubmit}
-          loading={loading}
-        />
-      </div>
+          <div className="fixed bottom-0 left-0 right-0">
+            <TransactionBar
+              amount={amount}
+              note={note}
+              onNoteClick={() => setNoteDialogOpen(true)}
+            />
+            <NumPad
+              onPress={handleNumPress}
+              onBackspace={handleBackspace}
+              onSubmit={handleSubmit}
+              loading={loading}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
