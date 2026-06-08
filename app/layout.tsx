@@ -33,6 +33,17 @@ export default function RootLayout({
       </head>
       <body className={`${spaceGrotesk.variable} antialiased`}>
         <AppShell>{children}</AppShell>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
