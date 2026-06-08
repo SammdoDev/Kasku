@@ -83,7 +83,7 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({
-    message: "Akun berhasil dibuat! Selamat datang di KasKu.",
+    message: "Akun berhasil dibuat! Selamat datang di Cashora.",
     user: {
       id: user.id,
       username: user.username,

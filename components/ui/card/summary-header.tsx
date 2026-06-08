@@ -112,7 +112,7 @@ export const SummaryCardsDesktop = ({
           Dashboard
         </h1>
         <p className="mt-1 text-[9px] tracking-wide text-[#999] uppercase">
-          {loading ? "Memuat data..." : `${monthLabel} · KasKu`}
+          {loading ? "Memuat data..." : `${monthLabel} · Cashora`}
         </p>
       </div>
 

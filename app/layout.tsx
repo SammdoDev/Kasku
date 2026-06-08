@@ -6,7 +6,7 @@ import "./globals.css";
 import AppShell from "@/components/layout/app-shell";
 
 export const metadata: Metadata = {
-  title: "KasKu App",
+  title: "Cashora App",
   description:
     "Aplikasi pencatatan keuangan untuk mengatur pemasukan dan pengeluaran secara praktis.",
   icons: {

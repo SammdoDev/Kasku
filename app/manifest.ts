@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "KasKu App",
-    short_name: "KasKu",
+    name: "Cashora App",
+    short_name: "Cashora",
     description: "Aplikasi keuangan pribadi",
     start_url: "/",
     display: "standalone",

@@ -52,7 +52,7 @@ const LoginPage = () => {
               width={50}
               className="h-10 z-10 w-auto hidden dark:block object-contain rounded-full"
             />
-            <FieldLabel>KasKu</FieldLabel>
+            <FieldLabel>Cashora</FieldLabel>
           </Link>
         </div>
 

@@ -80,7 +80,7 @@ export const NAV_BOTTOM: NavItem[] = [
 ];
 
 export const SIDEBAR_CONFIG = {
-  appName: "KasKu",
+  appName: "Cashora",
   sidebarWidth: "220px",
   accentColor: "#F5C518",
   bgColor: "#F5F0E8",

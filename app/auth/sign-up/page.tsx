@@ -68,7 +68,7 @@ const SignUpPage = () => {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-end">
           <Link href="/" aria-label="home" className="flex gap-2 items-center">
-            <FieldLabel>KasKu</FieldLabel>
+            <FieldLabel>Cashora</FieldLabel>
             <img
               src="/logo-wallet.png"
               alt="Logo"
