@@ -13,7 +13,6 @@ export const metadata: Metadata = {
     icon: "/logo-wallet.png",
     apple: "/icon-192.png",
   },
-  manifest: "/manifest.json",
 };
 
 const spaceGrotesk = Space_Grotesk({
