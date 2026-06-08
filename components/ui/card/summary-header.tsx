@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import formatIDR from "@/lib/helper/currency-format";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
+import MonthFilter from "../input-component/month-filter/month-filter";
 
 interface SummaryData {
   balance: number;
@@ -24,49 +25,24 @@ type Props = {
   onNext: () => void;
 };
 
-/* ── Skeleton pill ───────────────────────────────────────────────── */
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`rounded-lg bg-black/10 animate-pulse ${className}`} />
 );
 
-/* ── Mobile summary header ───────────────────────────────────────── */
 export const SummaryHeaderMobile = ({
   monthLabel,
   summary,
   loading,
-  onPrev,
-  onNext,
 }: Props) => {
   const month = monthLabel.split(" ")[0];
 
   return (
     <div style={{ fontFamily: DASHBOARD_FONT }}>
-      {/* Month selector */}
-      <div className="flex items-center gap-2 mb-4">
-        <button
-          onClick={onPrev}
-          className="w-8 h-8 rounded-xl border-[2.5px] border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
-          aria-label="Bulan sebelumnya"
-        >
-          <ChevronLeft size={14} strokeWidth={3} />
-        </button>
-        <div className="flex-1 h-8 rounded-xl border-[2.5px] border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_#000]">
-          <span className="text-[11px] font-black uppercase tracking-widest">
-            {monthLabel}
-          </span>
-        </div>
-        <button
-          onClick={onNext}
-          className="w-8 h-8 rounded-xl border-[2.5px] border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all"
-          aria-label="Bulan berikutnya"
-        >
-          <ChevronRight size={14} strokeWidth={3} />
-        </button>
+      <div className="flex items-center gap-2 mb-4 justify-end">
+        <MonthFilter size="sm" />
       </div>
 
-      {/* Income + Expense row */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Pengeluaran */}
         <div>
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingDown
@@ -87,7 +63,6 @@ export const SummaryHeaderMobile = ({
           )}
         </div>
 
-        {/* Pemasukan */}
         <div>
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingUp
@@ -109,7 +84,6 @@ export const SummaryHeaderMobile = ({
         </div>
       </div>
 
-      {/* Balance */}
       {!loading && summary && (
         <div className="flex items-center gap-1.5 mt-2">
           <span className="text-[11px] font-black text-black/40">
@@ -124,7 +98,6 @@ export const SummaryHeaderMobile = ({
   );
 };
 
-/* ── Desktop summary cards row ───────────────────────────────────── */
 export const SummaryCardsDesktop = ({
   monthLabel,
   summary,
@@ -133,7 +106,6 @@ export const SummaryCardsDesktop = ({
   onNext,
 }: Props) => (
   <div style={{ fontFamily: DASHBOARD_FONT }}>
-    {/* Header row */}
     <div className="flex items-center justify-between mb-5">
       <div>
         <h1 className="text-xl font-black leading-none tracking-tight text-[#1a1a1a] uppercase">
@@ -144,7 +116,6 @@ export const SummaryCardsDesktop = ({
         </p>
       </div>
 
-      {/* Month nav */}
       <div className="flex items-center gap-2">
         <button
           onClick={onPrev}
@@ -168,7 +139,6 @@ export const SummaryCardsDesktop = ({
       </div>
     </div>
 
-    {/* Stat cards */}
     <div className="grid grid-cols-3 gap-3">
       <StatCard
         label="Saldo Total"
@@ -194,7 +164,6 @@ export const SummaryCardsDesktop = ({
   </div>
 );
 
-/* ── Single stat card (desktop) ──────────────────────────────────── */
 const StatCard = ({
   label,
   value,

@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import formatIDR from "@/lib/helper/currency-format";
-import { ArrowRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 
 export interface RecentTransaction {
   id: string;
-  date: string; // ISO string
+  date: string;
   description: string;
   category_name: string | null;
   category_icon: string | null;
@@ -22,29 +23,9 @@ type Props = {
   limit?: number;
 };
 
-// Emoji fallback sama seperti CategorySpendCard
-const ICON_FALLBACK_MAP: [string[], string][] = [
-  [["makan", "food", "resto", "kuliner"], "🍔"],
-  [["transport", "bensin", "ojek", "grab", "gojek"], "🚗"],
-  [["belanja", "shop", "fashion", "pakaian"], "🛍️"],
-  [["listrik", "air", "tagihan", "utility", "pulsa", "internet"], "💡"],
-  [["kesehatan", "obat", "dokter", "medis"], "💊"],
-  [["hiburan", "nonton", "game", "streaming"], "🎮"],
-  [["pendidikan", "kursus", "buku", "sekolah"], "📚"],
-  [["investasi", "tabungan", "nabung"], "💰"],
-  [["rumah", "kos", "sewa", "kontrakan"], "🏠"],
-  [["gaji", "salary", "pendapatan"], "💼"],
-  [["lainnya", "other"], "📦"],
-];
-
-function resolveIcon(icon: string | null, name: string | null): string {
+function resolveHexcode(icon: string | null): string {
   if (icon && icon.trim().length > 0) return icon;
-  if (!name) return "📦";
-  const lower = name.toLowerCase();
-  for (const [keys, emoji] of ICON_FALLBACK_MAP) {
-    if (keys.some((k) => lower.includes(k))) return emoji;
-  }
-  return "📦";
+  return "1F4AC";
 }
 
 function formatRelativeDate(iso: string): string {
@@ -63,7 +44,6 @@ function formatRelativeDate(iso: string): string {
   return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
 }
 
-// Skeleton row
 const SkeletonRow = () => (
   <div className="flex items-center gap-3 py-2.5 animate-pulse">
     <div className="w-9 h-9 shrink-0 bg-gray-100 border-[2px] border-[#e5e5e5]" />
@@ -84,10 +64,9 @@ const RecentTransactionsCard = ({
 
   return (
     <div
-      className="border-[2.5px] border-[#1a1a1a] bg-white p-3.5"
+      className="border-[2.5px] h-full border-[#1a1a1a] bg-white p-3.5 shadow-brutal-lg"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
-      {/* Header */}
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] font-black tracking-[0.3px] text-[#1a1a1a] uppercase">
           Transaksi Terkini
@@ -97,33 +76,28 @@ const RecentTransactionsCard = ({
           className="flex items-center gap-1 text-[9px] font-black text-[#555] hover:text-black uppercase tracking-widest transition-colors group"
         >
           Lihat Semua
-          <ArrowRight
-            size={10}
+          <ChevronRight
+            size={13}
             strokeWidth={3}
-            className="group-hover:translate-x-[2px] transition-transform duration-100"
+            className="group-hover:translate-x-0.5 transition-transform duration-100"
           />
         </Link>
       </div>
 
-      {/* Divider */}
       <div className="border-t-[1.5px] border-dashed border-[#e5e5e5] mb-1" />
 
-      {/* Rows */}
       <div className="flex flex-col">
         {loading ? (
           Array.from({ length: limit }).map((_, i) => <SkeletonRow key={i} />)
         ) : items.length === 0 ? (
           <div className="py-8 text-center">
-            <span className="text-2xl block mb-2" aria-hidden="true">
-              📭
-            </span>
             <span className="text-[10px] font-black text-[#bbb] tracking-widest uppercase">
               Belum ada transaksi
             </span>
           </div>
         ) : (
           items.map((txn, idx) => {
-            const icon = resolveIcon(txn.category_icon, txn.category_name);
+            const hexcode = resolveHexcode(txn.category_icon);
             const isIncome = txn.type === "income";
             const bgColor = txn.category_color
               ? `${txn.category_color}22`
@@ -135,18 +109,20 @@ const RecentTransactionsCard = ({
 
             return (
               <div key={txn.id}>
-                {idx > 0 && <div className="border-t-[1px] border-[#f0f0f0]" />}
+                {idx > 0 && <div className="border-t border-[#f0f0f0]" />}
                 <div className="flex items-center gap-3 py-2.5">
-                  {/* Icon */}
                   <div
-                    className="w-9 h-9 shrink-0 border-[2px] border-[#1a1a1a] flex items-center justify-center text-[15px] select-none shadow-[2px_2px_0px_#1a1a1a]"
+                    className="w-9 h-9 shrink-0 border-2 flex items-center justify-center select-none shadow-[2px_2px_0px_#1a1a1a]"
                     style={{ background: bgColor, borderColor }}
                     aria-hidden="true"
                   >
-                    {icon}
+                    <OpenmojiImg
+                      hexcode={hexcode}
+                      size={22}
+                      alt={txn.category_name ?? ""}
+                    />
                   </div>
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-extrabold text-[#1a1a1a] truncate leading-tight">
                       {txn.description}
@@ -158,7 +134,6 @@ const RecentTransactionsCard = ({
                     </p>
                   </div>
 
-                  {/* Amount */}
                   <span
                     className={[
                       "text-[12px] font-black shrink-0 tabular-nums",
@@ -175,21 +150,18 @@ const RecentTransactionsCard = ({
         )}
       </div>
 
-      {/* Footer total jika ada data */}
       {!loading && items.length > 0 && (
-        <>
-          <div className="border-t-[1.5px] border-dashed border-[#e5e5e5] mt-1 pt-2.5 flex items-center justify-between">
-            <span className="text-[8px] font-black text-[#bbb] tracking-widest uppercase">
-              {items.length} transaksi ditampilkan
-            </span>
-            <Link
-              href="/transaksi"
-              className="text-[8px] font-black text-[#555] hover:text-black uppercase tracking-widest underline underline-offset-2 decoration-[#ddd] hover:decoration-black transition-colors"
-            >
-              Semua Transaksi →
-            </Link>
-          </div>
-        </>
+        <div className="border-t-[1.5px] border-dashed border-[#e5e5e5] mt-1 pt-2.5 flex items-center justify-between">
+          <span className="text-[8px] font-black text-[#bbb] tracking-widest uppercase">
+            {items.length} transaksi ditampilkan
+          </span>
+          <Link
+            href="/transaksi"
+            className="text-[8px] font-black text-[#555] hover:text-black uppercase tracking-widest underline underline-offset-2 decoration-[#ddd] hover:decoration-black transition-colors"
+          >
+            Semua Transaksi →
+          </Link>
+        </div>
       )}
     </div>
   );

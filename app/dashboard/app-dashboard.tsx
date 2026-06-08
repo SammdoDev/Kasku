@@ -26,6 +26,22 @@ interface CategorySpend {
   total: number;
   percent: number;
 }
+
+interface RawTransaction {
+  id: string;
+  type: "income" | "expense";
+  amount: number;
+  note: string | null;
+  date: string;
+  category: {
+    id: string;
+    icon: string | null;
+    name: string;
+    color: string | null;
+  } | null;
+  payment_method: unknown;
+}
+
 interface DailyPoint {
   date: string;
   income: number;
@@ -59,10 +75,9 @@ interface DashboardResponse {
   daily_trend: DailyPoint[];
   monthly_trend: MonthlyPoint[];
   budget_summary: BudgetItem[];
-  recent_transactions: RecentTransaction[];
+  recent_transactions: RawTransaction[];
 }
 
-// ── Error banner ──────────────────────────────────────────────────
 const ErrorBanner = ({
   onRetry,
   mobile,
@@ -73,7 +88,7 @@ const ErrorBanner = ({
   <div
     className={`flex items-center justify-between gap-3 ${
       mobile
-        ? "border-[2px] border-red-400 bg-red-50 rounded-2xl px-3.5 py-2.5"
+        ? "border-2 border-red-400 bg-red-50 rounded-2xl px-3.5 py-2.5"
         : "border-[2.5px] border-red-500 bg-red-100 px-3.5 py-2.5 mb-4"
     }`}
     style={{ fontFamily: DASHBOARD_FONT }}
@@ -96,7 +111,6 @@ const ErrorBanner = ({
   </div>
 );
 
-// ── Dashboard ─────────────────────────────────────────────────────
 const AppDashboard = () => {
   const { month, monthLabel, prevMonth, nextMonth } = useMonthFilter();
   const [data, setData] = useState<DashboardResponse | null>(null);
@@ -121,12 +135,8 @@ const AppDashboard = () => {
     fetchDashboard(month);
   }, [month, fetchDashboard]);
 
-  // ── Derived values ──────────────────────────────────────────────
   const summary = data?.summary;
-  const hasCategory = (data?.spending_by_category.length ?? 0) > 0;
-  const hasBudget = (data?.budget_summary.length ?? 0) > 0;
 
-  // sparkline data for summary cards
   const sparkIncome = data?.daily_trend.map((d) => d.income) ?? [];
   const sparkExpense = data?.daily_trend.map((d) => d.expense) ?? [];
   const sparkBalance = data?.daily_trend.map((d) => d.net) ?? [];
@@ -142,79 +152,70 @@ const AppDashboard = () => {
     sparkBalance,
   };
 
+  const recentTransactions: RecentTransaction[] = (
+    data?.recent_transactions ?? []
+  ).map((t) => ({
+    id: t.id,
+    date: t.date,
+    description: t.note ?? t.category?.name ?? "Transaksi",
+    category_name: t.category?.name ?? null,
+    category_icon: t.category?.icon ?? null,
+    category_color: t.category?.color ?? null,
+    amount: t.amount,
+    type: t.type,
+  }));
+
   return (
     <div
-      className="card w-full min-h-full"
+      className="card md:m-4 md:rounded-2xl border-[2.5px] border-[#1a1a1a] bg-white p-4 md:p-6"
       style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
-      {/* ── MOBILE ─────────────────────────────────────────────── */}
-      <div className="lg:hidden px-4 pt-4 pb-6 flex flex-col gap-4">
+      <div className="lg:hidden px-4 pt-4 pb-[84px] flex flex-col gap-4">
         {error && !loading && (
           <ErrorBanner onRetry={() => fetchDashboard(month)} mobile />
         )}
-
         <SummaryHeaderMobile {...monthNavProps} />
-
         <QuickAccessGrid loading={loading} />
-
         <RecentTransactionsCard
-          transactions={data?.recent_transactions ?? []}
+          transactions={recentTransactions}
           loading={loading}
           limit={5}
         />
-
-        {(loading || hasCategory) && (
-          <CategorySpendCard
-            categories={data?.spending_by_category ?? []}
-            monthLabel={monthLabel}
-            loading={loading}
-          />
-        )}
-
-        {!loading && hasBudget && (
-          <BudgetSummaryCard budgets={data!.budget_summary} variant="mobile" />
-        )}
+        <CategorySpendCard
+          categories={data?.spending_by_category ?? []}
+          monthLabel={monthLabel}
+          loading={loading}
+        />
+        <BudgetSummaryCard
+          budgets={data?.budget_summary ?? []}
+          variant="mobile"
+        />
       </div>
 
-      {/* ── DESKTOP ────────────────────────────────────────────── */}
+      {/* DESKTOP */}
       <div className="hidden lg:block px-6 py-6">
         <SummaryCardsDesktop {...monthNavProps} />
-
         {error && !loading && (
           <ErrorBanner onRetry={() => fetchDashboard(month)} />
         )}
-
-        {/* Quick access */}
-        <div className="mt-4 mb-4">
-          <QuickAccessGrid loading={loading} />
-        </div>
-
-        {/* 3-col grid */}
-        <div className="grid grid-cols-3 gap-3 items-start">
-          {/* Left 2 cols */}
+        <div className="grid grid-cols-3 gap-3 items-stretch mt-4">
           <div className="col-span-2 flex flex-col gap-3">
             <RecentTransactionsCard
-              transactions={data?.recent_transactions ?? []}
+              transactions={recentTransactions}
               loading={loading}
               limit={5}
             />
           </div>
-
-          {/* Right 1 col */}
-          <div className="col-span-1 flex flex-col gap-3 sticky top-[79px]">
-            {(loading || hasCategory) && (
-              <CategorySpendCard
-                categories={data?.spending_by_category ?? []}
-                monthLabel={monthLabel}
-                loading={loading}
-              />
-            )}
-            {!loading && hasBudget && (
-              <BudgetSummaryCard
-                budgets={data!.budget_summary}
-                variant="desktop"
-              />
-            )}
+          <div className="col-span-1 flex flex-col gap-3 sticky top-19.75">
+            <CategorySpendCard
+              categories={data?.spending_by_category ?? []}
+              monthLabel={monthLabel}
+              loading={loading}
+            />
+            <BudgetSummaryCard
+              budgets={data?.budget_summary ?? []}
+              variant="desktop"
+            />
           </div>
         </div>
       </div>

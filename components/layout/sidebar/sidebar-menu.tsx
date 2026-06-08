@@ -120,8 +120,8 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
                           "flex items-center gap-3 px-3 py-[9px] text-[13.5px] font-bold",
                           "border-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
                           isActive
-                            ? "border-black text-black shadow-[3px_3px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
-                            : "border-transparent text-black/65 hover:border-black hover:bg-white hover:shadow-[2px_2px_0px_#000] hover:-translate-x-[1px] hover:-translate-y-[1px]",
+                            ? "border-black text-black shadow-brutal -translate-x-0.5 -translate-y-0.5"
+                            : "border-transparent text-black/65 hover:border-black hover:bg-white hover:shadow-[2px_2px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5",
                         ].join(" ")}
                         style={
                           isActive
@@ -170,7 +170,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
                   "flex items-center gap-3 px-3 py-[9px] text-[13.5px] font-bold",
                   "border-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
                   isActive
-                    ? "border-black text-black shadow-[3px_3px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
+                    ? "border-black text-black shadow-brutal -translate-x-[1px] -translate-y-[1px]"
                     : "border-transparent text-black/55 hover:border-black hover:bg-white hover:shadow-[2px_2px_0px_#000] hover:-translate-x-[1px] hover:-translate-y-[1px]",
                 ].join(" ")}
                 style={
@@ -185,7 +185,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
         </div>
 
         <div className="px-3 pb-4 pt-2 shrink-0">
-          <div className="flex items-center gap-3 p-3 border-[3px] border-black bg-white shadow-[3px_3px_0px_#000]">
+          <div className="flex items-center gap-3 p-3 border-[3px] border-black bg-white shadow-brutal">
             <div
               style={{ background: SIDEBAR_CONFIG.accentColor }}
               className="w-9 h-9 border-[2px] border-black flex items-center justify-center shrink-0 select-none"

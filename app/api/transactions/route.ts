@@ -116,6 +116,9 @@ export const POST = withAuth(async (req: AuthedRequest) => {
   };
   try {
     body = await req.json();
+
+    console.log("[transactions POST] body:", body);
+    console.log("[transactions POST] user:", req.user);
   } catch {
     return badRequest("Invalid JSON body");
   }

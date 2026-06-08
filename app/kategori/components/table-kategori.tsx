@@ -4,10 +4,11 @@ import React from "react";
 import { TableDataComponent } from "@/components/ui/table-component/table-data-component";
 import type { TableHeader } from "@/components/ui/table-component/table-data-component";
 import { useKategoriStore, type Category } from "../store/kategori-store";
-import { EMOJI_OPTIONS, OpenmojiImg } from "./emoji-picker";
+import { OpenmojiImg } from "./emoji-picker";
 import { confirm } from "@/components/layout/for-pages/confirm-dialog";
 import { Button } from "@/components/ui/button-component/button";
 import { dateDisplay } from "@/lib/helper/date-format";
+import { EMOJI_OPTIONS } from "./emoji-option";
 
 interface TabelKategoriProps {
   onEdit: (c: Category) => void;

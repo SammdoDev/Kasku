@@ -76,9 +76,9 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
             "h-9 w-full min-w-0 border-2 border-black bg-white px-3",
             "text-[11px] font-mono font-bold tracking-wide",
             "placeholder:text-black/30",
-            "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-            "focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-            "focus:translate-x-[2px] focus:translate-y-[2px] transition-all duration-100",
+            "shadow-brutal-lg",
+            "focus:outline-none focus:shadow-brutal-sm",
+            "focus:translate-x-0.5 focus:translate-y-0.5 transition-all duration-100",
             "md:flex-1",
           ].join(" ")}
         />
@@ -121,8 +121,8 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
                 ? "bg-black text-white shadow-none translate-x-[3px] translate-y-[3px]"
                 : [
                     "bg-white text-black",
-                    "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-                    "hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                    "shadow-brutal-lg",
+                    "hover:shadow-brutal-sm",
                     "hover:translate-x-[2px] hover:translate-y-[2px]",
                     "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
                   ].join(" "),

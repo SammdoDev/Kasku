@@ -72,7 +72,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
           "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
           isSidebarOpen
             ? "shadow-none translate-x-[2px] translate-y-[2px]"
-            : "bg-white shadow-[3px_3px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]",
+            : "bg-white shadow-brutal hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]",
         ].join(" ")}
         style={isSidebarOpen ? { background: SIDEBAR_CONFIG.accentColor } : {}}
       >
@@ -92,7 +92,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
       <div className="flex items-center gap-2 shrink-0">
         <button
           aria-label={`Notifikasi${showBadge ? `, ${NAVBAR_CONFIG.notificationCount} baru` : ""}`}
-          className="relative flex items-center justify-center w-9 h-9 border-[3px] border-black bg-white shadow-[3px_3px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
+          className="relative flex items-center justify-center w-9 h-9 border-[3px] border-black bg-white shadow-brutal hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
         >
           <Bell size={16} strokeWidth={2.5} />
           {showBadge && (
@@ -107,7 +107,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
           )}
         </button>
 
-        <div className="flex items-center gap-2 px-2 py-1 border-[3px] border-black bg-white shadow-[3px_3px_0px_#000] hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 cursor-default select-none">
+        <div className="flex items-center gap-2 px-2 py-1 border-[3px] border-black bg-white shadow-brutal hover:shadow-[1px_1px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 cursor-default select-none">
           <div
             style={{ background: SIDEBAR_CONFIG.accentColor }}
             className="w-6 h-6 border-[2px] border-black flex items-center justify-center shrink-0"

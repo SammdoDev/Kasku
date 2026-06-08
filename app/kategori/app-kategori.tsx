@@ -117,7 +117,7 @@ const AppKategori = () => {
         )}
       </div>
 
-      <div className="mb-4 h-[2px] bg-[#1a1a1a]" />
+      <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
 
       {/* ── Filter & Actions ── */}
       <div className="flex flex-col gap-2 mb-5 sm:flex-row sm:items-center sm:justify-between">

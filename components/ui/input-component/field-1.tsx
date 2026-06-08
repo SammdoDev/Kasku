@@ -137,7 +137,7 @@ function FieldError({
       role="alert"
       data-slot="field-error"
       className={cn(
-        "border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+        "border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold text-black shadow-brutal-sm",
         className,
       )}
       {...props}

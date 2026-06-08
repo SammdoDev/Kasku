@@ -135,7 +135,7 @@ const BottomNavbar = () => {
         onClose={() => setOpen(false)}
         title="TAMBAH TRANSAKSI"
         subtitle="Catat pemasukan atau pengeluaran baru"
-        width="md"
+        width="full"
       >
         <ModalTambahTransaksi
           onSuccess={() => setOpen(false)}

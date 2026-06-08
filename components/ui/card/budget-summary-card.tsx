@@ -15,7 +15,7 @@ export interface BudgetItem {
 
 type Props = {
   budgets: BudgetItem[];
-  /** Mobile uses rounded-2xl + slightly bigger shadow, desktop uses sharp corners */
+  /** Mobile uses + slightly bigger shadow, desktop uses sharp corners */
   variant?: "mobile" | "desktop";
 };
 
@@ -63,14 +63,13 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
   );
 };
 
-/* ── Card wrapper ────────────────────────────────────────────────── */
 const BudgetSummaryCard = ({ budgets, variant = "mobile" }: Props) => {
   const overCount = budgets.filter((b) => b.over_budget).length;
 
   const cardClass =
     variant === "mobile"
-      ? "bg-white rounded-2xl border-[2.5px] border-black shadow-[3px_3px_0px_#000] p-4"
-      : "border-[2.5px] border-black bg-white p-4 shadow-[3px_3px_0px_#000]";
+      ? "bg-white border-[2.5px] border-black shadow-brutal-lg p-4"
+      : "border-[2.5px] border-black bg-white p-4 shadow-brutal-lg";
 
   return (
     <div className={cardClass} style={{ fontFamily: DASHBOARD_FONT }}>

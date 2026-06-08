@@ -222,7 +222,7 @@ const AppTransaksi = () => {
         )}
       </div>
 
-      <div className="mb-4 h-[2px] bg-[#1a1a1a]" />
+      <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
 
       <div className="mb-5">
         <FilterTransaksi onOpenCreate={() => setModalOpen(true)} />

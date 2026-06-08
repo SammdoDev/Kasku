@@ -22,7 +22,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className={cn(
             // height 34px → sejajar month-nav & tombol TAMBAH
             "flex h-[34px] w-full border-2 border-[#1a1a1a] bg-white px-3 text-[11px] font-mono font-bold tracking-wide placeholder:text-[#1a1a1a]/30",
-            "shadow-[3px_3px_0_#1a1a1a] focus:outline-none focus:shadow-[1px_1px_0_#1a1a1a] focus:translate-x-[2px] focus:translate-y-[2px]",
+            "shadow-[3px_3px_0_#1a1a1a] focus:outline-none focus:shadow-[1px_1px_0_#1a1a1a] focus:translate-x-0.5 focus:translate-y-0.5",
             "transition-all duration-100 disabled:cursor-not-allowed disabled:opacity-50",
             isPassword && showPasswordToggle && "pr-10",
             className,

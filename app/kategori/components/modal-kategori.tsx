@@ -1,13 +1,13 @@
-// src/app/(pages)/kategori/components/modal-kategori.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { post, patch, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { useKategoriStore, type Category } from "../store/kategori-store";
-import EmojiPicker, { OpenmojiImg, EMOJI_OPTIONS } from "./emoji-picker";
+import EmojiPicker, { OpenmojiImg } from "./emoji-picker";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
 import { Button } from "@/components/ui/button-component/button";
+import { EMOJI_OPTIONS } from "./emoji-option";
 
 const TYPE_OPTIONS = [
   { label: "KELUAR", value: "expense" },
@@ -131,9 +131,9 @@ export default function ModalKategori({
             "h-10 border-2 border-black bg-white px-3",
             "text-[12px] font-bold tracking-wide font-mono",
             "placeholder:text-black/25",
-            "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-            "focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-            "focus:translate-x-[2px] focus:translate-y-[2px] transition-all duration-100",
+            "shadow-brutal-lg",
+            "focus:outline-none focus:shadow-brutal-sm",
+            "focus:translate-x-0.5 focus:translate-y-0.5 transition-all duration-100",
           ].join(" ")}
         />
       </div>

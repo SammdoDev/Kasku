@@ -45,8 +45,8 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
   const navCls = [
     "inline-flex items-center justify-center font-black border-2 border-black",
     "bg-white text-black transition-all",
-    "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-    "hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]",
+    "shadow-[4px_4px_0px_#000]",
+    "hover:shadow-[2px_2px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]",
     "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
     h,
     sm ? "w-9" : "w-10",
@@ -66,7 +66,7 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
         className={[
           "inline-flex items-center justify-center whitespace-nowrap",
           "font-black tracking-wide font-mono border-2 border-black bg-white",
-          "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
+          "shadow-[4px_4px_0px_#000]",
           h,
           px,
           textSize,

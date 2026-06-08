@@ -129,20 +129,10 @@
   }
 }
 
-/* .nb-page {
-  background-color: #f0ebe0;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
-  min-height: 100vh;
-  width: 100%;
-} */
-
 .card {
   background: #ffffff;
   border: 2.5px solid #1a1a1a;
-  padding: 14px;
+  padding: 5px;
   box-shadow: 4px 4px 0 #1a1a1a;
   border-radius: 0;
   transition:
@@ -150,7 +140,48 @@
     transform 0.12s ease;
 }
 
+@media (min-width: 1024px) {
+  .card {
+    padding: 14px;
+  }
+}
+
 .card:hover {
   box-shadow: 6px 6px 0 #1a1a1a;
   transform: translate(-2px, -2px);
+}
+
+@utility shadow-brutal-sm {
+  box-shadow: 2px 2px 0 #000;
+}
+
+@utility shadow-brutal {
+  box-shadow: 3px 3px 0 #000;
+}
+
+@utility shadow-brutal-lg {
+  box-shadow: 4px 4px 0 #000;
+}
+
+@utility shadow-brutal-xs {
+  box-shadow: 1.5px 1.5px 0 #000;
+}
+
+@utility shadow-brutal-hover {
+  box-shadow: 1px 1px 0 #000;
+}
+
+@layer components {
+  .box {
+    @apply relative w-full aspect-square;
+    @apply lg:aspect-auto lg:h-10;
+    @apply border-[2.5px] lg:border-2 border-black overflow-hidden;
+    @apply flex items-center justify-center;
+    @apply shadow-brutal-sm lg:shadow-brutal-xs;
+    @apply group-hover:shadow-brutal-hover;
+    @apply group-hover:translate-x-[1px] group-hover:translate-y-[1px];
+    @apply group-active:shadow-none;
+    @apply group-active:translate-x-[2px] group-active:translate-y-[2px];
+    @apply transition-all duration-100;
+  }
 }

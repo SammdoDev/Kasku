@@ -12,7 +12,7 @@ interface ChildModalWrapperProps {
   title: string;
   subtitle?: string;
   children: ReactNode;
-  width?: "sm" | "md" | "lg";
+  width?: "sm" | "md" | "lg" | "full";
   className?: string;
 }
 
@@ -20,6 +20,7 @@ const widthMap = {
   sm: "max-w-sm",
   md: "max-w-lg",
   lg: "max-w-2xl",
+  full: "w-full h-full",
 };
 
 const ChildModalWrapper = ({
@@ -92,7 +93,10 @@ const ChildModalWrapper = ({
   return createPortal(
     <div
       ref={backdropRef}
-      className="fixed inset-0 z-[9999] items-center justify-center p-4"
+      className={cn(
+        "fixed inset-0 z-[9999] items-center justify-center",
+        width === "full" ? "p-0" : "p-4",
+      )}
       style={{ display: "none", opacity: 0, transition: "opacity 300ms" }}
       aria-modal="true"
       role="dialog"
@@ -102,7 +106,8 @@ const ChildModalWrapper = ({
       <div
         ref={panelRef}
         className={cn(
-          "relative w-full border-2 border-[#1a1a1a] bg-white shadow-[6px_6px_0_#1a1a1a] font-mono",
+          "relative w-full border-2 border-[#1a1a1a] bg-white font-mono",
+          width !== "full" && "shadow-[6px_6px_0_#1a1a1a]",
           widthMap[width],
           className,
         )}
@@ -134,7 +139,10 @@ const ChildModalWrapper = ({
 
         <div
           className="px-5 py-4 overflow-y-auto"
-          style={{ maxHeight: "calc(85vh - 60px)" }}
+          style={{
+            maxHeight:
+              width === "full" ? "calc(100vh - 60px)" : "calc(85vh - 60px)",
+          }}
         >
           {children}
         </div>

@@ -1,16 +1,18 @@
-// modal-tambah-transaksi.tsx — tidak ada perubahan logic, hanya style diseragamkan
 "use client";
 
-import { useState } from "react";
-import { post, getApiError } from "@/lib/helper/apiService";
+import { useEffect, useState } from "react";
+import { get, post, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
-import { useTransaksiStore } from "../store/transaksi-store";
-import { Button } from "@/components/ui/button-component/button";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
+import CategoryGrid, { CategoryItem } from "./category-grid";
+import TransactionBar from "./transaction-bar";
+import NumPad from "./num-pad";
+import NoteDialog from "./note-dialog";
 
 const TIPE_OPTIONS = [
-  { label: "PEMASUKAN", value: "income" },
   { label: "PENGELUARAN", value: "expense" },
+  { label: "PEMASUKAN", value: "income" },
+  { label: "TRANSFER", value: "transfer" },
 ];
 
 interface ModalTambahTransaksiProps {
@@ -18,61 +20,81 @@ interface ModalTambahTransaksiProps {
   onClose: () => void;
 }
 
-const labelCls =
-  "block text-[9px] font-black tracking-[0.15em] text-[#1a1a1a] mb-1";
-
-const inputCls = [
-  "h-9 w-full border-2 border-black bg-white px-3",
-  "text-[11px] font-mono font-bold tracking-wide",
-  "placeholder:text-black/25",
-  "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-  "focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-  "focus:translate-x-[2px] focus:translate-y-[2px] transition-all duration-100",
-].join(" ");
-
-const selectCls = [
-  "h-9 w-full appearance-none border-2 border-black bg-white px-3",
-  "text-[11px] font-mono font-bold tracking-wide cursor-pointer",
-  "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-  "hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5",
-  "focus:outline-none transition-all duration-100",
-].join(" ");
-
 const ModalTambahTransaksi = ({
   onSuccess,
   onClose,
 }: ModalTambahTransaksiProps) => {
-  const categories = useTransaksiStore((s) => s.categories);
-  const tags = useTransaksiStore((s) => s.tags);
-  const paymentMethods = useTransaksiStore((s) => s.paymentMethods);
-
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<"income" | "expense">("expense");
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [categoryId, setCategoryId] = useState("");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [paymentMethodId, setPaymentMethodId] = useState("");
-  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
 
-  const toggleTag = (id: string) =>
-    setTagIds((prev) =>
-      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id],
-    );
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [loadingCats, setLoadingCats] = useState(false);
+
+  useEffect(() => {
+    const fetchCats = async () => {
+      setLoadingCats(true);
+      setCategoryId(null);
+      try {
+        const res = await get<{ categories: CategoryItem[] }>(
+          `/categories?type=${type}`,
+        );
+        setCategories(res.categories);
+      } catch (err) {
+        toast.error("Gagal memuat kategori", getApiError(err));
+      } finally {
+        setLoadingCats(false);
+      }
+    };
+    fetchCats();
+  }, [type]);
+
+  const handleNumPress = (key: string) => {
+    if (key === "day") {
+      // TODO: open date picker
+      return;
+    }
+    if (key === "acc") {
+      // TODO: open account picker
+      return;
+    }
+    if (key === "bank") {
+      // TODO: open payment method picker
+      return;
+    }
+    if (key === "." && amount.includes(".")) return;
+    if (amount === "0" && key !== ".") {
+      setAmount(key);
+    } else {
+      setAmount((prev) => prev + key);
+    }
+  };
+
+  const handleBackspace = () => {
+    setAmount((prev) => prev.slice(0, -1));
+  };
 
   const reset = () => {
     setType("expense");
     setAmount("");
     setNote("");
     setDate(new Date().toISOString().split("T")[0]);
-    setCategoryId("");
+    setCategoryId(null);
     setPaymentMethodId("");
-    setTagIds([]);
   };
 
   const handleSubmit = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       toast.error("Jumlah harus diisi dan lebih dari 0");
+      return;
+    }
+    if (!categoryId) {
+      toast.error("Pilih kategori terlebih dahulu");
       return;
     }
     setLoading(true);
@@ -82,9 +104,8 @@ const ModalTambahTransaksi = ({
         amount: Number(amount),
         note: note || undefined,
         date,
-        category_id: categoryId || undefined,
+        category_id: categoryId,
         payment_method_id: paymentMethodId || undefined,
-        tag_ids: tagIds.length > 0 ? tagIds : undefined,
       });
       toast.success("Transaksi ditambahkan");
       reset();
@@ -97,168 +118,45 @@ const ModalTambahTransaksi = ({
     }
   };
 
-  const filteredCategories = categories.filter(
-    (c) => !c.type || c.type === type,
-  );
-
   return (
-    <div className="flex flex-col gap-4">
-      {/* Tipe */}
-      <div>
-        <span className={labelCls}>TIPE</span>
+    <div className="flex flex-col">
+      <div className="pt-5 pb-3 mb-2">
         <TabFilter
           value={type}
-          onChange={(val) => {
-            setType(val as "income" | "expense");
-            setCategoryId("");
-          }}
+          onChange={(val) => setType(val as "income" | "expense")}
           options={TIPE_OPTIONS}
           showAll={false}
         />
       </div>
+      <NoteDialog
+        open={noteDialogOpen}
+        value={note}
+        onConfirm={(val) => setNote(val)}
+        onClose={() => setNoteDialogOpen(false)}
+      />
 
-      {/* Jumlah */}
-      <div>
-        <label className={labelCls} htmlFor="amount">
-          JUMLAH (Rp)
-        </label>
-        <input
-          id="amount"
-          type="number"
-          min="1"
-          placeholder="0"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className={inputCls}
+      <CategoryGrid
+        categories={categories}
+        selected={categoryId}
+        onSelect={setCategoryId}
+        loading={loadingCats}
+        onAddCategory={() => {
+          window.open("/kategori", "_blank");
+        }}
+      />
+
+      <div className="fixed bottom-0 left-0 right-0">
+        <TransactionBar
+          amount={amount}
+          note={note}
+          onNoteClick={() => setNoteDialogOpen(true)}
         />
-      </div>
 
-      {/* Tanggal */}
-      <div>
-        <label className={labelCls} htmlFor="date">
-          TANGGAL
-        </label>
-        <input
-          id="date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className={inputCls}
-        />
-      </div>
-
-      {/* Catatan */}
-      <div>
-        <label className={labelCls} htmlFor="note">
-          CATATAN
-        </label>
-        <input
-          id="note"
-          type="text"
-          placeholder="Deskripsi transaksi..."
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          className={inputCls}
-        />
-      </div>
-
-      {/* Kategori + Metode */}
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className={labelCls} htmlFor="category">
-            KATEGORI
-          </label>
-          <div className="relative">
-            <select
-              id="category"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              className={selectCls}
-            >
-              <option value="">— Pilih —</option>
-              {filteredCategories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name.toUpperCase()}
-                </option>
-              ))}
-            </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px]">
-              ▾
-            </span>
-          </div>
-        </div>
-        <div>
-          <label className={labelCls} htmlFor="method">
-            METODE BAYAR
-          </label>
-          <div className="relative">
-            <select
-              id="method"
-              value={paymentMethodId}
-              onChange={(e) => setPaymentMethodId(e.target.value)}
-              className={selectCls}
-            >
-              <option value="">— Pilih —</option>
-              {paymentMethods.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name.toUpperCase()}
-                </option>
-              ))}
-            </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[10px]">
-              ▾
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Tags */}
-      {tags.length > 0 && (
-        <div>
-          <span className={labelCls}>TAGS</span>
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag) => (
-              <button
-                key={tag.id}
-                type="button"
-                onClick={() => toggleTag(tag.id)}
-                className={[
-                  "h-9 inline-flex items-center gap-1 border-2 border-black px-3",
-                  "text-[9px] font-black tracking-wide font-mono uppercase",
-                  "transition-all duration-100",
-                  tagIds.includes(tag.id)
-                    ? "bg-black text-white shadow-none translate-x-0.75 translate-y-0.75"
-                    : [
-                        "bg-white text-black",
-                        "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]",
-                        "hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-                        "hover:translate-x-0.5 hover:translate-y-0.5",
-                        "active:translate-x-0.75 active:translate-y-0.75 active:shadow-none",
-                      ].join(" "),
-                ].join(" ")}
-              >
-                <span className="opacity-40">#</span>
-                {tag.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="h-0.5 bg-[#1a1a1a]" />
-
-      {/* Actions */}
-      <div className="flex items-center justify-end gap-2">
-        <Button
-          label="BATAL"
-          variant="outline"
-          onClick={onClose}
-          disabled={loading}
-        />
-        <Button
-          label={loading ? "MENYIMPAN..." : "SIMPAN"}
-          onClick={handleSubmit}
-          disabled={loading}
+        <NumPad
+          onPress={handleNumPress}
+          onBackspace={handleBackspace}
+          onSubmit={handleSubmit}
+          loading={loading}
         />
       </div>
     </div>
