@@ -82,8 +82,8 @@ const AppKategori = () => {
 
   return (
     <div
-      className="card min-h-full md:m-4 md:rounded-2xl border-[2.5px] border-[#1a1a1a] bg-white p-4 pb-[84px] md:p-6 md:pb-6"
-      style={{ fontFamily: DASHBOARD_FONT }}
+      className="card md:m-4 p-4 md:p-6"
+      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
       <div className="flex flex-col gap-2 mb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div>
@@ -141,7 +141,6 @@ const AppKategori = () => {
 
       <TabelKategori onEdit={handleEdit} onDelete={handleDelete} />
 
-      {/* ── Modal ── */}
       <ChildModalWrapper
         open={modalOpen}
         onClose={handleClose}

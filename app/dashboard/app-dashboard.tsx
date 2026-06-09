@@ -167,7 +167,7 @@ const AppDashboard = () => {
 
   return (
     <div
-      className="card md:m-4 md:rounded-2xl border-[2.5px] border-[#1a1a1a] bg-white p-4 md:p-6"
+      className="card md:m-4 p-4 md:p-6"
       style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
       <div className="lg:hidden px-4 pt-4 pb-[84px] flex flex-col gap-4">

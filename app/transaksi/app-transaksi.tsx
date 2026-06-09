@@ -178,8 +178,8 @@ const AppTransaksi = () => {
 
   return (
     <div
-      className="card min-h-full md:m-4 md:rounded-2xl border-[2.5px] border-[#1a1a1a] bg-white p-4 pb-[84px] md:p-6 md:pb-6"
-      style={{ fontFamily: DASHBOARD_FONT }}
+      className="card md:m-4 p-4 md:p-6"
+      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
       <div className="lg:hidden mb-4">
         <SummaryHeaderMobile {...headerProps} />
