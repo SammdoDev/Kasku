@@ -170,7 +170,7 @@ const AppDashboard = () => {
       className="card md:m-4 p-4 md:p-6"
       style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
-      <div className="lg:hidden px-4 pt-4 pb-[84px] flex flex-col gap-4">
+      <div className="lg:hidden px-4 pt-4 flex flex-col gap-4">
         {error && !loading && (
           <ErrorBanner onRetry={() => fetchDashboard(month)} mobile />
         )}

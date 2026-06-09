@@ -41,78 +41,8 @@ function buildQuery(
   return p.toString();
 }
 
-function Pagination({
-  meta,
-  onPageChange,
-}: {
-  meta: { page: number; last_page: number; total: number };
-  onPageChange: (p: number) => void;
-}) {
-  const pages = Array.from({ length: meta.last_page }, (_, i) => i + 1)
-    .filter(
-      (p) => p === 1 || p === meta.last_page || Math.abs(p - meta.page) <= 1,
-    )
-    .reduce<(number | "…")[]>((acc, p, i, arr) => {
-      if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push("…");
-      acc.push(p);
-      return acc;
-    }, []);
-
-  const base =
-    "min-w-[32px] h-[32px] flex items-center justify-center text-[10px] font-black font-mono border-t-2 border-b-2 border-l-2 border-[#1a1a1a] transition-colors duration-100";
-
-  return (
-    <div className="flex flex-col gap-2 mt-4 pt-3 border-t-2 border-dashed border-[#e0e0e0] sm:flex-row sm:items-center sm:justify-between">
-      <span className="text-[9px] font-bold tracking-widest text-[#999] font-mono">
-        HAL {meta.page} / {meta.last_page} · {meta.total} DATA
-      </span>
-      <div className="overflow-x-auto">
-        <div className="inline-flex">
-          <button
-            disabled={meta.page <= 1}
-            onClick={() => onPageChange(meta.page - 1)}
-            className={`${base} disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1a1a1a] hover:text-white`}
-          >
-            ←
-          </button>
-          {pages.map((p, i) =>
-            p === "…" ? (
-              <span
-                key={`e${i}`}
-                className={`${base} cursor-default text-[#aaa]`}
-              >
-                …
-              </span>
-            ) : (
-              <button
-                key={p}
-                onClick={() => onPageChange(p as number)}
-                className={`${base} ${
-                  meta.page === p
-                    ? "bg-[#1a1a1a] text-white"
-                    : "bg-white text-[#1a1a1a] hover:bg-[#f0f0f0]"
-                }`}
-              >
-                {p}
-              </button>
-            ),
-          )}
-          <button
-            disabled={meta.page >= meta.last_page}
-            onClick={() => onPageChange(meta.page + 1)}
-            className={`${base} border-r-2 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1a1a1a] hover:text-white`}
-          >
-            →
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 const AppTransaksi = () => {
   const filter = useTransaksiStore((s) => s.filter);
-  const meta = useTransaksiStore((s) => s.meta);
   const summary = useTransaksiStore((s) => s.summary);
   const loading = useTransaksiStore((s) => s.loading);
   const setList = useTransaksiStore((s) => s.setList);
@@ -178,8 +108,8 @@ const AppTransaksi = () => {
 
   return (
     <div
-      className="card md:m-4 p-4 md:p-6"
-      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
+      className="card min-h-full md:m-4 p-4 md:p-6"
+      style={{ fontFamily: DASHBOARD_FONT }}
     >
       <div className="lg:hidden mb-4">
         <SummaryHeaderMobile {...headerProps} />
@@ -218,10 +148,6 @@ const AppTransaksi = () => {
       />
 
       <TabelTransaksi onEdit={openEdit} onDelete={handleDelete} />
-
-      {!loading && meta && meta.last_page > 1 && (
-        <Pagination meta={meta} onPageChange={(page) => setFilter({ page })} />
-      )}
 
       <ChildModalWrapper
         open={modalOpen}

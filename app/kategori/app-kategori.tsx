@@ -96,23 +96,6 @@ const AppKategori = () => {
               : `${list.length} KATEGORI · ${incomeCount} MASUK · ${expenseCount} KELUAR`}
           </p>
         </div>
-
-        {!loading && (
-          <div className="flex flex-wrap gap-1.5">
-            <div className="inline-flex items-center gap-2 border-2 border-emerald-600 text-emerald-700 bg-emerald-50 px-3 py-1.5">
-              <span className="text-[9px] font-black tracking-widest">
-                MASUK
-              </span>
-              <span className="text-[13px] font-black">{incomeCount}</span>
-            </div>
-            <div className="inline-flex items-center gap-2 border-2 border-red-500 text-red-600 bg-red-50 px-3 py-1.5">
-              <span className="text-[9px] font-black tracking-widest">
-                KELUAR
-              </span>
-              <span className="text-[13px] font-black">{expenseCount}</span>
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
