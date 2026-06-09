@@ -12,6 +12,7 @@ import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper
 import ModalKategori from "./components/modal-kategori";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
+import PageLeftRightWrapper from "@/components/layout/for-pages/page-left-right-wrapper";
 
 const TYPE_FILTER_OPTIONS = [
   { label: "KELUAR", value: "expense" },
@@ -71,8 +72,6 @@ const AppKategori = () => {
     closeEdit();
   };
 
-  // Tambah: closeEdit dulu sebelum buka modal tambah,
-  // supaya editTarget = null dan form pasti bersih
   const handleOpenTambah = () => {
     closeEdit();
     setModalOpen(true);
@@ -83,10 +82,9 @@ const AppKategori = () => {
 
   return (
     <div
-      className="card w-full px-4 py-4 sm:px-6 sm:py-6 font-mono h-full"
+      className="card md:m-4 md:rounded-2xl border-[2.5px] border-[#1a1a1a] bg-white p-4 md:p-6"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
-      {/* ── Header ── */}
       <div className="flex flex-col gap-2 mb-5 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <div>
           <h1 className="text-xl font-black tracking-[0.12em] leading-none text-[#1a1a1a]">
@@ -119,25 +117,28 @@ const AppKategori = () => {
 
       <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
 
-      {/* ── Filter & Actions ── */}
-      <div className="flex flex-col gap-2 mb-5 sm:flex-row sm:items-center sm:justify-between">
-        <TabFilter
-          value={filterType === "all" ? "" : filterType}
-          onChange={(v) =>
-            setFilterType((v || "all") as "all" | "income" | "expense")
-          }
-          options={TYPE_FILTER_OPTIONS}
-          allLabel="SEMUA"
-        />
-        <Button
-          size="sm"
-          leftIcon={<Plus size={12} />}
-          onClick={handleOpenTambah}
-          label="TAMBAH KATEGORI"
-        />
-      </div>
+      <PageLeftRightWrapper
+        leftComponent={
+          <TabFilter
+            value={filterType === "all" ? "" : filterType}
+            onChange={(v) =>
+              setFilterType((v || "all") as "all" | "income" | "expense")
+            }
+            options={TYPE_FILTER_OPTIONS}
+            allLabel="SEMUA"
+          />
+        }
+        rightComponent={
+          <Button
+            size="sm"
+            leftIcon={<Plus size={12} />}
+            onClick={handleOpenTambah}
+            label="TAMBAH KATEGORI"
+            className="w-full sm:w-auto"
+          />
+        }
+      />
 
-      {/* ── Table ── */}
       <TabelKategori onEdit={handleEdit} onDelete={handleDelete} />
 
       {/* ── Modal ── */}

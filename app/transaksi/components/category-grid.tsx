@@ -7,6 +7,7 @@ export interface CategoryItem {
   id: string;
   name: string;
   icon: string | null;
+  color?: string | null;
   type?: "income" | "expense" | null;
 }
 
@@ -16,6 +17,7 @@ interface CategoryGridProps {
   onSelect: (id: string) => void;
   onAddCategory?: () => void;
   loading?: boolean;
+  onEditCategory?: (id: string) => void;
 }
 
 const SkeletonCell = () => (
@@ -30,6 +32,7 @@ const CategoryGrid = ({
   selected,
   onSelect,
   onAddCategory,
+  onEditCategory,
   loading = false,
 }: CategoryGridProps) => {
   if (loading) {
@@ -52,7 +55,10 @@ const CategoryGrid = ({
           {onAddCategory && (
             <button
               type="button"
-              onClick={onAddCategory}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddCategory?.();
+              }}
               className="flex items-center gap-1.5 border-2 border-black bg-white px-3 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-[#1a1a1a] hover:text-white transition-colors duration-75 shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
               <Plus size={11} strokeWidth={3} />
@@ -70,12 +76,16 @@ const CategoryGrid = ({
               icon={cat.icon}
               selected={selected === cat.id}
               onClick={onSelect}
+              onEdit={onEditCategory}
             />
           ))}
           {onAddCategory && (
             <button
               type="button"
-              onClick={onAddCategory}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddCategory?.();
+              }}
               className="flex flex-col items-center justify-center gap-2 p-3 border-r-[1.5px] border-b-[1.5px] border-dashed border-black/30 hover:bg-[#f5f0e8] active:bg-[#1a1a1a] group transition-colors duration-75"
             >
               <div className="w-11 h-11 flex items-center justify-center border-[1.5px] border-dashed border-black/30 group-hover:border-black group-active:border-white transition-colors">

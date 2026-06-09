@@ -8,6 +8,8 @@ import EmojiPicker, { OpenmojiImg } from "./emoji-picker";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
 import { Button } from "@/components/ui/button-component/button";
 import { EMOJI_OPTIONS } from "./emoji-option";
+import InputText from "@/components/ui/input-component/input-text/input-text";
+import { Label } from "@/components/ui/input-component/label";
 
 const TYPE_OPTIONS = [
   { label: "KELUAR", value: "expense" },
@@ -117,32 +119,8 @@ export default function ModalKategori({
 
   return (
     <div className="flex flex-col gap-5 font-mono">
-      {/* Nama */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[9px] font-black tracking-[0.2em] text-black/50">
-          NAMA KATEGORI
-        </label>
-        <input
-          type="text"
-          placeholder="Contoh: Makan Siang"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={[
-            "h-10 border-2 border-black bg-white px-3",
-            "text-[12px] font-bold tracking-wide font-mono",
-            "placeholder:text-black/25",
-            "shadow-brutal-lg",
-            "focus:outline-none focus:shadow-brutal-sm",
-            "focus:translate-x-0.5 focus:translate-y-0.5 transition-all duration-100",
-          ].join(" ")}
-        />
-      </div>
-
-      {/* Tipe */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[9px] font-black tracking-[0.2em] text-black/50">
-          TIPE
-        </label>
+      <div className="flex flex-col gap-1">
+        <Label>TIPE</Label>
         <TabFilter
           value={type}
           onChange={(v) => setType((v || "expense") as "income" | "expense")}
@@ -150,11 +128,35 @@ export default function ModalKategori({
         />
       </div>
 
-      {/* Warna */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[9px] font-black tracking-[0.2em] text-black/50">
-          WARNA
-        </label>
+      <InputText
+        id="username"
+        label="NAMA KATEGORI"
+        required
+        type="text"
+        placeholder="Contoh: Makan Siang"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        fieldClassName="flex flex-col gap-1"
+      />
+
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between">
+          <Label>EMOJI</Label>
+          {icon && (
+            <button
+              type="button"
+              onClick={() => setIcon(null)}
+              className="text-[9px] font-black text-black/30 hover:text-black transition-colors"
+            >
+              HAPUS EMOJI
+            </button>
+          )}
+        </div>
+        <EmojiPicker value={icon} onChange={handleIconChange} />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <Label>WARNA</Label>
         <div className="flex flex-wrap gap-2 items-center">
           {COLOR_PRESETS.map((c) => (
             <button
@@ -190,31 +192,12 @@ export default function ModalKategori({
         </div>
       </div>
 
-      {/* Emoji */}
       <div className="flex flex-col gap-1.5">
-        <div className="flex items-center justify-between">
-          <label className="text-[9px] font-black tracking-[0.2em] text-black/50">
-            EMOJI
-          </label>
-          {icon && (
-            <button
-              type="button"
-              onClick={() => setIcon(null)}
-              className="text-[9px] font-black text-black/30 hover:text-black transition-colors"
-            >
-              HAPUS EMOJI
-            </button>
-          )}
-        </div>
-        <EmojiPicker value={icon} onChange={handleIconChange} />
-      </div>
-
-      {/* Preview */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-[9px] font-black tracking-[0.2em] text-black/50">
-          PREVIEW
-        </label>
-        <div className="flex items-center gap-3 border-2 border-black p-3 bg-black/[0.02]">
+        <Label>PREVIEW</Label>
+        <div
+          className="flex items-center gap-3 border-2 border-black p-3"
+          style={{ background: color + "11" }}
+        >
           <div
             className="w-9 h-9 border-2 border-black flex items-center justify-center shrink-0"
             style={{ background: color + "33" }}
@@ -235,14 +218,16 @@ export default function ModalKategori({
             <p className="text-[12px] font-black" style={{ color }}>
               {name || "Nama Kategori"}
             </p>
-            <p className="text-[9px] font-bold text-black/40 tracking-widest">
+            <p
+              className="text-[9px] font-bold tracking-widest"
+              style={{ color: color + "99" }}
+            >
               {type === "income" ? "PEMASUKAN" : "PENGELUARAN"}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Actions */}
       <div className="flex gap-2 pt-1">
         <Button
           variant="outline"

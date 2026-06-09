@@ -10,6 +10,7 @@ import NumPad from "./num-pad";
 import NoteDialog from "./note-dialog";
 import ModalKategori from "@/app/kategori/components/modal-kategori"; // sesuaikan path
 import { useKategoriStore } from "@/app/kategori/store/kategori-store"; // sesuaikan path
+import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 
 const TIPE_OPTIONS = [
   { label: "PENGELUARAN", value: "expense" },
@@ -116,7 +117,22 @@ const ModalTambahTransaksi = ({
   };
 
   const handleOpenAddKategori = () => {
-    setEditTarget(null); // pastikan mode tambah, bukan edit
+    setEditTarget(null);
+    setShowModalKategori(true);
+  };
+
+  const handleOpenEditKategori = (id: string) => {
+    const cat = categories.find((c) => c.id === id);
+    if (!cat) return;
+    setEditTarget({
+      id: cat.id,
+      name: cat.name,
+      icon: cat.icon ?? null,
+      color: cat.color ?? null,
+      type: cat.type ?? "expense",
+      created_at: "",
+      updated_at: "",
+    });
     setShowModalKategori(true);
   };
 
@@ -138,41 +154,42 @@ const ModalTambahTransaksi = ({
         onClose={() => setNoteDialogOpen(false)}
       />
 
-      {showModalKategori ? (
-        <div className="px-4 py-3">
-          <ModalKategori
-            onClose={() => setShowModalKategori(false)}
-            onSuccess={() => {
-              setShowModalKategori(false);
-              fetchCats(); // refetch setelah tambah kategori
-            }}
-          />
-        </div>
-      ) : (
-        <>
-          <CategoryGrid
-            categories={categories}
-            selected={categoryId}
-            onSelect={setCategoryId}
-            loading={loadingCats}
-            onAddCategory={handleOpenAddKategori}
-          />
+      <ChildModalWrapper
+        open={showModalKategori}
+        onClose={() => setShowModalKategori(false)}
+        title="TAMBAH KATEGORI"
+        width="full"
+      >
+        <ModalKategori
+          onClose={() => setShowModalKategori(false)}
+          onSuccess={() => {
+            setShowModalKategori(false);
+            fetchCats();
+          }}
+        />
+      </ChildModalWrapper>
+      <CategoryGrid
+        categories={categories}
+        selected={categoryId}
+        onSelect={setCategoryId}
+        loading={loadingCats}
+        onAddCategory={handleOpenAddKategori}
+        onEditCategory={handleOpenEditKategori}
+      />
 
-          <div className="fixed bottom-0 left-0 right-0">
-            <TransactionBar
-              amount={amount}
-              note={note}
-              onNoteClick={() => setNoteDialogOpen(true)}
-            />
-            <NumPad
-              onPress={handleNumPress}
-              onBackspace={handleBackspace}
-              onSubmit={handleSubmit}
-              loading={loading}
-            />
-          </div>
-        </>
-      )}
+      <div className="fixed bottom-0 left-0 right-0">
+        <TransactionBar
+          amount={amount}
+          note={note}
+          onNoteClick={() => setNoteDialogOpen(true)}
+        />
+        <NumPad
+          onPress={handleNumPress}
+          onBackspace={handleBackspace}
+          onSubmit={handleSubmit}
+          loading={loading}
+        />
+      </div>
     </div>
   );
 };

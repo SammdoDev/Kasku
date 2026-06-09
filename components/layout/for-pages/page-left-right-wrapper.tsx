@@ -9,7 +9,6 @@ interface PageLeftRightWrapperProps {
   className?: string;
   leftClassName?: string;
   rightClassName?: string;
-  hideRightOnMobile?: boolean;
 }
 
 const PageLeftRightWrapper = ({
@@ -18,24 +17,20 @@ const PageLeftRightWrapper = ({
   className,
   leftClassName,
   rightClassName,
-  hideRightOnMobile = true,
 }: PageLeftRightWrapperProps) => {
   return (
     <div
-      className={cn("h-screen overflow-hidden grid lg:grid-cols-2", className)}
+      className={cn(
+        "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4",
+        className,
+      )}
     >
-      <div className={cn("h-full overflow-y-auto p-6 md:p-10", leftClassName)}>
+      <div className={cn("w-full sm:flex-1", leftClassName)}>
         {leftComponent}
       </div>
 
       {rightComponent && (
-        <div
-          className={cn(
-            hideRightOnMobile ? "hidden lg:flex" : "flex",
-            "h-full overflow-hidden relative",
-            rightClassName,
-          )}
-        >
+        <div className={cn("w-full sm:w-auto sm:shrink-0", rightClassName)}>
           {rightComponent}
         </div>
       )}

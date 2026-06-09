@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRef, useCallback } from "react";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import formatIDR from "@/lib/helper/currency-format";
 import { ChevronRight } from "lucide-react";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
+import { confirm } from "@/components/layout/for-pages/confirm-dialog";
 
 export interface RecentTransaction {
   id: string;
@@ -21,6 +23,7 @@ type Props = {
   transactions: RecentTransaction[];
   loading?: boolean;
   limit?: number;
+  onDelete?: (id: string) => Promise<void> | void;
 };
 
 function resolveHexcode(icon: string | null): string {
@@ -55,10 +58,103 @@ const SkeletonRow = () => (
   </div>
 );
 
+// ─── TransactionRow ───────────────────────────────────────────────
+function TransactionRow({
+  txn,
+  idx,
+  onDelete,
+}: {
+  txn: RecentTransaction;
+  idx: number;
+  onDelete?: (id: string) => Promise<void> | void;
+}) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startPress = useCallback(() => {
+    if (!onDelete) return;
+    timer.current = setTimeout(async () => {
+      const ok = await confirm.show({
+        title: "Hapus Transaksi?",
+        message: `"${txn.description}" akan dihapus permanen.`,
+        confirmLabel: "HAPUS",
+        cancelLabel: "BATAL",
+        variant: "danger",
+      });
+      if (ok) await onDelete(txn.id);
+    }, 500);
+  }, [txn, onDelete]);
+
+  const cancelPress = useCallback(() => {
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+  }, []);
+
+  const hexcode = resolveHexcode(txn.category_icon);
+  const isIncome = txn.type === "income";
+  const bgColor = txn.category_color
+    ? `${txn.category_color}22`
+    : isIncome
+      ? "#bbf7d033"
+      : "#fca5a533";
+  const borderColor = txn.category_color ?? (isIncome ? "#bbf7d0" : "#fca5a5");
+
+  return (
+    <div
+      key={txn.id}
+      onMouseDown={startPress}
+      onMouseUp={cancelPress}
+      onMouseLeave={cancelPress}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
+      className={onDelete ? "select-none cursor-pointer" : ""}
+    >
+      {idx > 0 && <div className="border-t border-[#f0f0f0]" />}
+      <div className="flex items-center gap-3 py-2.5">
+        <div
+          className="w-9 h-9 shrink-0 border-2 flex items-center justify-center select-none shadow-[2px_2px_0px_#1a1a1a]"
+          style={{ background: bgColor, borderColor }}
+          aria-hidden="true"
+        >
+          <OpenmojiImg
+            hexcode={hexcode}
+            size={22}
+            alt={txn.category_name ?? ""}
+          />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-extrabold text-[#1a1a1a] truncate leading-tight">
+            {txn.description}
+          </p>
+          <p className="text-[9px] text-[#999] font-bold mt-0.5">
+            {txn.category_name ?? "—"}
+            <span className="mx-1 text-[#ddd]">·</span>
+            {formatRelativeDate(txn.date)}
+          </p>
+        </div>
+
+        <span
+          className={[
+            "text-[12px] font-black shrink-0 tabular-nums",
+            isIncome ? "text-[#166534]" : "text-[#991b1b]",
+          ].join(" ")}
+        >
+          {isIncome ? "+" : "-"}
+          {formatIDR(txn.amount)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── RecentTransactionsCard ───────────────────────────────────────
 const RecentTransactionsCard = ({
   transactions,
   loading = false,
   limit = 5,
+  onDelete,
 }: Props) => {
   const items = transactions.slice(0, limit);
 
@@ -96,57 +192,14 @@ const RecentTransactionsCard = ({
             </span>
           </div>
         ) : (
-          items.map((txn, idx) => {
-            const hexcode = resolveHexcode(txn.category_icon);
-            const isIncome = txn.type === "income";
-            const bgColor = txn.category_color
-              ? `${txn.category_color}22`
-              : isIncome
-                ? "#bbf7d033"
-                : "#fca5a533";
-            const borderColor =
-              txn.category_color ?? (isIncome ? "#bbf7d0" : "#fca5a5");
-
-            return (
-              <div key={txn.id}>
-                {idx > 0 && <div className="border-t border-[#f0f0f0]" />}
-                <div className="flex items-center gap-3 py-2.5">
-                  <div
-                    className="w-9 h-9 shrink-0 border-2 flex items-center justify-center select-none shadow-[2px_2px_0px_#1a1a1a]"
-                    style={{ background: bgColor, borderColor }}
-                    aria-hidden="true"
-                  >
-                    <OpenmojiImg
-                      hexcode={hexcode}
-                      size={22}
-                      alt={txn.category_name ?? ""}
-                    />
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] font-extrabold text-[#1a1a1a] truncate leading-tight">
-                      {txn.description}
-                    </p>
-                    <p className="text-[9px] text-[#999] font-bold mt-0.5">
-                      {txn.category_name ?? "—"}
-                      <span className="mx-1 text-[#ddd]">·</span>
-                      {formatRelativeDate(txn.date)}
-                    </p>
-                  </div>
-
-                  <span
-                    className={[
-                      "text-[12px] font-black shrink-0 tabular-nums",
-                      isIncome ? "text-[#166534]" : "text-[#991b1b]",
-                    ].join(" ")}
-                  >
-                    {isIncome ? "+" : "-"}
-                    {formatIDR(txn.amount)}
-                  </span>
-                </div>
-              </div>
-            );
-          })
+          items.map((txn, idx) => (
+            <TransactionRow
+              key={txn.id}
+              txn={txn}
+              idx={idx}
+              onDelete={onDelete}
+            />
+          ))
         )}
       </div>
 

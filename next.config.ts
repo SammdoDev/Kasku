@@ -10,4 +10,12 @@ const pwaConfig = withPWA({
 
 export default pwaConfig({
   turbopack: {},
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.jsdelivr.net",
+      },
+    ],
+  },
 });

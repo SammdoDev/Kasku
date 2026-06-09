@@ -50,7 +50,7 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
 
       return (
         <div
-          className="w-8 h-8 border-2 border-black flex items-center justify-center"
+          className="w-8 h-8 shadow-brutal-sm flex items-center justify-center"
           style={{ background: (cat.color ?? "#6366f1") + "22" }}
         >
           {cat.icon ? (

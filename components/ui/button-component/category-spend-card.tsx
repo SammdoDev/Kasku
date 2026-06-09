@@ -17,6 +17,7 @@ type Props = {
   categories: CategorySpend[];
   monthLabel: string;
   loading?: boolean;
+  onEdit?: (id: string) => void;
 };
 
 function resolveHexcode(icon: string | null): string {
@@ -41,6 +42,7 @@ const CategorySpendCard = ({
   categories,
   monthLabel,
   loading = false,
+  onEdit
 }: Props) => {
   const top5 = categories.slice(0, 5);
 

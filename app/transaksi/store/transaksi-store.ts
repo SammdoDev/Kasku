@@ -21,6 +21,7 @@ export interface PaymentMethod {
 }
 
 export interface Transaction {
+  icon: any;
   id: string;
   date: string;
   type: TransactionType;
@@ -45,10 +46,17 @@ export interface TransactionSummary {
   net: number;
 }
 
+// ─── API response shape (sesuai backend) ─────────────────────────
 export interface TransactionListResponse {
-  data: Transaction[];
-  meta: TransactionMeta;
-  summary: TransactionSummary;
+  transactions: Transaction[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
+  // summary opsional — kalau BE belum return, dihitung client-side
+  summary?: TransactionSummary;
 }
 
 export interface TransactionFilter {
@@ -71,7 +79,7 @@ export interface TransactionForm {
   tag_ids: string[];
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────
 
 function currentMonth(): string {
   const d = new Date();
@@ -89,6 +97,17 @@ function transactionToForm(t: Transaction): TransactionForm {
     payment_method_id: t.payment_method?.id ?? "",
     tag_ids: t.tags.map((tg) => tg.id),
   };
+}
+
+// Hitung summary dari list kalau BE ga return
+function calcSummary(transactions: Transaction[]): TransactionSummary {
+  const total_income = transactions
+    .filter((t) => t.type === "income")
+    .reduce((s, t) => s + t.amount, 0);
+  const total_expense = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((s, t) => s + t.amount, 0);
+  return { total_income, total_expense, net: total_income - total_expense };
 }
 
 export const FORM_DEFAULT: TransactionForm = {
@@ -111,25 +130,21 @@ const FILTER_DEFAULT: TransactionFilter = {
   page: 1,
 };
 
-// ─── Store ───────────────────────────────────────────────────────────────────
+// ─── Store ───────────────────────────────────────────────────────
 
 interface TransaksiState {
-  // table data
   list: Transaction[];
   meta: TransactionMeta | null;
   summary: TransactionSummary | null;
   loading: boolean;
   error: boolean;
 
-  // filter
   filter: TransactionFilter;
 
-  // reference data (dropdowns)
   categories: Category[];
   tags: Tag[];
   paymentMethods: PaymentMethod[];
 
-  // modal
   modalOpen: boolean;
   editingTransaction: Transaction | null;
   form: TransactionForm;
@@ -176,21 +191,38 @@ export const useTransaksiStore = create<TransaksiState>((set) => ({
   form: FORM_DEFAULT,
   saving: false,
 
-  setFilter: (patch) => set((s) => ({ filter: { ...s.filter, ...patch } })),
+  setFilter: (patch) =>
+    set((s) => ({
+      filter: { ...s.filter, ...patch, page: 1 },
+      ...("page" in patch ? { filter: { ...s.filter, ...patch } } : {}),
+    })),
   resetFilter: () =>
     set((s) => ({
-      filter: {
-        ...FILTER_DEFAULT,
-        month: s.filter.month,
-      },
+      filter: { ...FILTER_DEFAULT, month: s.filter.month },
     })),
-  setList: (res) =>
-    set({ list: res.data, meta: res.meta, summary: res.summary, error: false }),
+
+  // ── adapter: map API shape → internal shape ──────────────────
+  setList: (res) => {
+    const list = res.transactions ?? [];
+    const p = res.pagination;
+    const meta: TransactionMeta = {
+      total: p.total,
+      page: p.page,
+      per_page: p.limit,
+      last_page: p.total_pages,
+    };
+    const summary = res.summary ?? calcSummary(list);
+    set({ list, meta, summary, error: false });
+  },
+
   setLoading: (v) => set({ loading: v }),
   setError: (v) => set({ error: v }),
   setReference: (data) => set((s) => ({ ...s, ...data })),
   removeTransaction: (id) =>
-    set((s) => ({ list: s.list.filter((t) => t.id !== id) })),
+    set((s) => ({
+      list: s.list.filter((t) => t.id !== id),
+      meta: s.meta ? { ...s.meta, total: s.meta.total - 1 } : null,
+    })),
 
   openCreate: () =>
     set({ modalOpen: true, editingTransaction: null, form: FORM_DEFAULT }),

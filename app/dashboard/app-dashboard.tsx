@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useCallback, useState } from "react";
-import { get, getApiError } from "@/lib/helper/apiService";
+import { del, get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { X } from "lucide-react";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
@@ -180,6 +180,11 @@ const AppDashboard = () => {
           transactions={recentTransactions}
           loading={loading}
           limit={5}
+          onDelete={async (id) => {
+            await del(`/transactions/${id}`);
+            toast.success("Transaksi dihapus");
+            fetchDashboard(month);
+          }}
         />
         <CategorySpendCard
           categories={data?.spending_by_category ?? []}
@@ -204,6 +209,11 @@ const AppDashboard = () => {
               transactions={recentTransactions}
               loading={loading}
               limit={5}
+              onDelete={async (id) => {
+                await del(`/transactions/${id}`);
+                toast.success("Transaksi dihapus");
+                fetchDashboard(month);
+              }}
             />
           </div>
           <div className="col-span-1 flex flex-col gap-3 sticky top-19.75">

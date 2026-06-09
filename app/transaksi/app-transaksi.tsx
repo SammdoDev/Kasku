@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { get, del, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
-import formatIDR from "@/lib/helper/currency-format";
 import {
   useTransaksiStore,
   type Transaction,
@@ -11,13 +10,24 @@ import {
 } from "./store/transaksi-store";
 import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
 import TabelTransaksi from "./components/table-transaksi";
-import FilterTransaksi from "./components/filter-transaksi";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Plus } from "lucide-react";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import ModalTambahTransaksi from "./components/modal-tambah-transaksi";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
+import { confirm } from "../../components/layout/for-pages/confirm-dialog";
+import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
+import PageLeftRightWrapper from "@/components/layout/for-pages/page-left-right-wrapper";
+import { Button } from "@/components/ui/button-component/button";
+import {
+  SummaryCardsDesktop,
+  SummaryHeaderMobile,
+} from "@/components/ui/card/summary-header";
 
-// ─── helpers ─────────────────────────────────────────────────────
+const TYPE_FILTER_OPTIONS = [
+  { label: "KELUAR", value: "expense" },
+  { label: "MASUK", value: "income" },
+];
+
 function buildQuery(
   filter: ReturnType<typeof useTransaksiStore.getState>["filter"],
 ) {
@@ -31,45 +41,6 @@ function buildQuery(
   return p.toString();
 }
 
-// ─── SummaryBadge ─────────────────────────────────────────────────
-function SummaryBadge({
-  label,
-  value,
-  variant,
-}: {
-  label: string;
-  value: number;
-  variant: "income" | "expense" | "net";
-}) {
-  const cfg = {
-    income: {
-      icon: <TrendingUp size={10} />,
-      cls: "border-emerald-600 text-emerald-700 bg-emerald-50",
-    },
-    expense: {
-      icon: <TrendingDown size={10} />,
-      cls: "border-red-500 text-red-600 bg-red-50",
-    },
-    net: {
-      icon: <Minus size={10} />,
-      cls:
-        value >= 0
-          ? "border-[#1a1a1a] text-[#1a1a1a] bg-white"
-          : "border-red-500 text-red-600 bg-red-50",
-    },
-  }[variant];
-  return (
-    <div
-      className={`inline-flex items-center gap-2 border-2 px-3 py-1.5 font-mono ${cfg.cls}`}
-    >
-      {cfg.icon}
-      <span className="text-[9px] font-black tracking-widest">{label}</span>
-      <span className="text-[11px] font-black">{formatIDR(value)}</span>
-    </div>
-  );
-}
-
-// ─── Pagination ───────────────────────────────────────────────────
 function Pagination({
   meta,
   onPageChange,
@@ -95,7 +66,6 @@ function Pagination({
       <span className="text-[9px] font-bold tracking-widest text-[#999] font-mono">
         HAL {meta.page} / {meta.last_page} · {meta.total} DATA
       </span>
-      {/* Pagination buttons — scrollable on very small screens */}
       <div className="overflow-x-auto">
         <div className="inline-flex">
           <button
@@ -140,7 +110,6 @@ function Pagination({
   );
 }
 
-// ─── AppTransaksi ─────────────────────────────────────────────────
 const AppTransaksi = () => {
   const filter = useTransaksiStore((s) => s.filter);
   const meta = useTransaksiStore((s) => s.meta);
@@ -153,7 +122,7 @@ const AppTransaksi = () => {
   const openEdit = useTransaksiStore((s) => s.openEdit);
   const removeTransaction = useTransaksiStore((s) => s.removeTransaction);
 
-  const { monthLabel } = useMonthFilter();
+  const { monthLabel, prevMonth, nextMonth } = useMonthFilter();
   const [modalOpen, setModalOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
@@ -176,7 +145,14 @@ const AppTransaksi = () => {
   }, [fetchData]);
 
   const handleDelete = async (t: Transaction) => {
-    if (!confirm(`Hapus transaksi "${t.description}"?`)) return;
+    const ok = await confirm.show({
+      title: "Hapus Transaksi?",
+      message: `"${t.description}" akan dihapus permanen.`,
+      confirmLabel: "HAPUS",
+      cancelLabel: "BATAL",
+      variant: "danger",
+    });
+    if (!ok) return;
     try {
       await del(`/transactions/${t.id}`);
       toast.success("Transaksi dihapus");
@@ -186,47 +162,60 @@ const AppTransaksi = () => {
     }
   };
 
+  const handleOpenTambah = () => setModalOpen(true);
+
+  const summaryForHeader = summary
+    ? { ...summary, balance: summary.net }
+    : null;
+
+  const headerProps = {
+    monthLabel,
+    summary: summaryForHeader,
+    loading,
+    onPrev: prevMonth,
+    onNext: nextMonth,
+  };
+
   return (
     <div
-      className="card w-full px-4 py-4 sm:px-6 sm:py-6 font-mono h-full"
+      className="card md:m-4 md:rounded-2xl border-[2.5px] border-[#1a1a1a] bg-white p-4 md:p-6"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
-      {/* ── Header ── */}
-      <div className="flex flex-col gap-2 mb-5 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3">
-        <div>
-          <h1 className="text-xl font-black tracking-[0.12em] leading-none text-[#1a1a1a]">
-            TRANSAKSI
-          </h1>
-          <p className="mt-1.5 text-[9px] tracking-[0.2em] text-[#999] font-mono">
-            {loading
-              ? "MEMUAT DATA..."
-              : `${meta?.total ?? 0} TRANSAKSI · ${monthLabel.toUpperCase()}`}
-          </p>
-        </div>
+      <div className="lg:hidden mb-4">
+        <SummaryHeaderMobile {...headerProps} />
+      </div>
 
-        {/* Summary badges — scroll horizontal kalau terlalu sempit */}
-        {!loading && summary && (
-          <div className="flex flex-wrap gap-1.5">
-            <SummaryBadge
-              label="MASUK"
-              value={summary.total_income}
-              variant="income"
-            />
-            <SummaryBadge
-              label="KELUAR"
-              value={summary.total_expense}
-              variant="expense"
-            />
-            <SummaryBadge label="NET" value={summary.net} variant="net" />
-          </div>
-        )}
+      <div className="hidden lg:block mb-4">
+        <SummaryCardsDesktop {...headerProps} />
       </div>
 
       <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
 
-      <div className="mb-5">
-        <FilterTransaksi onOpenCreate={() => setModalOpen(true)} />
-      </div>
+      <PageLeftRightWrapper
+        className="mb-5"
+        leftComponent={
+          <TabFilter
+            value={filter.type === "all" ? "" : filter.type}
+            onChange={(v) =>
+              setFilter({
+                type: (v || "all") as "all" | "income" | "expense",
+                page: 1,
+              })
+            }
+            options={TYPE_FILTER_OPTIONS}
+            allLabel="SEMUA"
+          />
+        }
+        rightComponent={
+          <Button
+            size="sm"
+            leftIcon={<Plus size={12} />}
+            onClick={handleOpenTambah}
+            label="TAMBAH TRANSAKSI"
+            className="w-full sm:w-auto"
+          />
+        }
+      />
 
       <TabelTransaksi onEdit={openEdit} onDelete={handleDelete} />
 
