@@ -197,7 +197,6 @@ const AppDashboard = () => {
         />
       </div>
 
-      {/* DESKTOP */}
       <div className="hidden lg:block px-6 py-6">
         <SummaryCardsDesktop {...monthNavProps} />
         {error && !loading && (
