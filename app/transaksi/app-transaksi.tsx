@@ -154,7 +154,7 @@ const AppTransaksi = () => {
         onClose={() => setModalOpen(false)}
         title="TAMBAH TRANSAKSI"
         subtitle="ISI DETAIL TRANSAKSI BARU"
-        width="md"
+        width="full"
       >
         <ModalTambahTransaksi
           onClose={() => setModalOpen(false)}

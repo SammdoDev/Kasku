@@ -1,7 +1,6 @@
-// child-modal-wrapper.tsx
 "use client";
 
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -34,13 +33,13 @@ const ChildModalWrapper = ({
 }: ChildModalWrapperProps) => {
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const portalRef = useRef<HTMLDivElement | null>(null);
+  const [portal, setPortal] = useState<HTMLDivElement | null>(null);
 
-  // Buat portal container sekali di client
   useEffect(() => {
     const el = document.createElement("div");
     document.body.appendChild(el);
-    portalRef.current = el;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPortal(el);
     return () => {
       document.body.removeChild(el);
     };
@@ -69,7 +68,7 @@ const ChildModalWrapper = ({
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [open, portal]); // ← tambah portal di sini
 
   useEffect(() => {
     if (!open) return;
@@ -87,8 +86,7 @@ const ChildModalWrapper = ({
     };
   }, [open]);
 
-  // eslint-disable-next-line react-hooks/refs
-  if (!portalRef.current) return null;
+  if (!portal) return null;
 
   return createPortal(
     <div
@@ -148,8 +146,7 @@ const ChildModalWrapper = ({
         </div>
       </div>
     </div>,
-    // eslint-disable-next-line react-hooks/refs
-    portalRef.current,
+    portal,
   );
 };
 

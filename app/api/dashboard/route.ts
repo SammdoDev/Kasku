@@ -27,12 +27,14 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   const supabase = createServiceClient();
   const userId = req.user.sub;
 
+  // ── 1. Monthly summary (exclude transfer) ─────────────────
   const { data: monthlyTxns, error: monthlyError } = await supabase
     .from("transactions")
     .select("type, amount")
     .eq("user_id", userId)
     .gte("date", dateFrom)
-    .lte("date", dateTo);
+    .lte("date", dateTo)
+    .is("transfer_pair_id", null); // ✅ exclude transfer
 
   if (monthlyError) {
     console.error("[dashboard] monthly totals error:", monthlyError);
@@ -47,11 +49,12 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  // ── 2. All-time balance ───────────────────────────────────
+  // ── 2. All-time balance (tetap include transfer, karena balance payment method sudah bener) ──
   const { data: allTxns } = await supabase
     .from("transactions")
     .select("type, amount")
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .is("transfer_pair_id", null); // ✅ exclude transfer, balance sudah di-handle RPC
 
   const balance =
     (allTxns ?? [])
@@ -61,19 +64,19 @@ export const GET = withAuth(async (req: AuthedRequest) => {
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  // ── 3. Spending by category ───────────────────────────────
+  // ── 3. Spending by category (exclude transfer) ────────────
   const { data: byCategoryRaw } = await supabase
     .from("transactions")
     .select("amount, category:categories(id, name, icon, color)")
     .eq("user_id", userId)
     .eq("type", "expense")
     .gte("date", dateFrom)
-    .lte("date", dateTo);
+    .lte("date", dateTo)
+    .is("transfer_pair_id", null); // ✅ exclude transfer
 
   const categoryMap: Record<string, CategoryRow & { total: number }> = {};
 
   for (const txn of byCategoryRaw ?? []) {
-    // Supabase returns joined row as array when using !inner — cast safely
     const rawCat = txn.category;
     const cat: CategoryRow | null = Array.isArray(rawCat)
       ? ((rawCat[0] as CategoryRow) ?? null)
@@ -100,13 +103,14 @@ export const GET = withAuth(async (req: AuthedRequest) => {
         totalExpense > 0 ? Math.round((c.total / totalExpense) * 100) : 0,
     }));
 
-  // ── 4. Daily trend ────────────────────────────────────────
+  // ── 4. Daily trend (exclude transfer) ────────────────────
   const { data: dailyTxns } = await supabase
     .from("transactions")
     .select("type, amount, date")
     .eq("user_id", userId)
     .gte("date", dateFrom)
     .lte("date", dateTo)
+    .is("transfer_pair_id", null) // ✅ exclude transfer
     .order("date");
 
   const dailyMap: Record<string, { income: number; expense: number }> = {};
@@ -122,7 +126,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     net: v.income - v.expense,
   }));
 
-  // ── 5. Last 6 months trend ────────────────────────────────
+  // ── 5. Last 6 months trend (exclude transfer) ────────────
   const sixMonthsAgo = new Date(year, month - 7, 1).toISOString().split("T")[0];
 
   const { data: trendTxns } = await supabase
@@ -130,7 +134,8 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .select("type, amount, date")
     .eq("user_id", userId)
     .gte("date", sixMonthsAgo)
-    .lte("date", dateTo);
+    .lte("date", dateTo)
+    .is("transfer_pair_id", null); // ✅ exclude transfer
 
   const monthlyMap: Record<string, { income: number; expense: number }> = {};
   for (const txn of trendTxns ?? []) {
@@ -148,7 +153,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
       net: v.income - v.expense,
     }));
 
-  // ── 6. Budget summary ─────────────────────────────────────
+  // ── 6. Budget summary (exclude transfer) ─────────────────
   const { data: budgets } = await supabase
     .from("budgets")
     .select("id, name, amount, period, category_id")
@@ -163,7 +168,8 @@ export const GET = withAuth(async (req: AuthedRequest) => {
         .eq("user_id", userId)
         .eq("type", "expense")
         .gte("date", dateFrom)
-        .lte("date", dateTo);
+        .lte("date", dateTo)
+        .is("transfer_pair_id", null); // ✅ exclude transfer
 
       if (b.category_id) q = q.eq("category_id", b.category_id);
 
@@ -186,7 +192,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     }),
   );
 
-  // ── 7. Recent transactions ────────────────────────────────
+  // ── 7. Recent transactions (tetap include transfer, biar keliatan di list) ──
   const { data: recentTxns } = await supabase
     .from("transactions")
     .select(

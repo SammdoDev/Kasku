@@ -17,13 +17,13 @@ type NavbarProps = {
 
 const ROUTE_LABELS: Record<string, string> = {
   "/": "Dashboard",
-  "/dompet": "Dompet",
   "/transaksi": "Transaksi",
-  "/laporan": "Laporan",
   "/kategori": "Kategori",
+  "/tag-transaksi": "Tag Transaksi",
+  "/metode-pembayaran": "Dompet",
   "/anggaran": "Anggaran",
-  "/tujuan": "Tujuan",
-  "/bantuan": "Bantuan",
+  "/ringkasan": "Ringkasan",
+  "/saya": "Profil",
 };
 
 function getPageLabel(pathname: string): string {

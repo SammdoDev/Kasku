@@ -12,7 +12,7 @@ const NAV_ITEMS = [
   { href: "/", label: "Beranda", icon: Home },
   { href: "/transaksi", label: "Transaksi", icon: ArrowLeftRight },
   { href: "/anggaran", label: "Anggaran", icon: Wallet },
-  { href: "/laporan", label: "Laporan", icon: PieChart },
+  { href: "/saya", label: "Saya", icon: PieChart },
 ];
 
 const BottomNavbar = () => {
@@ -138,7 +138,10 @@ const BottomNavbar = () => {
         width="full"
       >
         <ModalTambahTransaksi
-          onSuccess={() => setOpen(false)}
+          onSuccess={() => {
+            setOpen(false);
+            window.dispatchEvent(new CustomEvent("transaksi:added"));
+          }}
           onClose={() => setOpen(false)}
         />
       </ChildModalWrapper>

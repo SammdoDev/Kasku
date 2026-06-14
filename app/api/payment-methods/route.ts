@@ -22,7 +22,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
 
   const { data, error } = await supabase
     .from("payment_methods")
-    .select("id, name, type, icon, created_at, updated_at")
+    .select("id, name, type, icon, balance, created_at, updated_at")
     .eq("user_id", req.user.sub)
     .order("type")
     .order("name");
@@ -71,7 +71,7 @@ export const POST = withAuth(async (req: AuthedRequest) => {
       type: type ?? null,
       icon: icon ?? null,
     })
-    .select("id, name, type, icon, created_at")
+    .select("id, name, type, icon, balance, created_at")
     .single();
 
   if (error) {

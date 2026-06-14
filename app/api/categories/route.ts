@@ -1,5 +1,3 @@
-// src/app/api/categories/route.ts
-
 import { NextResponse } from "next/server";
 import {
   withAuth,
@@ -9,7 +7,6 @@ import {
 } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
-// GET /api/categories?type=income|expense
 export const GET = withAuth(async (req: AuthedRequest) => {
   const { searchParams } = new URL(req.url);
   const type = searchParams.get("type");
@@ -37,15 +34,6 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   return NextResponse.json({ categories: data });
 });
 
-// POST /api/categories
-// Body: { name, type, icon?, color? }
-//
-// icon: OpenMoji hexcode string.
-//   Single codepoint  → "1F4B0"
-//   Multi-codepoint   → "1F9D1-200D-1F4BB"  (joined by hyphens)
-//   Render via: https://cdn.jsdelivr.net/gh/hfg-gmuend/openmoji@15.1.0/color/svg/{HEXCODE}.svg
-//
-// color: hex string, e.g. "#f97316"
 export const POST = withAuth(async (req: AuthedRequest) => {
   let body: {
     name?: string;
@@ -62,15 +50,11 @@ export const POST = withAuth(async (req: AuthedRequest) => {
   const { name, icon, color, type } = body;
 
   if (!name || !type) return badRequest("name and type are required");
+  // "transfer" dikunci — hanya bisa dibuat otomatis via service transfer
   if (!["income", "expense"].includes(type))
     return badRequest("type must be 'income' or 'expense'");
   if (name.trim().length < 1) return badRequest("name cannot be empty");
 
-  // icon must be an OpenMoji hexcode string.
-  // Valid formats:
-  //   - Single codepoint:   "1F4B0"  (4-6 uppercase hex chars)
-  //   - Multi-codepoint:    "1F9D1-200D-1F4BB"  (segments joined by "-")
-  // Regex: one or more hex segments (4-6 chars) separated by hyphens.
   if (icon !== undefined && icon !== null) {
     if (
       typeof icon !== "string" ||
@@ -83,7 +67,6 @@ export const POST = withAuth(async (req: AuthedRequest) => {
     }
   }
 
-  // color must be a valid hex color
   if (color !== undefined && color !== null) {
     if (
       typeof color !== "string" ||
@@ -100,7 +83,6 @@ export const POST = withAuth(async (req: AuthedRequest) => {
     .insert({
       user_id: req.user.sub,
       name: name.trim(),
-      // Normalize to uppercase for consistency with OpenMoji filenames
       icon: icon ? icon.toUpperCase() : null,
       color: color ?? null,
       type,

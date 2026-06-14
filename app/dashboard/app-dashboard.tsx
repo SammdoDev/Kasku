@@ -33,13 +33,14 @@ interface RawTransaction {
   amount: number;
   note: string | null;
   date: string;
+  transfer_pair_id: string | null;
   category: {
     id: string;
     icon: string | null;
     name: string;
     color: string | null;
   } | null;
-  payment_method: unknown;
+  payment_method: { id: string; name: string } | null;
 }
 
 interface DailyPoint {
@@ -117,6 +118,25 @@ const AppDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const [txLimit, setTxLimit] = useState(5);
+  const [transactions, setTransactions] = useState<RawTransaction[]>([]);
+  const [txLoading, setTxLoading] = useState(true);
+
+  const fetchTransactions = useCallback(async (m: string, lim: number) => {
+    setTxLoading(true);
+    try {
+      const res = await get<{ transactions: RawTransaction[] }>(
+        `/transactions?month=${m}&limit=${lim}&page=1`,
+      );
+      setTransactions(res.transactions);
+    } catch (err) {
+      toast.error("Gagal memuat transaksi", getApiError(err));
+    } finally {
+      setTxLoading(false);
+    }
+  }, []);
+
+  // fetch dashboard tetap seperti biasa tanpa limit
   const fetchDashboard = useCallback(async (m: string) => {
     setLoading(true);
     setError(false);
@@ -133,7 +153,21 @@ const AppDashboard = () => {
 
   useEffect(() => {
     fetchDashboard(month);
-  }, [month, fetchDashboard]);
+    fetchTransactions(month, txLimit);
+  }, [month]);
+
+  useEffect(() => {
+    fetchTransactions(month, txLimit);
+  }, [txLimit]);
+
+  useEffect(() => {
+    const handler = () => {
+      fetchDashboard(month);
+      fetchTransactions(month, txLimit);
+    };
+    window.addEventListener("transaksi:added", handler);
+    return () => window.removeEventListener("transaksi:added", handler);
+  }, [month, txLimit]);
 
   const summary = data?.summary;
 
@@ -152,9 +186,7 @@ const AppDashboard = () => {
     sparkBalance,
   };
 
-  const recentTransactions: RecentTransaction[] = (
-    data?.recent_transactions ?? []
-  ).map((t) => ({
+  const recentTransactions: RecentTransaction[] = transactions.map((t) => ({
     id: t.id,
     date: t.date,
     description: t.note ?? t.category?.name ?? "Transaksi",
@@ -163,8 +195,24 @@ const AppDashboard = () => {
     category_color: t.category?.color ?? null,
     amount: t.amount,
     type: t.type,
+    payment_method_name: t.payment_method?.name ?? null,
+    transfer_pair_id: t.transfer_pair_id ?? null,
   }));
 
+  const txCard = (
+    <RecentTransactionsCard
+      transactions={recentTransactions}
+      loading={txLoading}
+      limit={txLimit}
+      onLimitChange={(lim) => setTxLimit(lim)}
+      onDelete={async (id) => {
+        await del(`/transactions/${id}`);
+        toast.success("Transaksi dihapus");
+        fetchDashboard(month);
+        fetchTransactions(month, txLimit);
+      }}
+    />
+  );
   return (
     <div
       className="card md:m-4 p-4 md:p-6"
@@ -176,16 +224,7 @@ const AppDashboard = () => {
         )}
         <SummaryHeaderMobile {...monthNavProps} />
         <QuickAccessGrid loading={loading} />
-        <RecentTransactionsCard
-          transactions={recentTransactions}
-          loading={loading}
-          limit={5}
-          onDelete={async (id) => {
-            await del(`/transactions/${id}`);
-            toast.success("Transaksi dihapus");
-            fetchDashboard(month);
-          }}
-        />
+        {txCard}
         <CategorySpendCard
           categories={data?.spending_by_category ?? []}
           monthLabel={monthLabel}
@@ -203,18 +242,7 @@ const AppDashboard = () => {
           <ErrorBanner onRetry={() => fetchDashboard(month)} />
         )}
         <div className="grid grid-cols-3 gap-3 items-stretch mt-4">
-          <div className="col-span-2 flex flex-col gap-3">
-            <RecentTransactionsCard
-              transactions={recentTransactions}
-              loading={loading}
-              limit={5}
-              onDelete={async (id) => {
-                await del(`/transactions/${id}`);
-                toast.success("Transaksi dihapus");
-                fetchDashboard(month);
-              }}
-            />
-          </div>
+          <div className="col-span-2 flex flex-col gap-3">{txCard}</div>
           <div className="col-span-1 flex flex-col gap-3 sticky top-19.75">
             <CategorySpendCard
               categories={data?.spending_by_category ?? []}

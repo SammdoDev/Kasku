@@ -12,19 +12,16 @@ import { createServiceClient } from "@/lib/supabase/client";
 
 type Ctx = { params: Record<string, string> };
 
-// GET /api/transactions/[id]
 export const GET = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
   const supabase = createServiceClient();
 
   const { data, error } = await supabase
     .from("transactions")
     .select(
-      `
-      id, type, amount, note, date, created_at, updated_at,
+      `id, type, amount, note, date, transfer_pair_id, created_at,
       category:categories(id, name, icon, color, type),
       payment_method:payment_methods(id, name, type, icon),
-      tags:transaction_tags(tag:tags(id, name, color))
-    `,
+      tags:transaction_tags(tag:tags(id, name, color))`,
     )
     .eq("id", params.id)
     .eq("user_id", req.user.sub)
@@ -32,23 +29,24 @@ export const GET = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
 
   if (error || !data) return notFound("Transaction");
 
-  const transaction = {
+  const response = {
     ...data,
-    tags: (data.tags as Array<{ tag: unknown }>).map((t) => t.tag),
+    tags: ((data as { tags: Array<{ tag: unknown }> })?.tags ?? []).map(
+      (t) => t.tag,
+    ),
   };
 
-  return NextResponse.json({ transaction });
+  return NextResponse.json({ transaction: response });
 });
 
-// PATCH /api/transactions/[id]
 export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
   let body: {
     type?: string;
     amount?: number;
-    note?: string | null;
+    note?: string;
     date?: string;
-    category_id?: string | null;
-    payment_method_id?: string | null;
+    category_id?: string;
+    payment_method_id?: string;
     tag_ids?: string[];
   };
   try {
@@ -57,99 +55,85 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
     return badRequest("Invalid JSON body");
   }
 
-  if (body.type && !["income", "expense"].includes(body.type)) {
-    return badRequest("type must be 'income' or 'expense'");
-  }
-  if (body.amount !== undefined && Number(body.amount) <= 0) {
-    return badRequest("amount must be positive");
-  }
-  if (body.date && !/^\d{4}-\d{2}-\d{2}$/.test(body.date)) {
-    return badRequest("date must be in YYYY-MM-DD format");
-  }
-
   const supabase = createServiceClient();
+  const userId = req.user.sub;
 
-  // Verify ownership
+  // Get existing transaction
   const { data: existing } = await supabase
     .from("transactions")
-    .select("id")
+    .select("id, type, amount, payment_method_id")
     .eq("id", params.id)
-    .eq("user_id", req.user.sub)
+    .eq("user_id", userId)
     .single();
 
   if (!existing) return notFound("Transaction");
 
-  // Verify category if provided
-  if (body.category_id) {
-    const { data: cat } = await supabase
-      .from("categories")
-      .select("id")
-      .eq("id", body.category_id)
-      .eq("user_id", req.user.sub)
-      .single();
-    if (!cat) return badRequest("Category not found or does not belong to you");
-  }
-
-  // Verify payment method if provided
-  if (body.payment_method_id) {
-    const { data: pm } = await supabase
-      .from("payment_methods")
-      .select("id")
-      .eq("id", body.payment_method_id)
-      .eq("user_id", req.user.sub)
-      .single();
-    if (!pm)
-      return badRequest("Payment method not found or does not belong to you");
-  }
-
-  // Verify tags if provided
-  if (body.tag_ids && body.tag_ids.length > 0) {
-    const { data: userTags } = await supabase
-      .from("tags")
-      .select("id")
-      .eq("user_id", req.user.sub)
-      .in("id", body.tag_ids);
-
-    if ((userTags ?? []).length !== body.tag_ids.length) {
-      return badRequest("One or more tag IDs are invalid");
-    }
-  }
-
-  // Build transaction updates (exclude tag_ids)
-  const allowed = [
-    "type",
-    "amount",
-    "note",
-    "date",
-    "category_id",
-    "payment_method_id",
-  ];
   const updates: Record<string, unknown> = {};
-  for (const key of allowed) {
-    if (key in body) updates[key] = (body as Record<string, unknown>)[key];
+  if ("type" in body) {
+    if (!["income", "expense"].includes(body.type!))
+      return badRequest("Invalid type");
+    updates.type = body.type;
+  }
+  if ("amount" in body) {
+    if (Number(body.amount) <= 0) return badRequest("amount must be positive");
+    updates.amount = body.amount;
+  }
+  if ("note" in body) updates.note = body.note ?? null;
+  if ("date" in body) updates.date = body.date;
+  if ("category_id" in body) updates.category_id = body.category_id ?? null;
+  if ("payment_method_id" in body)
+    updates.payment_method_id = body.payment_method_id ?? null;
+
+  if (Object.keys(updates).length === 0 && !body.tag_ids)
+    return badRequest("No fields to update");
+
+  // Reverse old balance
+  if (existing.payment_method_id) {
+    const oldDelta =
+      existing.type === "income"
+        ? -Number(existing.amount)
+        : Number(existing.amount);
+    await supabase.rpc("increment_balance", {
+      pm_id: existing.payment_method_id,
+      delta: oldDelta,
+    });
   }
 
-  if (Object.keys(updates).length > 0) {
-    const { error: updateError } = await supabase
-      .from("transactions")
-      .update(updates)
-      .eq("id", params.id);
+  const { data: txn, error } = await supabase
+    .from("transactions")
+    .update(updates)
+    .eq("id", params.id)
+    .select("id, type, amount, payment_method_id")
+    .single();
 
-    if (updateError) {
-      console.error("[transactions] update error:", updateError);
-      return serverError("Failed to update transaction");
-    }
+  if (error || !txn) {
+    console.error("[transactions] update error:", error);
+    return serverError("Failed to update");
   }
 
-  // Replace tags if tag_ids provided (replace-all strategy)
-  if ("tag_ids" in body && Array.isArray(body.tag_ids)) {
-    // Delete old tags
+  // Apply new balance
+  const newPmId = (
+    "payment_method_id" in updates
+      ? updates.payment_method_id
+      : existing.payment_method_id
+  ) as string | null;
+  const newType = (updates.type ?? existing.type) as string;
+  const newAmount = Number(updates.amount ?? existing.amount);
+
+  if (newPmId) {
+    const newDelta = newType === "income" ? newAmount : -newAmount;
+    await supabase.rpc("increment_balance", {
+      pm_id: newPmId,
+      delta: newDelta,
+    });
+  }
+
+  // Update tags
+  if (body.tag_ids !== undefined) {
     await supabase
       .from("transaction_tags")
       .delete()
       .eq("transaction_id", params.id);
-
-    // Insert new tags
     if (body.tag_ids.length > 0) {
       await supabase
         .from("transaction_tags")
@@ -159,52 +143,65 @@ export const PATCH = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
     }
   }
 
-  // Return updated transaction
-  const { data } = await supabase
-    .from("transactions")
-    .select(
-      `
-      id, type, amount, note, date, created_at, updated_at,
-      category:categories(id, name, icon, color, type),
-      payment_method:payment_methods(id, name, type, icon),
-      tags:transaction_tags(tag:tags(id, name, color))
-    `,
-    )
-    .eq("id", params.id)
-    .single();
-
-  const transaction = {
-    ...data,
-    tags: ((data as { tags: Array<{ tag: unknown }> } | null)?.tags ?? []).map(
-      (t) => t.tag,
-    ),
-  };
-
-  return NextResponse.json({ transaction });
+  return NextResponse.json({ message: "Transaction updated" });
 });
 
-// DELETE /api/transactions/[id]
 export const DELETE = withAuth(async (req: AuthedRequest, { params }: Ctx) => {
   const supabase = createServiceClient();
+  const userId = req.user.sub;
 
-  const { data: existing } = await supabase
+  const { data: txn } = await supabase
     .from("transactions")
-    .select("id")
+    .select("id, type, amount, payment_method_id, transfer_pair_id")
     .eq("id", params.id)
-    .eq("user_id", req.user.sub)
+    .eq("user_id", userId)
     .single();
 
-  if (!existing) return notFound("Transaction");
+  if (!txn) return notFound("Transaction");
 
-  // transaction_tags cascade on delete, no need to delete manually
+  // If transfer, delete pair too and reverse both balances
+  if (txn.transfer_pair_id) {
+    const { data: pair } = await supabase
+      .from("transactions")
+      .select("id, type, amount, payment_method_id")
+      .eq("transfer_pair_id", txn.transfer_pair_id)
+      .eq("user_id", userId);
+
+    for (const t of pair ?? []) {
+      if (t.payment_method_id) {
+        const delta =
+          t.type === "income" ? -Number(t.amount) : Number(t.amount);
+        await supabase.rpc("increment_balance", {
+          pm_id: t.payment_method_id,
+          delta,
+        });
+      }
+    }
+
+    await supabase
+      .from("transactions")
+      .delete()
+      .eq("transfer_pair_id", txn.transfer_pair_id);
+    return NextResponse.json({ message: "Transfer deleted" });
+  }
+
+  // Reverse balance
+  if (txn.payment_method_id) {
+    const delta =
+      txn.type === "income" ? -Number(txn.amount) : Number(txn.amount);
+    await supabase.rpc("increment_balance", {
+      pm_id: txn.payment_method_id,
+      delta,
+    });
+  }
+
   const { error } = await supabase
     .from("transactions")
     .delete()
     .eq("id", params.id);
-
   if (error) {
     console.error("[transactions] delete error:", error);
-    return serverError("Failed to delete transaction");
+    return serverError("Failed to delete");
   }
 
   return NextResponse.json({ message: "Transaction deleted" });

@@ -14,14 +14,14 @@ export interface QuickAccessItem {
 
 const DEFAULT_ITEMS: QuickAccessItem[] = [
   {
-    href: "/metode-pembayaran",
-    label: "Metode Pembayaran",
+    href: "/dompet",
+    label: "Dompet",
     icon: "/best-seller.svg",
     bgColor: "#F9C74F",
   },
   {
     href: "/tag-transaksi",
-    label: "Tag Transaksi",
+    label: "Tag",
     icon: "/calendar.svg",
     bgColor: "#90E0EF",
   },
