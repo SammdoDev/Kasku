@@ -107,3 +107,20 @@ export async function del<T>(path: string): Promise<T> {
 
   return handleResponse<T>(res);
 }
+
+export const downloadFromApi = async (url: string, filename: string) => {
+  const token = getSessionToken();
+  const res = await fetch(`${BASE_URL}${url}`, {
+    method: "GET",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!res.ok) throw new Error("Gagal mengunduh");
+  const blob = await res.blob();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};

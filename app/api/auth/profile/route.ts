@@ -3,13 +3,12 @@ import { withAuth, AuthedRequest } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
 
 export const GET = withAuth(async (req: AuthedRequest) => {
-  
   const supabase = createServiceClient();
 
   const { data: user, error } = await supabase
     .from("users")
     .select(
-      "id, username, full_name, email, currency, avatar_url, created_at, updated_at",
+      "id, username, full_name, email, currency, avatar_url, created_at, updated_at, google_id", // pastikan google_id ada di sini
     )
     .eq("id", req.user.sub)
     .single();

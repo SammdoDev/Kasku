@@ -20,7 +20,7 @@ const DEFAULT_ITEMS: QuickAccessItem[] = [
     bgColor: "#F9C74F",
   },
   {
-    href: "/tag-transaksi",
+    href: "/tag",
     label: "Tag",
     icon: "/calendar.svg",
     bgColor: "#90E0EF",
