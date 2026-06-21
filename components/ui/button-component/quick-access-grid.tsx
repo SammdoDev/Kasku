@@ -19,12 +19,7 @@ const DEFAULT_ITEMS: QuickAccessItem[] = [
     icon: "/best-seller.svg",
     bgColor: "#F9C74F",
   },
-  {
-    href: "/tag",
-    label: "Tag",
-    icon: "/calendar.svg",
-    bgColor: "#90E0EF",
-  },
+  { href: "/tag", label: "Tag", icon: "/calendar.svg", bgColor: "#90E0EF" },
   {
     href: "/kategori",
     label: "Kategori",
@@ -52,15 +47,15 @@ type Props = {
 
 const SkeletonItem = () => (
   <div className="animate-pulse flex flex-col items-center gap-2">
-    <div className="w-full aspect-square lg:aspect-auto lg:h-10 border-[2px] border-[#e5e5e5] bg-gray-100" />
-    <div className="h-2.5 w-10 bg-gray-200" />
+    <div className="w-full aspect-square lg:aspect-auto lg:h-10 border-[2px] border-border bg-foreground/10" />
+    <div className="h-2.5 w-10 bg-foreground/10" />
   </div>
 );
 
 const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
   return (
     <div
-      className="bg-white border-[2.5px] border-black shadow-brutal-lg px-4 py-4 lg:px-3 lg:py-3"
+      className="bg-card border-[2.5px] border-border shadow-brutal-lg px-4 py-4 lg:px-3 lg:py-3"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
       <div
@@ -86,15 +81,14 @@ const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
                     className="w-[88%] h-[88%] lg:w-5 lg:h-5 object-contain rotate-350 relative left-2 top-2 drop-shadow-sm select-none"
                     draggable={false}
                   />
-
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-[5px] -right-[5px] min-w-[15px] h-[15px] px-[3px] border-[2px] border-black bg-black text-white text-[7px] font-black flex items-center justify-center leading-none">
+                    <span className="absolute -top-[5px] -right-[5px] min-w-[15px] h-[15px] px-[3px] border-[2px] border-border bg-foreground text-background text-[7px] font-black flex items-center justify-center leading-none">
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
                 </div>
 
-                <span className="text-[11px] lg:text-[9px] font-bold text-black/70 text-center leading-[1.15] min-h-[26px]">
+                <span className="text-[11px] lg:text-[9px] font-bold text-foreground/70 text-center leading-[1.15] min-h-[26px]">
                   {item.label}
                 </span>
               </Link>

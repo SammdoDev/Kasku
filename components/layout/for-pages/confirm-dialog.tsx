@@ -1,21 +1,18 @@
-// src/components/layout/confirm-dialog.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { create } from "zustand";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 export type ConfirmVariant = "danger" | "warning" | "info";
 
 interface ConfirmOptions {
   title: string;
   description?: string;
-  message?: string; // detail body text (opsional)
-  confirmLabel?: string; // default: "YA, LANJUTKAN"
-  cancelLabel?: string; // default: "BATAL"
-  variant?: ConfirmVariant; // default: "danger"
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: ConfirmVariant;
 }
 
 interface ConfirmState {
@@ -27,41 +24,29 @@ interface ConfirmState {
   _cancel: () => void;
 }
 
-// ─── Store ────────────────────────────────────────────────────────────────────
-
 export const useConfirmStore = create<ConfirmState>((set, get) => ({
   open: false,
   options: { title: "" },
   resolve: null,
-
-  show: (options) => {
-    return new Promise<boolean>((resolve) => {
+  show: (options) =>
+    new Promise<boolean>((resolve) => {
       set({ open: true, options, resolve });
-    });
-  },
-
+    }),
   _confirm: () => {
     get().resolve?.(true);
     set({ open: false, resolve: null });
   },
-
   _cancel: () => {
     get().resolve?.(false);
     set({ open: false, resolve: null });
   },
 }));
 
-// ─── Public API ───────────────────────────────────────────────────────────────
-// Cara pakai:
-//   const ok = await confirm.show({ title: "Hapus?", message: 'Yakin hapus "Makan Siang"?' })
-//   if (ok) { ... }
-
 export const confirm = {
   show: (options: ConfirmOptions) => useConfirmStore.getState().show(options),
 };
 
-// ─── Config per variant ───────────────────────────────────────────────────────
-
+// Variant config — warna semantic, bukan hardcode
 const VARIANT_CONFIG: Record<
   ConfirmVariant,
   { icon: string; iconBg: string; btnClass: string; btnShadow: string }
@@ -86,8 +71,6 @@ const VARIANT_CONFIG: Record<
   },
 };
 
-// ─── Dialog Component ─────────────────────────────────────────────────────────
-
 function ConfirmDialogInner() {
   const open = useConfirmStore((s) => s.open);
   const options = useConfirmStore((s) => s.options);
@@ -95,11 +78,9 @@ function ConfirmDialogInner() {
   const _cancel = useConfirmStore((s) => s._cancel);
 
   const [visible, setVisible] = useState(false);
-
   const variant = options.variant ?? "danger";
   const cfg = VARIANT_CONFIG[variant];
 
-  // Animate in/out
   useEffect(() => {
     if (open) {
       const id = requestAnimationFrame(() => setVisible(true));
@@ -110,7 +91,6 @@ function ConfirmDialogInner() {
     }
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => {
@@ -127,7 +107,7 @@ function ConfirmDialogInner() {
       className={[
         "fixed inset-0 z-[10000] flex items-center justify-center p-4 font-mono",
         "transition-all duration-200",
-        visible ? "bg-black/50" : "bg-black/0",
+        visible ? "bg-foreground/50" : "bg-foreground/0",
       ].join(" ")}
       onClick={(e) => {
         if (e.target === e.currentTarget) _cancel();
@@ -135,15 +115,15 @@ function ConfirmDialogInner() {
     >
       <div
         className={[
-          "bg-white border-[2.5px] border-black w-full max-w-sm",
+          "bg-card border-[2.5px] border-border w-full max-w-sm",
           "transition-all duration-200",
           visible
-            ? "opacity-100 scale-100 shadow-[6px_6px_0px_#1a1a1a]"
+            ? "opacity-100 scale-100 shadow-[6px_6px_0px_hsl(var(--border))]"
             : "opacity-0 scale-95 shadow-none",
         ].join(" ")}
       >
         {/* Header */}
-        <div className="flex items-start gap-3 px-5 pt-4 pb-3.5 border-b-2 border-black">
+        <div className="flex items-start gap-3 px-5 pt-4 pb-3.5 border-b-2 border-border">
           <div
             className={[
               "w-8 h-8 border-2 flex items-center justify-center shrink-0",
@@ -154,11 +134,11 @@ function ConfirmDialogInner() {
             {cfg.icon}
           </div>
           <div>
-            <p className="text-[12px] font-black tracking-[0.15em] text-black">
+            <p className="text-[12px] font-black tracking-[0.15em] text-foreground">
               {options.title.toUpperCase()}
             </p>
             {options.description && (
-              <p className="text-[11px] text-black/50 mt-0.5 leading-snug">
+              <p className="text-[11px] text-foreground/50 mt-0.5 leading-snug">
                 {options.description}
               </p>
             )}
@@ -167,7 +147,7 @@ function ConfirmDialogInner() {
 
         {/* Body */}
         {options.message && (
-          <div className="px-5 py-3.5 text-[12px] text-black/70 leading-relaxed border-b-2 border-black bg-black/[0.02]">
+          <div className="px-5 py-3.5 text-[12px] text-foreground/70 leading-relaxed border-b-2 border-border bg-foreground/[0.02]">
             {options.message}
           </div>
         )}
@@ -178,9 +158,9 @@ function ConfirmDialogInner() {
             onClick={_cancel}
             className={[
               "px-4 py-2 text-[10px] font-black tracking-[0.15em]",
-              "border-2 border-black bg-white text-black",
-              "hover:bg-black hover:text-white transition-all duration-100",
-              "shadow-[2px_2px_0px_#1a1a1a] hover:shadow-none",
+              "border-2 border-border bg-card text-foreground",
+              "hover:bg-foreground hover:text-background transition-all duration-100",
+              "shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none",
               "hover:translate-x-[2px] hover:translate-y-[2px]",
             ].join(" ")}
           >
@@ -203,8 +183,6 @@ function ConfirmDialogInner() {
     </div>
   );
 }
-
-// ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function ConfirmDialogProvider() {
   const [mounted, setMounted] = useState(false);

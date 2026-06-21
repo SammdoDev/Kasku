@@ -18,27 +18,22 @@ const NoteDialog = ({ open, value, onConfirm, onClose }: NoteDialogProps) => {
 
   useEffect(() => {
     if (!open) return;
-
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDraft(value);
-
     const timer = setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
-
     return () => clearTimeout(timer);
   }, [open, value]);
 
   useEffect(() => {
     if (!open) return;
-
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Enter") {
         onConfirm(draft);
         onClose();
       }
     };
-
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, draft, onConfirm, onClose]);
@@ -61,7 +56,7 @@ const NoteDialog = ({ open, value, onConfirm, onClose }: NoteDialogProps) => {
             maxLength={100}
             autoFocus
           />
-          <p className="mt-1.5 text-right text-[9px] font-bold text-black/30">
+          <p className="mt-1.5 text-right text-[9px] font-bold text-foreground/30">
             {draft.length}/100
           </p>
         </div>
@@ -73,7 +68,6 @@ const NoteDialog = ({ open, value, onConfirm, onClose }: NoteDialogProps) => {
             onClick={onClose}
             className="flex-1"
           />
-
           <Button
             label="Simpan"
             onClick={() => {

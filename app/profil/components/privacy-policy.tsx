@@ -36,11 +36,11 @@ const PRIVACY_ITEMS: PrivacyItem[] = [
 const PrivacyPolicyCard = () => {
   return (
     <div>
-      <span className="inline-block bg-[#CBFF4D] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-black px-2.5 py-1 mb-3">
+      <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3">
         Privacy Policy
       </span>
 
-      <div className="bg-white border-[3px] border-black shadow-[6px_6px_0_#000] p-4.5">
+      <div className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] p-4.5">
         {PRIVACY_ITEMS.map((item, i) => {
           const Icon = item.icon;
           return (
@@ -49,7 +49,7 @@ const PrivacyPolicyCard = () => {
               className={[
                 "py-3.5",
                 i < PRIVACY_ITEMS.length - 1
-                  ? "border-b-[3px] border-black"
+                  ? "border-b-[3px] border-border"
                   : "",
               ].join(" ")}
             >

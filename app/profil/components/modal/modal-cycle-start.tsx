@@ -56,7 +56,7 @@ export default function ModalCycleStart({
     <div className="flex flex-col gap-4 font-mono">
       <CalendarPicker value={dateStr} onChange={setDateStr} />
 
-      <div className="flex items-center gap-2 border-[2px] border-black px-3 py-2 bg-[#F5F3EE]">
+      <div className="flex items-center gap-2 border-[2px] border-border px-3 py-2 bg-[#F5F3EE]">
         <span className="text-[10px] font-bold text-black/50">
           TANGGAL DIPILIH
         </span>

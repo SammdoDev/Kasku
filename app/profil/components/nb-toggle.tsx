@@ -14,12 +14,12 @@ const NbToggle = ({ checked, onChange, label }: NbToggleProps) => {
       aria-checked={checked}
       aria-label={label}
       onClick={() => onChange(!checked)}
-      className="relative w-[46px] h-[26px] border-[3px] border-black shrink-0 bg-black"
+      className="relative w-[46px] h-[26px] border-[3px] border-border shrink-0 bg-black"
     >
       <span
         className="absolute top-[2px] left-[2px] w-4 h-4 transition-transform duration-150"
         style={{
-          background: "#CBFF4D",
+          background: "var(--accent-bg)",
           transform: checked ? "translateX(20px)" : "translateX(0)",
         }}
       />

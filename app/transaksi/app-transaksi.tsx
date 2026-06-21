@@ -119,7 +119,7 @@ const AppTransaksi = () => {
         <SummaryCardsDesktop {...headerProps} />
       </div>
 
-      <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
+      <div className="mb-4 h-0.5 bg-border" />
 
       <PageLeftRightWrapper
         className="mb-5"

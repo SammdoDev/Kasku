@@ -2,12 +2,9 @@
 
 /* ─── Tailwind v4 theme tokens ─────────────────────────────────────────── */
 @theme inline {
-  /* Fonts */
-  --font-sans:
-    var(--font-space-grotesk), ui-sans-serif, system-system, sans-serif;
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Space Mono", ui-monospace, monospace;
 
-  /* Colour aliases – light mode defaults */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -28,13 +25,12 @@
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
 
-  /* Border radius */
   --radius-sm: var(--radius);
   --radius-md: var(--radius);
   --radius-lg: var(--radius);
 }
 
-/* ─── CSS custom properties (HSL channels) ─────────────────────────────── */
+/* ─── CSS custom properties ─────────────────────────────────────────────── */
 @layer base {
   *,
   *::before,
@@ -42,7 +38,7 @@
     box-sizing: border-box;
   }
 
-  /* Light mode */
+  /* ── Light mode ── */
   :root {
     --background: 60 33% 97%;
     --foreground: 0 0% 0%;
@@ -73,9 +69,35 @@
     --ring: 0 0% 0%;
 
     --radius: 0rem;
+
+    /* ── Brand / accent globals ── */
+    --brand-accent: #f5c518;
+    --brand-accent-hover: #e0b010;
+    --brand-accent-fg: #000000;
+    --sidebar-bg: #f5f0e8;
+    --navbar-bg: #f5f0e8;
+    --sidebar-width: 240px;
+
+    /* ── Accent alias (hex, usable langsung di style="") ── */
+    --accent-bg: var(--brand-accent);
+    --accent-fg: var(--brand-accent-fg);
+
+    /* ── Semantic status colors ── */
+    --color-success: #166534;
+    --color-danger: #991b1b;
+    --color-warning: #92400e;
+
+    /* ── Size scale tokens ── */
+    --navbar-h: 71px;
+    --sidebar-w: 240px;
+    --font-scale: 1;
+    --base-font-size: 14px;
+    --nav-font-size: 13.5px;
+    --icon-size: 16px;
+    --spacing-nav: 9px;
   }
 
-  /* Dark mode (class strategy) */
+  /* ── Dark mode ── */
   .dark {
     --background: 0 0% 8%;
     --foreground: 0 0% 100%;
@@ -106,34 +128,58 @@
     --ring: 54 97% 57%;
 
     --radius: 0rem;
+
+    /* ── Brand / accent globals ── */
+    --brand-accent: #f5c518;
+    --brand-accent-hover: #ffd740;
+    --brand-accent-fg: #000000;
+    --sidebar-bg: #1a1a14;
+    --navbar-bg: #1a1a14;
+
+    /* ── Accent alias ── */
+    --accent-bg: var(--brand-accent);
+    --accent-fg: var(--brand-accent-fg);
+
+    /* ── Semantic status colors ── */
+    --color-success: #4ade80;
+    --color-danger: #f87171;
+    --color-warning: #fbbf24;
+
+    /* ── Size scale tokens (sama, override via JS) ── */
+    --navbar-h: 71px;
+    --sidebar-w: 240px;
+    --font-scale: 1;
+    --base-font-size: 14px;
+    --nav-font-size: 13.5px;
+    --icon-size: 16px;
+    --spacing-nav: 9px;
   }
 
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-family: var(--font-sans, Arial, sans-serif);
+    font-size: var(--base-font-size);
   }
 
-  /* Neo-brutalism scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
   }
-
   ::-webkit-scrollbar-track {
     background: hsl(var(--background));
-    border-left: 2px solid black;
+    border-left: 2px solid hsl(var(--border));
   }
-
   ::-webkit-scrollbar-thumb {
-    background: black;
+    background: hsl(var(--foreground));
   }
 }
 
+/* ─── .card component ───────────────────────────────────────────────────── */
 .card {
-  background: #ffffff;
-  border: 2.5px solid #1a1a1a;
+  background: hsl(var(--card));
+  border: 2.5px solid hsl(var(--border));
   padding: 5px;
-  box-shadow: 4px 4px 0 #1a1a1a;
+  box-shadow: 4px 4px 0 hsl(var(--border));
   border-radius: 0;
   transition:
     box-shadow 0.12s ease,
@@ -147,35 +193,33 @@
 }
 
 .card:hover {
-  box-shadow: 6px 6px 0 #1a1a1a;
+  box-shadow: 6px 6px 0 hsl(var(--border));
   transform: translate(-2px, -2px);
 }
 
+/* ─── Shadow utilities ──────────────────────────────────────────────────── */
 @utility shadow-brutal-sm {
-  box-shadow: 2px 2px 0 #000;
+  box-shadow: 2px 2px 0 hsl(var(--border));
 }
-
 @utility shadow-brutal {
-  box-shadow: 3px 3px 0 #000;
+  box-shadow: 3px 3px 0 hsl(var(--border));
 }
-
 @utility shadow-brutal-lg {
-  box-shadow: 4px 4px 0 #000;
+  box-shadow: 4px 4px 0 hsl(var(--border));
 }
-
 @utility shadow-brutal-xs {
-  box-shadow: 1.5px 1.5px 0 #000;
+  box-shadow: 1.5px 1.5px 0 hsl(var(--border));
 }
-
 @utility shadow-brutal-hover {
-  box-shadow: 1px 1px 0 #000;
+  box-shadow: 1px 1px 0 hsl(var(--border));
 }
 
+/* ─── .box component ────────────────────────────────────────────────────── */
 @layer components {
   .box {
     @apply relative w-full aspect-square;
     @apply lg:aspect-auto lg:h-10;
-    @apply border-[2.5px] lg:border-2 border-black overflow-hidden;
+    @apply border-[2.5px] lg:border-2 border-border overflow-hidden;
     @apply flex items-center justify-center;
     @apply shadow-brutal-sm lg:shadow-brutal-xs;
     @apply group-hover:shadow-brutal-hover;

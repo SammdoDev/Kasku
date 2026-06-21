@@ -13,10 +13,10 @@ const AccountTopbar = ({
 }: AccountTopbarProps) => {
   return (
     <div
-      className="flex items-stretch h-[58px] border-b-[4px] border-black px-7"
-      style={{ background: "#CBFF4D" }}
+      className="flex items-stretch h-[58px] border-b-[4px] border-border px-7"
+      style={{ background: "var(--accent-bg)" }}
     >
-      <div className="flex items-center pr-6 mr-6 border-r-[4px] border-black">
+      <div className="flex items-center pr-6 mr-6 border-r-[4px] border-border">
         <span className="font-black text-xl uppercase tracking-tight">
           {title}
         </span>
@@ -26,7 +26,7 @@ const AccountTopbar = ({
         {subtitle}
       </div>
 
-      <div className="flex border-l-[4px] border-black">
+      <div className="flex border-l-[4px] border-border">
         {[
           { icon: Bell, label: "Notifikasi" },
           { icon: Settings, label: "Pengaturan" },
@@ -38,8 +38,8 @@ const AccountTopbar = ({
             aria-label={label}
             className={[
               "w-[58px] flex items-center justify-center transition-colors duration-100",
-              "hover:bg-black hover:text-[#CBFF4D]",
-              i < 2 ? "border-r-[4px] border-black" : "",
+              "hover:bg-black hover:text-[var(--accent)]",
+              i < 2 ? "border-r-[4px] border-border" : "",
             ].join(" ")}
           >
             <Icon size={18} strokeWidth={2.5} />

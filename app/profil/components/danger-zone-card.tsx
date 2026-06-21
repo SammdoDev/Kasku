@@ -12,9 +12,9 @@ const DangerZoneCard = ({
   onDeleteAccount,
 }: DangerZoneCardProps) => {
   return (
-    <div className="border-[3px] border-black shadow-[8px_8px_0_#000] overflow-hidden">
+    <div className="border-[3px] border-border shadow-[8px_8px_0_#000] overflow-hidden">
       <div
-        className="flex items-center gap-2.5 px-5 py-3.5 border-b-[3px] border-black"
+        className="flex items-center gap-2.5 px-5 py-3.5 border-b-[3px] border-border"
         style={{ background: "#FF3B3B" }}
       >
         <AlertTriangle size={18} strokeWidth={2.5} className="text-white" />
@@ -38,7 +38,7 @@ const DangerZoneCard = ({
           <button
             type="button"
             onClick={onResetBudgetData}
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-black bg-white transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border bg-card transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <RefreshCw size={13} strokeWidth={2.5} />
             Reset Budgeting Data
@@ -46,7 +46,7 @@ const DangerZoneCard = ({
           <button
             type="button"
             onClick={onDeleteAccount}
-            className="inline-flex items-center gap-2 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-black bg-[#FF3B3B] text-white transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border bg-[#FF3B3B] text-white transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <Trash2 size={13} strokeWidth={2.5} />
             Delete Account Permanently

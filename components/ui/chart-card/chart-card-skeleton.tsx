@@ -1,7 +1,7 @@
 "use client";
 
 const ChartCardSkeleton = ({ height = 240 }: { height?: number }) => (
-  <div className="border-[2.5px] border-[#1a1a1a] bg-white p-4">
+  <div className="border-[2.5px] border-[#1a1a1a] bg-card p-4">
     {/* title + toggle */}
     <div className="flex justify-between mb-2.5">
       <div>

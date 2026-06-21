@@ -264,7 +264,7 @@ const ModalTambahTransaksi = ({
         onClose={() => setCalendarDialogOpen(false)}
       />
 
-      <div className="sticky bottom-0 left-0 right-0 z-50 border-t-2 border-black">
+      <div className="sticky bottom-0 left-0 right-0 z-50 border-t-2 border-border">
         <TransactionBar
           amount={amount}
           note={note}

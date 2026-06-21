@@ -12,7 +12,7 @@ interface ApiUser {
 }
 
 const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`rounded bg-black/10 animate-pulse ${className}`} />
+  <div className={`rounded bg-foreground/10 animate-pulse ${className}`} />
 );
 
 const LoginAccountCard = () => {
@@ -39,20 +39,23 @@ const LoginAccountCard = () => {
 
   return (
     <div
-      className="bg-white border-[3px] border-black shadow-[6px_6px_0_#000] p-5"
+      className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] p-5"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
-      <span className="inline-block bg-[#CBFF4D] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-black px-2.5 py-1 mb-3">
+      <span
+        style={{ background: "var(--accent-bg)" }}
+        className="inline-block  text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3"
+      >
         Login &amp; Akun
       </span>
 
       {loading ? (
         <Skeleton className="h-[54px] w-full" />
       ) : (
-        <div className="flex items-center gap-3 border-[3px] border-black px-4 py-3 bg-[#F5F3EE]">
+        <div className="flex items-center gap-3 border-[3px] border-border px-4 py-3 bg-[#F5F3EE]">
           <div
-            className="w-8 h-8 border-[2px] border-black flex items-center justify-center shrink-0"
-            style={{ background: "#CBFF4D" }}
+            className="w-8 h-8 border-[2px] border-border flex items-center justify-center shrink-0"
+            style={{ background: "var(--accent-fg)" }}
           >
             {isGoogleUser ? (
               <Mail size={14} strokeWidth={2.5} />
@@ -68,7 +71,7 @@ const LoginAccountCard = () => {
               {isGoogleUser ? user?.email : "Login manual aktif"}
             </p>
           </div>
-          <span className="text-[9px] font-black uppercase tracking-wider bg-black text-[#CBFF4D] border-[2px] border-black px-2.5 py-1 whitespace-nowrap">
+          <span className="text-[9px] font-black uppercase tracking-wider bg-black text-[var(--accent)] border-[2px] border-border px-2.5 py-1 whitespace-nowrap">
             Aktif
           </span>
         </div>

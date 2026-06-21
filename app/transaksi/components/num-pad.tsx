@@ -10,7 +10,7 @@ interface NumPadProps {
   loading?: boolean;
   walletName?: string;
   date: string;
-  onDateClick: () => void; // buka CalendarDialog
+  onDateClick: () => void;
   onWalletClick: () => void;
 }
 
@@ -19,13 +19,21 @@ interface NumKeyProps {
   onClick: () => void;
   className?: string;
   disabled?: boolean;
+  style?: React.CSSProperties;
 }
 
-const NumKey = ({ label, onClick, className, disabled }: NumKeyProps) => (
+const NumKey = ({
+  label,
+  onClick,
+  className,
+  disabled,
+  style,
+}: NumKeyProps) => (
   <button
     type="button"
     onClick={onClick}
     disabled={disabled}
+    style={style}
     className={cn(
       "flex items-center justify-center select-none",
       "text-[22px] font-black font-mono",
@@ -59,129 +67,139 @@ const NumPad = ({
   };
 
   return (
-    <div className="grid grid-cols-4 divide-x-2 divide-y-2 divide-black border-l-2">
+    <div className="grid grid-cols-4 divide-x-2 divide-y-2 divide-border border-l-2 border-border">
+      {/* Row 1 */}
       <NumKey
         label="1"
         onClick={() => onPress("1")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label="2"
         onClick={() => onPress("2")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label="3"
         onClick={() => onPress("3")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       {/* HARI */}
       <NumKey
         label={
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-[10px] font-black tracking-[0.1em] text-[#713f12]">
+            <span
+              className="text-[10px] font-black tracking-[0.1em]"
+              style={{ color: "var(--brand-accent-fg)" }}
+            >
               HARI
             </span>
-            <span className="text-[8px] font-bold text-[#713f12]/60">
+            <span
+              className="text-[8px] font-bold opacity-60"
+              style={{ color: "var(--brand-accent-fg)" }}
+            >
               {isToday ? "hari ini" : formatShort(date)}
             </span>
           </div>
         }
         onClick={onDateClick}
-        className="bg-[#fef9c3] hover:bg-[#fef08a] text-[#713f12]"
+        className="hover:brightness-95"
+        style={{ background: "var(--brand-accent)" } as React.CSSProperties}
       />
 
+      {/* Row 2 */}
       <NumKey
         label="4"
         onClick={() => onPress("4")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label="5"
         onClick={() => onPress("5")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label="6"
         onClick={() => onPress("6")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       {/* AKUN */}
       <NumKey
         label={
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-[10px] font-black tracking-[0.1em]">
+            <span className="text-[10px] font-black tracking-[0.1em] text-foreground">
               AKUN
             </span>
             {walletName && (
-              <span className="text-[7px] font-bold tracking-wide text-[#7c2d12]/70 max-w-[48px] truncate">
+              <span className="text-[7px] font-bold tracking-wide text-foreground/50 max-w-[48px] truncate">
                 {walletName}
               </span>
             )}
           </div>
         }
         onClick={onWalletClick}
-        className={
-          walletName
-            ? "bg-[#fed7aa] text-[#7c2d12]"
-            : "bg-[#ffedd5] hover:bg-[#fed7aa] text-[#7c2d12]"
-        }
+        className="bg-foreground/[0.06] hover:bg-foreground/10 text-foreground"
       />
 
+      {/* Row 3 */}
       <NumKey
         label="7"
         onClick={() => onPress("7")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label="8"
         onClick={() => onPress("8")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label="9"
         onClick={() => onPress("9")}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       {/* DOMPET */}
       <NumKey
         label={
-          <span className="text-[10px] font-black tracking-[0.1em]">
+          <span className="text-[10px] font-black tracking-[0.1em] text-foreground">
             DOMPET
           </span>
         }
         onClick={onWalletClick}
-        className="bg-[#ffedd5] hover:bg-[#fed7aa] text-[#7c2d12]"
+        className="bg-foreground/[0.06] hover:bg-foreground/10"
       />
 
+      {/* Row 4 */}
       <NumKey
         label="0"
         onClick={() => onPress("0")}
-        className="bg-white hover:bg-[#f5f0e8]"
-      />
-      <NumKey
-        label={<span className="text-[20px] font-light">,</span>}
-        onClick={() => onPress(".")}
-        className="bg-white hover:bg-[#f5f0e8]"
-      />
-      <NumKey
-        label={<Delete size={20} strokeWidth={2} />}
-        onClick={onBackspace}
-        className="bg-white hover:bg-[#f5f0e8]"
+        className="bg-card text-foreground hover:bg-foreground/5"
       />
       <NumKey
         label={
+          <span className="text-[20px] font-light text-foreground">,</span>
+        }
+        onClick={() => onPress(".")}
+        className="bg-card hover:bg-foreground/5"
+      />
+      <NumKey
+        label={<Delete size={20} strokeWidth={2} className="text-foreground" />}
+        onClick={onBackspace}
+        className="bg-card hover:bg-foreground/5"
+      />
+      {/* SUBMIT */}
+      <NumKey
+        label={
           loading ? (
-            <span className="text-[11px] tracking-widest animate-pulse">
+            <span className="text-[11px] tracking-widest animate-pulse text-background">
               ···
             </span>
           ) : (
-            <span className="text-[18px]">✓</span>
+            <span className="text-[18px] text-background">✓</span>
           )
         }
         onClick={onSubmit}
         disabled={loading}
-        className="bg-[#1a1a1a] text-white hover:bg-[#333]"
+        className="bg-foreground hover:opacity-90"
       />
     </div>
   );

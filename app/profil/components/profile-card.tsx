@@ -21,7 +21,7 @@ interface ApiUser {
 }
 
 const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`rounded bg-black/10 animate-pulse ${className}`} />
+  <div className={`rounded bg-foreground/10 animate-pulse ${className}`} />
 );
 
 const getInitials = (name: string) =>
@@ -72,22 +72,22 @@ const ProfileCard = () => {
   return (
     <>
       <div
-        className="bg-white border-[3px] border-black shadow-[6px_6px_0_#000] p-5"
+        className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] p-5"
         style={{ fontFamily: DASHBOARD_FONT }}
       >
-        <span className="inline-block bg-[#CBFF4D] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-black px-2.5 py-1 mb-3">
+        <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3">
           Profil Pengguna
         </span>
 
         <div className="flex gap-4 items-start">
           <div
-            className="w-[60px] h-[60px] md:w-[68px] md:h-[68px] border-[3px] border-black shadow-[4px_4px_0_#000] flex items-center justify-center shrink-0"
-            style={{ background: "#CBFF4D" }}
+            className="w-[60px] h-[60px] md:w-[68px] md:h-[68px] border-[3px] border-border shadow-[4px_4px_0_hsl(var(--border))] flex items-center justify-center shrink-0"
+            style={{ background: "var(--accent-bg)" }}
           >
             {loading ? (
               <Skeleton className="w-8 h-6" />
             ) : (
-              <span className="font-black text-lg md:text-xl">
+              <span className="font-black text-lg md:text-xl text-black">
                 {getInitials(displayName)}
               </span>
             )}
@@ -105,7 +105,7 @@ const ProfileCard = () => {
                 <p className="text-xl md:text-2xl font-black uppercase tracking-tighter leading-tight break-words">
                   {displayName}
                 </p>
-                <div className="text-[11px] font-bold text-black/55 mt-1.5 leading-relaxed">
+                <div className="text-[11px] font-bold mt-1.5 leading-relaxed">
                   <p>@{user?.username}</p>
                   <p className="break-all">{user?.email}</p>
                   <p>
@@ -122,7 +122,7 @@ const ProfileCard = () => {
             type="button"
             onClick={() => setActiveModal("edit-profile")}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-black bg-white disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
+            className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border bg-card disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <Edit size={13} strokeWidth={2.5} />
             Edit Profil
@@ -131,7 +131,7 @@ const ProfileCard = () => {
             type="button"
             onClick={() => setActiveModal("change-password")}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-black bg-black text-[#CBFF4D] disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
+            className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border bg-foreground text-background disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <Lock size={13} strokeWidth={2.5} />
             Ganti Password
@@ -140,7 +140,7 @@ const ProfileCard = () => {
             type="button"
             onClick={handleLogout}
             disabled={logoutLoading}
-            className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-red-600 bg-white text-red-600 disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#dc2626] active:translate-x-0 active:translate-y-0 active:shadow-none"
+            className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-red-600 bg-card text-red-600 disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#dc2626] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <LogOut size={13} strokeWidth={2.5} />
             {logoutLoading ? "KELUAR..." : "Logout"}
@@ -148,7 +148,6 @@ const ProfileCard = () => {
         </div>
       </div>
 
-      {/* Modal Edit Profil */}
       <ChildModalWrapper
         open={activeModal === "edit-profile"}
         onClose={() => setActiveModal(null)}
@@ -165,7 +164,6 @@ const ProfileCard = () => {
         />
       </ChildModalWrapper>
 
-      {/* Modal Ganti Password */}
       <ChildModalWrapper
         open={activeModal === "change-password"}
         onClose={() => setActiveModal(null)}

@@ -61,13 +61,13 @@ const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
   };
 
   return (
-    <div className="w-full border-2 border-black bg-white p-3">
+    <div className="w-full border-2 border-border bg-card p-3">
       {/* Month nav */}
       <div className="flex items-center justify-between mb-3">
         <button
           type="button"
           onClick={prevMonth}
-          className="w-8 h-8 flex items-center justify-center border-2 border-black font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+          className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
         >
           ‹
         </button>
@@ -86,7 +86,7 @@ const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
         <button
           type="button"
           onClick={nextMonth}
-          className="w-8 h-8 flex items-center justify-center border-2 border-black font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+          className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
         >
           ›
         </button>

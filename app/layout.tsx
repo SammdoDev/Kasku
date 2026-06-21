@@ -4,6 +4,8 @@ import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 import AppShell from "@/components/layout/app-shell";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ThemeConfigProvider } from "@/components/providers/theme-config-provider";
 
 export const metadata: Metadata = {
   title: "Cashora App",
@@ -32,7 +34,15 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={`${spaceGrotesk.variable} antialiased`}>
-        <AppShell>{children}</AppShell>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+          <ThemeConfigProvider>
+            <AppShell>{children}</AppShell>
+          </ThemeConfigProvider>
+        </ThemeProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `

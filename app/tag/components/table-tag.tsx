@@ -64,7 +64,7 @@ const TabelTag = ({ onEdit, onDelete }: Props) => {
       return (
         <div className="flex items-center gap-1.5">
           <div
-            className="w-4 h-4 border-2 border-black/20"
+            className="w-4 h-4 border-2 border-border/20"
             style={{ background: item.color ?? "#6366f1" }}
           />
           <span className="text-[10px] font-mono text-black/50">

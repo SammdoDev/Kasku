@@ -13,7 +13,7 @@ const ThemeToggle = () => {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    return <div className="h-9 w-9 border-[2.5px] border-black" />;
+    return <div className="h-9 w-9 border-[2.5px] border-border" />;
   }
 
   const isDark = theme === "dark";

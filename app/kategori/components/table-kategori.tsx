@@ -47,7 +47,6 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
       const emojiMeta = cat.icon
         ? EMOJI_OPTIONS.find((e) => e.hexcode === cat.icon)
         : null;
-
       return (
         <div
           className="w-8 h-8 shadow-brutal-sm flex items-center justify-center"
@@ -84,8 +83,8 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
           className={[
             "inline-flex items-center border-2 px-2 py-0.5 text-[9px] font-black tracking-widest",
             cat.type === "income"
-              ? "border-emerald-600 text-emerald-700 bg-emerald-50"
-              : "border-red-500 text-red-600 bg-red-50",
+              ? "border-[var(--color-success)] text-[var(--color-success)] bg-[var(--color-success)]/10"
+              : "border-destructive text-destructive bg-destructive/10",
           ].join(" ")}
         >
           {cat.type === "income" ? "PEMASUKAN" : "PENGELUARAN"}
@@ -95,17 +94,17 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
       return (
         <div className="flex items-center gap-2">
           <div
-            className="w-5 h-5 border-2 border-black shadow-[2px_2px_0px_#000]"
+            className="w-5 h-5 border-2 border-border shadow-brutal-xs"
             style={{ background: cat.color ?? "#6366f1" }}
           />
-          <span className="text-[9px] font-mono font-bold text-black/40">
+          <span className="text-[9px] font-mono font-bold text-foreground/40">
             {cat.color ?? "—"}
           </span>
         </div>
       );
     } else if (header.value === "createdAt") {
       return (
-        <span className="text-[10px] text-black/40 font-mono">
+        <span className="text-[10px] text-foreground/40 font-mono">
           {dateDisplay(cat.created_at)}
         </span>
       );
@@ -120,7 +119,6 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
             }}
             variant="outline"
           />
-
           <Button
             label="HAPUS"
             variant="destructive"

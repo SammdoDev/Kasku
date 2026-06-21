@@ -153,17 +153,17 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
 
       <Field>
         <FieldLabel>PERIODE</FieldLabel>
-        <div className="flex border-2 border-black">
+        <div className="flex border-2 border-border">
           {PERIOD_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => set({ period: opt.value })}
               className={[
-                "flex-1 py-2 text-[10px] font-black tracking-wider transition-all duration-75 border-r-2 border-black last:border-r-0",
+                "flex-1 py-2 text-[10px] font-black tracking-wider transition-all duration-75 border-r-2 border-border last:border-r-0",
                 form.period === opt.value
                   ? "bg-[#1a1a1a] text-white"
-                  : "bg-white text-black/50 hover:bg-[#f5f0e8] hover:text-black",
+                  : "bg-card text-black/50 hover:bg-[#f5f0e8] hover:text-black",
               ].join(" ")}
             >
               {opt.label}

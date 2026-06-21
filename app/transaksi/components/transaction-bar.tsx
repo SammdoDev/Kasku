@@ -15,9 +15,9 @@ function formatRupiah(raw: string): string {
 
 const TransactionBar = ({ amount, note, onNoteClick }: TransactionBarProps) => {
   return (
-    <div className="grid grid-cols-2 border-b-2 border-t-2 border-black bg-white">
+    <div className="grid grid-cols-2 border-b-2 border-t-2 border-border bg-card">
       {/* Jumlah */}
-      <div className="px-3 py-2.5 border-r-2 border-black">
+      <div className="px-3 py-2.5 border-r-2 border-border">
         <p className="text-[8px] font-black tracking-[0.15em] text-[#999] uppercase mb-0.5">
           Jumlah
         </p>

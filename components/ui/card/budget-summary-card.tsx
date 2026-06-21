@@ -15,38 +15,37 @@ export interface BudgetItem {
 
 type Props = {
   budgets: BudgetItem[];
-  /** Mobile uses + slightly bigger shadow, desktop uses sharp corners */
   variant?: "mobile" | "desktop";
 };
 
-/* ── Single budget row ───────────────────────────────────────────── */
 export const BudgetRow = ({ b }: { b: BudgetItem }) => {
   const barColor = b.over_budget
-    ? "#ef4444"
+    ? "var(--color-danger)"
     : b.percent_used > 80
       ? "#f97316"
-      : "#22c55e";
+      : "var(--color-success)";
 
   return (
     <div style={{ fontFamily: DASHBOARD_FONT }}>
       <div className="mb-1 flex flex-wrap items-center justify-between gap-1">
-        <span className="text-[10px] font-extrabold text-[#1a1a1a]">
+        <span className="text-[10px] font-extrabold text-foreground">
           {b.name}
         </span>
         <span
-          className={`flex items-center gap-1.5 text-[9px] font-bold ${b.over_budget ? "text-red-500" : "text-[#555]"}`}
+          className={`flex items-center gap-1.5 text-[9px] font-bold ${
+            b.over_budget ? "text-destructive" : "text-foreground/60"
+          }`}
         >
           {formatIDR(b.spent)} / {formatIDR(b.amount)}
           {b.over_budget && (
-            <span className="border border-red-400 bg-red-100 px-1 py-px text-[7px] font-black text-red-500 rounded">
+            <span className="border border-destructive bg-destructive/10 px-1 py-px text-[7px] font-black text-destructive rounded">
               OVER
             </span>
           )}
         </span>
       </div>
 
-      {/* Progress bar */}
-      <div className="h-1.5 overflow-hidden rounded-full bg-gray-200">
+      <div className="h-1.5 overflow-hidden rounded-full bg-foreground/10">
         <div
           className="h-full transition-[width] duration-500 rounded-full"
           style={{
@@ -56,7 +55,7 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
         />
       </div>
 
-      <p className="mt-0.5 text-[8px] text-[#aaa]">
+      <p className="mt-0.5 text-[8px] text-foreground/40">
         {b.percent_used}% terpakai · Sisa {formatIDR(Math.max(0, b.remaining))}
       </p>
     </div>
@@ -66,22 +65,24 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
 const BudgetSummaryCard = ({ budgets, variant = "mobile" }: Props) => {
   const overCount = budgets.filter((b) => b.over_budget).length;
 
-  const cardClass =
-    variant === "mobile"
-      ? "bg-white border-[2.5px] border-black shadow-brutal-lg p-4"
-      : "border-[2.5px] border-black bg-white p-4 shadow-brutal-lg";
-
   return (
-    <div className={cardClass} style={{ fontFamily: DASHBOARD_FONT }}>
+    <div
+      className="bg-card border-[2.5px] border-border shadow-brutal-lg p-4"
+      style={{ fontFamily: DASHBOARD_FONT }}
+    >
       <div className="flex items-center justify-between mb-3">
         <span
-          className={`font-black uppercase tracking-tight ${variant === "mobile" ? "text-[11px]" : "text-[10px]"}`}
+          className={`font-black uppercase tracking-tight text-foreground ${
+            variant === "mobile" ? "text-[11px]" : "text-[10px]"
+          }`}
         >
           Ringkasan Anggaran
         </span>
         {overCount > 0 && (
           <span
-            className={`border border-red-400 bg-red-100 text-red-500 font-black px-2 py-0.5 text-[8px] ${variant === "mobile" ? "rounded-full" : ""}`}
+            className={`border border-destructive bg-destructive/10 text-destructive font-black px-2 py-0.5 text-[8px] ${
+              variant === "mobile" ? "rounded-full" : ""
+            }`}
           >
             {overCount} OVER
           </span>

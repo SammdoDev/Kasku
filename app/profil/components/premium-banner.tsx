@@ -16,10 +16,10 @@ const PremiumBanner = ({
   onUpgrade,
 }: PremiumBannerProps) => {
   return (
-    <div className="bg-black border-[3px] border-black shadow-[8px_8px_0_#000] flex items-center gap-5 flex-wrap px-7 py-6">
+    <div className="bg-black border-[3px] border-border shadow-[8px_8px_0_#000] flex items-center gap-5 flex-wrap px-7 py-6">
       <div
-        className="w-[52px] h-[52px] border-[3px] border-black flex items-center justify-center shrink-0"
-        style={{ background: "#CBFF4D" }}
+        className="w-[52px] h-[52px] border-[3px] border-border flex items-center justify-center shrink-0"
+        style={{ background: "var(--accent-bg)" }}
         aria-hidden="true"
       >
         <Crown size={24} strokeWidth={2.5} />
@@ -28,7 +28,7 @@ const PremiumBanner = ({
       <div className="flex-1 min-w-0">
         <p
           className="text-xl font-black uppercase tracking-tight leading-none"
-          style={{ color: "#CBFF4D" }}
+          style={{ color: "var(--accent-fg)" }}
         >
           Premium Membership
         </p>
@@ -36,8 +36,8 @@ const PremiumBanner = ({
           Berlaku hingga {expiresAt}
         </p>
         <span
-          className="inline-block text-[9px] font-black uppercase tracking-wider border-[2px] border-black px-2.5 py-1 mt-2"
-          style={{ background: "#CBFF4D" }}
+          className="inline-block text-[9px] font-black uppercase tracking-wider border-[2px] border-border px-2.5 py-1 mt-2"
+          style={{ background: "var(--accent-fg)" }}
         >
           ● Status: {isActive ? "Aktif" : "Nonaktif"}
         </span>
@@ -55,8 +55,8 @@ const PremiumBanner = ({
         <button
           type="button"
           onClick={onUpgrade}
-          className="inline-flex items-center gap-2 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-black text-black shadow-[4px_4px_0_#000] transition-transform duration-100 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[6px_6px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none"
-          style={{ background: "#CBFF4D" }}
+          className="inline-flex items-center gap-2 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border text-black shadow-[4px_4px_0_#000] transition-transform duration-100 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[6px_6px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none"
+          style={{ background: "var(--accent-bg)" }}
         >
           <Rocket size={13} strokeWidth={2.5} />
           Upgrade Plan

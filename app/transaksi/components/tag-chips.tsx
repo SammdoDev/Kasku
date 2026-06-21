@@ -58,7 +58,7 @@ const TagChips = ({ selected, onChange }: TagChipsProps) => {
   if (tags.length === 0) return null;
 
   return (
-    <div className="border-t-2 border-black">
+    <div className="border-t-2 border-border">
       <div className="flex gap-2 px-3 py-2 overflow-x-auto scrollbar-none">
         {tags.map((tag) => {
           const isSelected = selected.includes(tag.id);

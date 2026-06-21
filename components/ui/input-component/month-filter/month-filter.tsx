@@ -43,8 +43,8 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
   const iconSize = sm ? 14 : 16;
 
   const navCls = [
-    "inline-flex items-center justify-center font-black border-2 border-black",
-    "bg-white text-black transition-all",
+    "inline-flex items-center justify-center font-black border-2 border-border",
+    "bg-card text-black transition-all",
     "shadow-[4px_4px_0px_#000]",
     "hover:shadow-[2px_2px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]",
     "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
@@ -65,7 +65,7 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
       <div
         className={[
           "inline-flex items-center justify-center whitespace-nowrap",
-          "font-black tracking-wide font-mono border-2 border-black bg-white",
+          "font-black tracking-wide font-mono border-2 border-border bg-card",
           "shadow-[4px_4px_0px_#000]",
           h,
           px,

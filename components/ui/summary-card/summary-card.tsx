@@ -44,7 +44,7 @@ const SummaryCard = ({
       ref={cardRef}
       onClick={onClick}
       className={[
-        "group relative flex flex-col overflow-hidden border-[2.5px] border-[#1a1a1a] bg-white",
+        "group relative flex flex-col overflow-hidden border-[2.5px] border-[#1a1a1a] bg-card",
         "px-4 pb-0 pt-3.5 font-mono",
         "transition-[box-shadow,transform] duration-150 ease-out",
         "hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#1a1a1a]",

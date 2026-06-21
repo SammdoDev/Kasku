@@ -45,25 +45,25 @@ const TermsAccordion = ({ items = DEFAULT_ITEMS }: TermsAccordionProps) => {
 
   return (
     <div>
-      <span className="inline-block bg-[#CBFF4D] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-black px-2.5 py-1 mb-3">
+      <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3">
         Terms &amp; Conditions
       </span>
 
-      <div className="border-[3px] border-black shadow-[6px_6px_0_#000]">
+      <div className="border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))]">
         {items.map((item, i) => {
           const isOpen = openId === item.id;
           return (
             <div
               key={item.id}
               className={
-                i < items.length - 1 ? "border-b-[3px] border-black" : ""
+                i < items.length - 1 ? "border-b-[3px] border-border" : ""
               }
             >
               <button
                 type="button"
                 onClick={() => setOpenId(isOpen ? null : item.id)}
                 aria-expanded={isOpen}
-                className="w-full flex items-center justify-between text-left px-4.5 py-3.5 bg-white text-[11px] font-black uppercase tracking-wide transition-colors duration-100 hover:bg-[#CBFF4D]"
+                className="w-full flex items-center justify-between text-left px-4.5 py-3.5 bg-card text-[11px] font-black uppercase tracking-wide transition-colors duration-100 hover:bg-[var(--accent)]"
               >
                 {item.title}
                 <ChevronDown
@@ -76,7 +76,7 @@ const TermsAccordion = ({ items = DEFAULT_ITEMS }: TermsAccordionProps) => {
                 />
               </button>
               {isOpen && (
-                <div className="px-4.5 py-3.5 bg-[#F5F3EE] border-t-[3px] border-black text-[12px] text-black/65 font-medium leading-relaxed">
+                <div className="px-4.5 py-3.5 bg-[#F5F3EE] border-t-[3px] border-border text-[12px] text-black/65 font-medium leading-relaxed">
                   {item.content}
                 </div>
               )}

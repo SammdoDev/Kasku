@@ -12,7 +12,7 @@ import TermsAccordion from "./components/terms-accordion";
 
 const AppSaya = () => {
   return (
-    <div className="mx-auto" style={{ background: "#F5F3EE" }}>
+    <div className="mx-auto bg-background min-h-screen">
       <div className="flex flex-col gap-5 p-6">
         <AccountStatStrip />
 

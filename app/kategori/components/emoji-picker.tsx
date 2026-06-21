@@ -42,13 +42,13 @@ interface EmojiPickerProps {
 
 const EmojiPicker = ({ value, onChange }: EmojiPickerProps) => {
   return (
-    <div className="border-2 border-black bg-white max-h-64 overflow-y-auto">
+    <div className="border-2 border-border bg-card max-h-64 overflow-y-auto">
       {GROUPS.map((group) => {
         const emojis = EMOJI_OPTIONS.filter((e) => e.group === group);
         return (
           <div key={group}>
-            <div className="px-3 py-1.5 bg-white border-b border-black/10 sticky top-0 z-10">
-              <span className="text-[9px] font-black tracking-widest uppercase text-black/40">
+            <div className="px-3 py-1.5 bg-card border-b border-border/10 sticky top-0 z-10">
+              <span className="text-[9px] font-black tracking-widest uppercase text-foreground/40">
                 {group}
               </span>
             </div>
@@ -62,22 +62,24 @@ const EmojiPicker = ({ value, onChange }: EmojiPickerProps) => {
                     title={emoji.label}
                     onClick={() => onChange(emoji.hexcode)}
                     className={[
-                      "flex flex-col items-center justify-center gap-1 p-2 border-b border-r border-black/10 transition-colors duration-75",
+                      "flex flex-col items-center justify-center gap-1 p-2 border-b border-r border-border/10 transition-colors duration-75",
                       isSelected
-                        ? "bg-black"
-                        : "hover:bg-black/5 active:bg-black/10",
+                        ? "bg-foreground"
+                        : "hover:bg-foreground/5 active:bg-foreground/10",
                     ].join(" ")}
                   >
                     <OpenmojiImg
                       hexcode={emoji.hexcode}
                       size={22}
                       alt={emoji.label}
-                      className={isSelected ? "brightness-[10]" : ""}
+                      className={
+                        isSelected ? "brightness-[10] dark:brightness-0" : ""
+                      }
                     />
                     <span
                       className={[
                         "text-[8px] font-bold leading-tight text-center line-clamp-2 w-full",
-                        isSelected ? "text-white" : "text-black/40",
+                        isSelected ? "text-background" : "text-foreground/40",
                       ].join(" ")}
                     >
                       {emoji.label}

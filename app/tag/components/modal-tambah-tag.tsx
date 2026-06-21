@@ -105,8 +105,8 @@ const ModalTambahTag = ({ onClose, onSuccess, editTarget }: Props) => {
               className={[
                 "w-7 h-7 border-2 transition-all",
                 form.color === c
-                  ? "border-black scale-110 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                  : "border-transparent hover:border-black/40",
+                  ? "border-border scale-110 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  : "border-transparent hover:border-border/40",
               ].join(" ")}
               style={{ background: c }}
             />
@@ -114,7 +114,7 @@ const ModalTambahTag = ({ onClose, onSuccess, editTarget }: Props) => {
         </div>
         <div className="flex items-center gap-2 mt-1">
           <div
-            className="w-8 h-8 border-2 border-black flex-shrink-0"
+            className="w-8 h-8 border-2 border-border flex-shrink-0"
             style={{ background: form.color }}
           />
           <InputText

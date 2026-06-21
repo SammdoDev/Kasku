@@ -27,7 +27,6 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
   const resetFilter = useTransaksiStore((s) => s.resetFilter);
   const setReference = useTransaksiStore((s) => s.setReference);
 
-  // ── sync month filter → transaksi filter ──────────────────────
   const { month } = useMonthFilter();
   useEffect(() => {
     setFilter({ month, page: 1 });
@@ -73,9 +72,9 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
           defaultValue={filter.search}
           onChange={(e) => handleSearch(e.target.value)}
           className={[
-            "h-9 w-full min-w-0 border-2 border-black bg-white px-3",
-            "text-[11px] font-mono font-bold tracking-wide",
-            "placeholder:text-black/30",
+            "h-9 w-full min-w-0 border-2 border-border bg-card px-3",
+            "text-[11px] font-mono font-bold tracking-wide text-foreground",
+            "placeholder:text-foreground/30",
             "shadow-brutal-lg",
             "focus:outline-none focus:shadow-brutal-sm",
             "focus:translate-x-0.5 focus:translate-y-0.5 transition-all duration-100",
@@ -114,13 +113,13 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
               })
             }
             className={[
-              "h-9 inline-flex items-center gap-1 border-2 border-black px-3",
+              "h-9 inline-flex items-center gap-1 border-2 border-border px-3",
               "text-[10px] font-black tracking-wide font-mono uppercase",
               "transition-all duration-100",
               filter.tag_id === tag.id
-                ? "bg-black text-white shadow-none translate-x-[3px] translate-y-[3px]"
+                ? "bg-foreground text-background shadow-none translate-x-[3px] translate-y-[3px]"
                 : [
-                    "bg-white text-black",
+                    "bg-card text-foreground",
                     "shadow-brutal-lg",
                     "hover:shadow-brutal-sm",
                     "hover:translate-x-[2px] hover:translate-y-[2px]",

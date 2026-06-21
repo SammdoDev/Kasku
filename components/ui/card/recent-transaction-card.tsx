@@ -20,7 +20,7 @@ export interface RecentTransaction {
   amount: number;
   type: "income" | "expense";
   payment_method_name: string | null;
-  transfer_pair_id?: string | null; // ✅ tambah field ini
+  transfer_pair_id?: string | null;
 }
 
 type Props = {
@@ -46,12 +46,12 @@ function resolveHexcode(icon: string | null): string {
 
 const SkeletonRow = () => (
   <div className="flex items-center gap-3 py-2.5 animate-pulse">
-    <div className="w-9 h-9 shrink-0 bg-gray-100 border-[2px] border-[#e5e5e5]" />
+    <div className="w-9 h-9 shrink-0 bg-foreground/10 border-[2px] border-border" />
     <div className="flex-1 min-w-0 flex flex-col gap-1.5">
-      <div className="h-2.5 w-32 bg-gray-200" />
-      <div className="h-2 w-20 bg-gray-100" />
+      <div className="h-2.5 w-32 bg-foreground/10" />
+      <div className="h-2 w-20 bg-foreground/[0.07]" />
     </div>
-    <div className="h-3 w-16 bg-gray-200 shrink-0" />
+    <div className="h-3 w-16 bg-foreground/10 shrink-0" />
   </div>
 );
 
@@ -112,10 +112,10 @@ function TransactionRow({
       onTouchEnd={cancelPress}
       className={onDelete ? "select-none cursor-pointer" : ""}
     >
-      {idx > 0 && <div className="border-t border-[#f0f0f0]" />}
+      {idx > 0 && <div className="border-t border-border/30" />}
       <div className="flex items-center gap-3 py-2.5">
         <div
-          className="w-9 h-9 shrink-0 border-2 flex items-center justify-center select-none shadow-[2px_2px_0px_#1a1a1a]"
+          className="w-9 h-9 shrink-0 border-2 flex items-center justify-center select-none shadow-[2px_2px_0px_hsl(var(--border))]"
           style={{ background: bgColor, borderColor }}
           aria-hidden="true"
         >
@@ -127,19 +127,19 @@ function TransactionRow({
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-extrabold text-[#1a1a1a] truncate leading-tight">
+          <p className="text-[11px] font-extrabold text-foreground truncate leading-tight">
             {txn.description}
           </p>
-          <p className="text-[9px] text-[#999] font-bold mt-0.5 flex items-center gap-1 flex-wrap leading-tight">
+          <p className="text-[9px] text-foreground/50 font-bold mt-0.5 flex items-center gap-1 flex-wrap leading-tight">
             <span className="truncate max-w-[80px]">
               {txn.category_name ?? "—"}
             </span>
-            <span className="text-[#ddd]">·</span>
+            <span className="text-foreground/20">·</span>
             <span>{formatRelativeDate(txn.date)}</span>
             {txn.payment_method_name && (
               <>
-                <span className="text-[#ddd]">·</span>
-                <span className="truncate max-w-[60px] text-[#aaa]">
+                <span className="text-foreground/20">·</span>
+                <span className="truncate max-w-[60px] text-foreground/35">
                   {txn.payment_method_name}
                 </span>
               </>
@@ -151,10 +151,10 @@ function TransactionRow({
           className={[
             "text-[12px] font-black shrink-0 tabular-nums",
             isTransfer
-              ? "text-[#4338ca]"
+              ? "text-[#4338ca] dark:text-[#818cf8]"
               : isIncome
-                ? "text-[#166534]"
-                : "text-[#991b1b]",
+                ? "text-[var(--color-success)]"
+                : "text-[var(--color-danger)]",
           ].join(" ")}
         >
           {isTransfer ? "⇄" : isIncome ? "+" : "-"}
@@ -187,12 +187,12 @@ const RecentTransactionsCard = ({
 
   return (
     <div
-      className="border-[2.5px] h-full border-[#1a1a1a] bg-white shadow-brutal-lg flex flex-col"
+      className="border-[2.5px] h-full border-border bg-card shadow-brutal-lg flex flex-col"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2">
-        <span className="text-[10px] font-black tracking-[0.3px] text-[#1a1a1a] uppercase">
+        <span className="text-[10px] font-black tracking-[0.3px] text-foreground uppercase">
           Transaksi Terkini
         </span>
         <div className="flex items-center gap-2">
@@ -200,10 +200,10 @@ const RecentTransactionsCard = ({
             type="button"
             onClick={() => setFilterOpen((v) => !v)}
             className={[
-              "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-colors px-1.5 py-0.5 border",
+              "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all px-1.5 py-0.5 border",
               filterOpen
-                ? "border-black bg-black text-white"
-                : "border-black/20 text-[#555] hover:border-black hover:text-black",
+                ? "border-border bg-foreground text-background"
+                : "border-border/20 text-foreground/50 hover:border-border hover:text-foreground",
             ].join(" ")}
           >
             <SlidersHorizontal size={10} strokeWidth={3} />
@@ -216,7 +216,7 @@ const RecentTransactionsCard = ({
           </button>
           <Link
             href="/transaksi"
-            className="flex items-center gap-1 text-[9px] font-black text-[#555] hover:text-black uppercase tracking-widest transition-colors group"
+            className="flex items-center gap-1 text-[9px] font-black text-foreground/50 hover:text-foreground uppercase tracking-widest transition-colors group"
           >
             Semua
             <ChevronRight
@@ -240,8 +240,8 @@ const RecentTransactionsCard = ({
 
       {/* Accordion limit */}
       {filterOpen && (
-        <div className="px-3.5 pb-2.5 border-b-2 border-dashed border-[#e5e5e5]">
-          <p className="text-[8px] font-black tracking-widest text-[#bbb] uppercase mb-1.5">
+        <div className="px-3.5 pb-2.5 border-b-2 border-dashed border-border/40">
+          <p className="text-[8px] font-black tracking-widest text-foreground/30 uppercase mb-1.5">
             Tampilkan
           </p>
           <div className="flex items-center gap-1.5">
@@ -256,21 +256,21 @@ const RecentTransactionsCard = ({
                 className={[
                   "text-[10px] font-black px-3 py-1 border-2 transition-all duration-75 active:brightness-90",
                   limit === opt
-                    ? "border-black bg-[#1a1a1a] text-white shadow-none translate-x-[1px] translate-y-[1px]"
-                    : "border-black bg-white text-black shadow-[2px_2px_0px_#1a1a1a] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none",
+                    ? "border-border bg-foreground text-background shadow-none translate-x-[1px] translate-y-[1px]"
+                    : "border-border bg-card text-foreground shadow-[2px_2px_0px_hsl(var(--border))] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none",
                 ].join(" ")}
               >
                 {opt}
               </button>
             ))}
-            <span className="text-[8px] font-bold text-[#bbb] ml-1">
+            <span className="text-[8px] font-bold text-foreground/30 ml-1">
               transaksi
             </span>
           </div>
         </div>
       )}
 
-      <div className="border-t-[1.5px] border-dashed border-[#e5e5e5]" />
+      <div className="border-t-[1.5px] border-dashed border-border/40" />
 
       {/* List */}
       <div className="max-h-[350px] overflow-y-auto px-3.5">
@@ -278,7 +278,7 @@ const RecentTransactionsCard = ({
           Array.from({ length: limit }).map((_, i) => <SkeletonRow key={i} />)
         ) : filtered.length === 0 ? (
           <div className="py-8 text-center">
-            <span className="text-[10px] font-black text-[#bbb] tracking-widest uppercase">
+            <span className="text-[10px] font-black text-foreground/30 tracking-widest uppercase">
               Belum ada transaksi
             </span>
           </div>
@@ -295,8 +295,8 @@ const RecentTransactionsCard = ({
       </div>
 
       {!loading && filtered.length > 0 && (
-        <div className="shrink-0 border-t-[1.5px] border-dashed border-[#e5e5e5] mx-3.5 mt-1 mb-3.5 pt-2.5 flex items-center justify-between">
-          <span className="text-[8px] font-black text-[#bbb] tracking-widest uppercase">
+        <div className="shrink-0 border-t-[1.5px] border-dashed border-border/40 mx-3.5 mt-1 mb-3.5 pt-2.5 flex items-center justify-between">
+          <span className="text-[8px] font-black text-foreground/30 tracking-widest uppercase">
             {filtered.length} transaksi ditampilkan
           </span>
         </div>

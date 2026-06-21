@@ -31,14 +31,10 @@ const CategoryButton = ({
   const startPress = () => {
     didLongPress.current = false;
     longPressCount.current = 0;
-
-    // long press pertama (500ms) → edit
     pressTimer.current = setTimeout(() => {
       didLongPress.current = true;
       longPressCount.current = 1;
       onEdit?.(id);
-
-      // long press kedua (tahan terus 1000ms total) → delete
       pressTimer.current = setTimeout(() => {
         longPressCount.current = 2;
         onDelete?.(id);
@@ -70,16 +66,16 @@ const CategoryButton = ({
       onTouchMove={cancelPress}
       onContextMenu={(e) => e.preventDefault()}
       className={[
-        "flex flex-col items-center gap-2 p-3 border-r-[1.5px] border-b-[1.5px] border-black/10 transition-colors duration-75",
+        "flex flex-col items-center gap-2 p-3 border-r-[1.5px] border-b-[1.5px] border-border/10 transition-colors duration-75",
         selected
-          ? "bg-[#1a1a1a] text-white"
-          : "hover:bg-[#f5f0e8] active:bg-[#1a1a1a] active:text-white",
+          ? "bg-foreground text-background"
+          : "hover:bg-[var(--sidebar-bg)] active:bg-foreground active:text-background",
       ].join(" ")}
     >
       <div
         className={[
           "w-11 h-11 flex items-center justify-center border-2",
-          selected ? "border-white/30" : "border-black/10",
+          selected ? "border-background/30" : "border-border/10",
         ].join(" ")}
         style={
           !selected && color ? { backgroundColor: color + "22" } : undefined

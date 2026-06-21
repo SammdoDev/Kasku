@@ -92,7 +92,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
       );
     } else if (header.value === "period") {
       return (
-        <span className="text-[10px] font-black tracking-wider border-2 border-black px-2 py-0.5">
+        <span className="text-[10px] font-black tracking-wider border-2 border-border px-2 py-0.5">
           {PERIOD_LABEL[item.period] ?? item.period}
         </span>
       );
@@ -127,7 +127,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
           className="flex flex-col gap-1 w-full"
           style={{ fontFamily: DASHBOARD_FONT }}
         >
-          <div className="w-full h-3 border-2 border-black bg-white">
+          <div className="w-full h-3 border-2 border-border bg-card">
             <div
               className={`h-full transition-all ${over ? "bg-red-500" : pct >= 80 ? "bg-yellow-400" : "bg-[#1a1a1a]"}`}
               style={{ width: `${Math.min(pct, 100)}%` }}

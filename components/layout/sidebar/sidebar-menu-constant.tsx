@@ -48,8 +48,6 @@ export const NAV_BOTTOM: NavItem[] = [
 export const SIDEBAR_CONFIG = {
   appName: "Cashora",
   sidebarWidth: "220px",
-  accentColor: "#F5C518",
-  bgColor: "#F5F0E8",
 } as const;
 
 export const NAVBAR_CONFIG = {

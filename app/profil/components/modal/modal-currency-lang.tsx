@@ -64,8 +64,8 @@ export default function ModalCurrencyLang({
               className={[
                 "flex items-center justify-between px-3 py-2.5 border-[2px] text-left transition-all duration-100",
                 currency === c.value
-                  ? "border-black bg-black text-[#CBFF4D]"
-                  : "border-black bg-white hover:bg-[#f5f5f5]",
+                  ? "border-border bg-black text-[var(--accent)]"
+                  : "border-border bg-card hover:bg-[#f5f5f5]",
               ].join(" ")}
             >
               <span className="text-[11px] font-black">{c.label}</span>
@@ -88,8 +88,8 @@ export default function ModalCurrencyLang({
               className={[
                 "flex items-center justify-between px-3 py-2.5 border-[2px] text-left transition-all duration-100",
                 language === l.value
-                  ? "border-black bg-black text-[#CBFF4D]"
-                  : "border-black bg-white hover:bg-[#f5f5f5]",
+                  ? "border-border bg-black text-[var(--accent)]"
+                  : "border-border bg-card hover:bg-[#f5f5f5]",
               ].join(" ")}
             >
               <span className="text-[11px] font-black">{l.label}</span>

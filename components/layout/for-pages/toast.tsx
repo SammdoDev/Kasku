@@ -128,7 +128,7 @@ function ToastItem({ toast: t }: { toast: Toast }) {
       onMouseLeave={resume}
       className={[
         "relative flex items-start gap-3 overflow-hidden",
-        "border-[2.5px] border-black font-mono",
+        "border-[2.5px] border-border font-mono",
         "px-3.5 py-3 min-w-[280px] max-w-[380px]",
         "transition-all duration-300",
         cfg.bg,
@@ -141,7 +141,7 @@ function ToastItem({ toast: t }: { toast: Toast }) {
       <span
         className={[
           "shrink-0 self-start mt-0.5",
-          "border-2 border-black px-1.5 py-0.5",
+          "border-2 border-border px-1.5 py-0.5",
           "text-[10px] font-black tracking-[0.15em] text-white",
           cfg.accent,
         ].join(" ")}

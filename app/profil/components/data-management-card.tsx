@@ -70,11 +70,11 @@ const DataManagementCard = () => {
   return (
     <>
       <div
-        className="bg-white border-[3px] border-black shadow-[6px_6px_0_#000] overflow-hidden"
+        className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] overflow-hidden"
         style={{ fontFamily: DASHBOARD_FONT }}
       >
-        <div className="px-5 pt-4 pb-3.5 border-b-[3px] border-black">
-          <span className="inline-block bg-[#CBFF4D] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-black px-2.5 py-1">
+        <div className="px-5 pt-4 pb-3.5 border-b-[3px] border-border">
+          <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1">
             Kelola Data
           </span>
         </div>
@@ -87,13 +87,13 @@ const DataManagementCard = () => {
               onClick={onClick}
               disabled={!!loadingKey}
               className={[
-                "flex flex-col items-center justify-center gap-2 py-5 px-2 bg-white transition-colors duration-100 hover:bg-[#CBFF4D] disabled:opacity-50 disabled:pointer-events-none",
+                "flex flex-col items-center justify-center gap-2 py-5 px-2 bg-card transition-colors duration-100 hover:bg-[var(--accent)] disabled:opacity-50 disabled:pointer-events-none",
                 // border kanan: mobile tiap kolom kiri, desktop semua kecuali terakhir
-                i % 2 === 0 ? "border-r-[2px] border-black" : "",
-                "md:border-r-[2px] md:border-black",
+                i % 2 === 0 ? "border-r-[2px] border-border" : "",
+                "md:border-r-[2px] md:border-border",
                 i === actions.length - 1 ? "md:border-r-0" : "",
                 // border bawah: mobile row pertama
-                i < 2 ? "border-b-[2px] border-black md:border-b-0" : "",
+                i < 2 ? "border-b-[2px] border-border md:border-b-0" : "",
               ].join(" ")}
             >
               {loadingKey === key ? (

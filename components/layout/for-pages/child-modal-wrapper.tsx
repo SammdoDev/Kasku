@@ -68,7 +68,7 @@ const ChildModalWrapper = ({
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [open, portal]); // ← tambah portal di sini
+  }, [open, portal]);
 
   useEffect(() => {
     if (!open) return;
@@ -99,13 +99,18 @@ const ChildModalWrapper = ({
       aria-modal="true"
       role="dialog"
     >
-      <div className="absolute inset-0 bg-[#1a1a1a]/60" onClick={onClose} />
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/70 dark:bg-black/80"
+        onClick={onClose}
+      />
 
+      {/* Panel */}
       <div
         ref={panelRef}
         className={cn(
-          "relative w-full border-2 border-[#1a1a1a] bg-white font-mono",
-          width !== "full" && "shadow-[6px_6px_0_#1a1a1a]",
+          "relative w-full border-[3px] border-border bg-card font-mono",
+          width !== "full" && "shadow-[6px_6px_0_hsl(var(--border))]",
           widthMap[width],
           className,
         )}
@@ -115,26 +120,28 @@ const ChildModalWrapper = ({
           transition: "opacity 300ms, transform 300ms",
         }}
       >
-        <div className="flex items-start justify-between border-b-2 border-[#1a1a1a] px-5 py-3.5">
+        {/* Header */}
+        <div className="flex items-start justify-between border-b-[3px] border-border px-5 py-3.5">
           <div>
-            <h2 className="text-[13px] font-black tracking-[0.12em] text-[#1a1a1a] leading-none">
+            <h2 className="text-[13px] font-black tracking-[0.12em] text-foreground leading-none">
               {title}
             </h2>
             {subtitle && (
-              <p className="mt-1 text-[9px] tracking-widest text-[#999]">
+              <p className="mt-1 text-[9px] tracking-widest text-foreground/40">
                 {subtitle}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="ml-4 flex h-7 w-7 flex-shrink-0 items-center justify-center border-2 border-[#1a1a1a] text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-colors duration-100"
+            className="ml-4 flex h-7 w-7 flex-shrink-0 items-center justify-center border-[2px] border-border text-foreground hover:bg-foreground hover:text-background transition-colors duration-100"
             aria-label="Tutup"
           >
             <X size={13} />
           </button>
         </div>
 
+        {/* Body */}
         <div
           className="px-5 py-4 overflow-y-auto"
           style={{

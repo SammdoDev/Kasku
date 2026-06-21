@@ -25,7 +25,7 @@ const DashboardSummaryBar = ({
 
   return (
     <div
-      className="border-[2.5px] border-[#1a1a1a] bg-white p-4"
+      className="border-[2.5px] border-[#1a1a1a] bg-card p-4"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
       {/* Top row: bulan + filter */}

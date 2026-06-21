@@ -86,8 +86,8 @@ export default function ModalImport({ onClose, onSuccess }: Props) {
         onDragOver={(e) => e.preventDefault()}
         onClick={() => inputRef.current?.click()}
         className={[
-          "border-[3px] border-dashed border-black p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors",
-          file ? "bg-[#CBFF4D]/20" : "bg-white hover:bg-[#f5f5f5]",
+          "border-[3px] border-dashed border-border p-6 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors",
+          file ? "bg-[var(--accent)]/20" : "bg-card hover:bg-[#f5f5f5]",
         ].join(" ")}
       >
         <input
@@ -135,8 +135,8 @@ export default function ModalImport({ onClose, onSuccess }: Props) {
 
       {/* Result */}
       {result && (
-        <div className="border-[2px] border-black">
-          <div className="flex items-center gap-2 px-3 py-2 border-b-[2px] border-black bg-[#CBFF4D]">
+        <div className="border-[2px] border-border">
+          <div className="flex items-center gap-2 px-3 py-2 border-b-[2px] border-border bg-[var(--accent)]">
             <CheckCircle size={13} strokeWidth={2.5} />
             <p className="text-[10px] font-black uppercase tracking-wide">
               Hasil Import
@@ -155,7 +155,7 @@ export default function ModalImport({ onClose, onSuccess }: Props) {
             ))}
           </div>
           {result.errors.length > 0 && (
-            <div className="px-3 py-2 border-t-[2px] border-black bg-red-50">
+            <div className="px-3 py-2 border-t-[2px] border-border bg-red-50">
               <p className="text-[9px] font-black text-red-600 uppercase mb-1">
                 Error
               </p>

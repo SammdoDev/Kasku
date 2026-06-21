@@ -78,8 +78,8 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
     <p
       data-slot="field-description"
       className={cn(
-        "text-black/60 text-sm font-medium leading-normal",
-        "[&>a:hover]:text-black [&>a]:underline [&>a]:underline-offset-4 [&>a]:font-bold",
+        "text-foreground/60 text-sm font-medium leading-normal",
+        "[&>a:hover]:text-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a]:font-bold",
         className,
       )}
       {...props}
@@ -100,7 +100,7 @@ function FieldSeparator({
     >
       <Separator className="absolute inset-0 top-1/2" />
       {children && (
-        <span className="bg-white text-black/60 font-bold uppercase tracking-wide text-xs relative mx-auto block w-fit px-3">
+        <span className="bg-card text-foreground/60 font-bold uppercase tracking-wide text-xs relative mx-auto block w-fit px-3">
           {children}
         </span>
       )}
@@ -137,7 +137,7 @@ function FieldError({
       role="alert"
       data-slot="field-error"
       className={cn(
-        "border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold text-black shadow-brutal-sm",
+        "border-2 border-border bg-destructive/10 px-3 py-2 text-sm font-bold text-destructive shadow-brutal-sm",
         className,
       )}
       {...props}

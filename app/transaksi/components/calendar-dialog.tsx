@@ -23,7 +23,7 @@ const MONTHS_ID = [
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
   const totalDays = new Date(year, month + 1, 0).getDate();
-  const offset = (firstDay + 6) % 7; // Mon = 0
+  const offset = (firstDay + 6) % 7;
   const cells: (number | null)[] = Array(offset).fill(null);
   for (let d = 1; d <= totalDays; d++) cells.push(d);
   return cells;
@@ -50,7 +50,6 @@ const CalendarDialog = ({
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   const cells = getCalendarDays(viewYear, viewMonth);
-
   const makeDate = (day: number) =>
     `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
@@ -86,12 +85,13 @@ const CalendarDialog = ({
           <button
             type="button"
             onClick={prevMonth}
-            className="w-9 h-9 flex items-center justify-center border-2 border-black font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+            className="w-9 h-9 flex items-center justify-center border-2 border-border text-foreground font-black text-lg hover:bg-foreground/5 active:brightness-90 transition-colors"
           >
             ‹
           </button>
+
           <div className="flex items-center gap-2">
-            <span className="text-[13px] font-black tracking-wider">
+            <span className="text-[13px] font-black tracking-wider text-foreground">
               {MONTHS_ID[viewMonth]} {viewYear}
             </span>
             <button
@@ -100,15 +100,21 @@ const CalendarDialog = ({
                 onConfirm(todayStr);
                 onClose();
               }}
-              className="text-[9px] font-black tracking-widest text-[#713f12] bg-[#fef9c3] border-2 border-[#713f12]/30 px-2 py-0.5 hover:bg-[#fef08a] active:brightness-90 transition-colors"
+              className="text-[9px] font-black tracking-widest px-2 py-0.5 border-2 transition-colors"
+              style={{
+                color: "var(--brand-accent-fg)",
+                background: "var(--brand-accent)",
+                borderColor: "var(--brand-accent)",
+              }}
             >
               HARI INI
             </button>
           </div>
+
           <button
             type="button"
             onClick={nextMonth}
-            className="w-9 h-9 flex items-center justify-center border-2 border-black font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+            className="w-9 h-9 flex items-center justify-center border-2 border-border text-foreground font-black text-lg hover:bg-foreground/5 active:brightness-90 transition-colors"
           >
             ›
           </button>
@@ -119,7 +125,7 @@ const CalendarDialog = ({
           {DAYS.map((d) => (
             <div
               key={d}
-              className="text-center text-[9px] font-black text-black/40 py-1"
+              className="text-center text-[9px] font-black text-foreground/40 py-1"
             >
               {d}
             </div>
@@ -141,11 +147,19 @@ const CalendarDialog = ({
                 className={cn(
                   "text-[13px] font-black py-2 transition-colors duration-75 active:brightness-90",
                   isSelected
-                    ? "bg-[#1a1a1a] text-white"
+                    ? "bg-foreground text-background"
                     : isTodayCell
-                      ? "bg-[#fef9c3] text-[#713f12] hover:bg-[#fef08a]"
-                      : "hover:bg-[#f5f0e8] text-[#1a1a1a]",
+                      ? "text-foreground"
+                      : "hover:bg-foreground/5 text-foreground",
                 )}
+                style={
+                  isTodayCell && !isSelected
+                    ? {
+                        background: "var(--brand-accent)",
+                        color: "var(--brand-accent-fg)",
+                      }
+                    : undefined
+                }
               >
                 {day}
               </button>

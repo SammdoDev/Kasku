@@ -26,7 +26,7 @@ type Props = {
 };
 
 const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`rounded-lg bg-black/10 animate-pulse ${className}`} />
+  <div className={`rounded-lg bg-foreground/10 animate-pulse ${className}`} />
 );
 
 export const SummaryHeaderMobile = ({
@@ -50,14 +50,14 @@ export const SummaryHeaderMobile = ({
               strokeWidth={2.5}
               className="text-red-400"
             />
-            <span className="text-[10px] font-bold text-black/50">
+            <span className="text-[10px] font-bold text-foreground/50">
               {month} · Pengeluaran
             </span>
           </div>
           {loading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
-            <p className="text-[22px] font-black text-black leading-none tracking-tight">
+            <p className="text-[22px] font-black text-foreground leading-none tracking-tight">
               {formatIDR(summary?.total_expense ?? 0)}
             </p>
           )}
@@ -70,14 +70,14 @@ export const SummaryHeaderMobile = ({
               strokeWidth={2.5}
               className="text-green-500"
             />
-            <span className="text-[10px] font-bold text-black/50">
+            <span className="text-[10px] font-bold text-foreground/50">
               {month} · Pendapatan
             </span>
           </div>
           {loading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
-            <p className="text-[22px] font-black text-black leading-none tracking-tight">
+            <p className="text-[22px] font-black text-foreground leading-none tracking-tight">
               {formatIDR(summary?.total_income ?? 0)}
             </p>
           )}
@@ -86,10 +86,10 @@ export const SummaryHeaderMobile = ({
 
       {!loading && summary && (
         <div className="flex items-center gap-1.5 mt-2">
-          <span className="text-[11px] font-black text-black/40">
+          <span className="text-[11px] font-black text-foreground/40">
             {formatIDR(summary.balance)}
           </span>
-          <span className="text-[9px] text-black/30 font-bold">
+          <span className="text-[9px] text-foreground/30 font-bold">
             saldo total
           </span>
         </div>
@@ -108,10 +108,10 @@ export const SummaryCardsDesktop = ({
   <div style={{ fontFamily: DASHBOARD_FONT }}>
     <div className="flex items-center justify-between mb-5">
       <div>
-        <h1 className="text-xl font-black leading-none tracking-tight text-[#1a1a1a] uppercase">
+        <h1 className="text-xl font-black leading-none tracking-tight text-foreground uppercase">
           Dashboard
         </h1>
-        <p className="mt-1 text-[9px] tracking-wide text-[#999] uppercase">
+        <p className="mt-1 text-[9px] tracking-wide text-foreground/40 uppercase">
           {loading ? "Memuat data..." : `${monthLabel} · Cashora`}
         </p>
       </div>
@@ -119,19 +119,19 @@ export const SummaryCardsDesktop = ({
       <div className="flex items-center gap-2">
         <button
           onClick={onPrev}
-          className="w-8 h-8 border-[2.5px] border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           aria-label="Bulan sebelumnya"
         >
           <ChevronLeft size={14} strokeWidth={3} />
         </button>
-        <div className="h-8 px-4 border-[2.5px] border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_#000]">
-          <span className="text-[11px] font-black uppercase tracking-widest">
+        <div className="h-8 px-4 border-[2.5px] border-border bg-card flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))]">
+          <span className="text-[11px] font-black uppercase tracking-widest text-foreground">
             {monthLabel}
           </span>
         </div>
         <button
           onClick={onNext}
-          className="w-8 h-8 border-[2.5px] border-black bg-white flex items-center justify-center shadow-[2px_2px_0px_#000] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
           aria-label="Bulan berikutnya"
         >
           <ChevronRight size={14} strokeWidth={3} />
@@ -144,21 +144,19 @@ export const SummaryCardsDesktop = ({
         label="Saldo Total"
         value={summary?.balance ?? 0}
         loading={loading}
-        colorClass={
-          (summary?.balance ?? 0) >= 0 ? "text-[#166534]" : "text-[#991b1b]"
-        }
+        positive={(summary?.balance ?? 0) >= 0}
       />
       <StatCard
         label="Pemasukan"
         value={summary?.total_income ?? 0}
         loading={loading}
-        colorClass="text-[#166534]"
+        positive={true}
       />
       <StatCard
         label="Pengeluaran"
         value={summary?.total_expense ?? 0}
         loading={loading}
-        colorClass="text-[#991b1b]"
+        positive={false}
       />
     </div>
   </div>
@@ -168,24 +166,29 @@ const StatCard = ({
   label,
   value,
   loading,
-  colorClass,
+  positive,
 }: {
   label: string;
   value: number;
   loading?: boolean;
-  colorClass: string;
+  positive: boolean;
 }) => (
   <div
-    className="border-[2.5px] border-black bg-white p-4 shadow-[3px_3px_0px_#000]"
+    className="border-[2.5px] border-border bg-card p-4 shadow-[3px_3px_0px_hsl(var(--border))]"
     style={{ fontFamily: DASHBOARD_FONT }}
   >
-    <p className="text-[9px] font-black tracking-widest text-[#999] uppercase mb-1">
+    <p className="text-[9px] font-black tracking-widest text-foreground/40 uppercase mb-1">
       {label}
     </p>
     {loading ? (
-      <div className="h-7 w-32 bg-gray-100 animate-pulse" />
+      <div className="h-7 w-32 bg-foreground/10 animate-pulse rounded" />
     ) : (
-      <p className={`text-2xl font-black tracking-tight ${colorClass}`}>
+      <p
+        className="text-2xl font-black tracking-tight"
+        style={{
+          color: positive ? "var(--color-success)" : "var(--color-danger)",
+        }}
+      >
         {formatIDR(value)}
       </p>
     )}

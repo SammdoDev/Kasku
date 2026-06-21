@@ -10,10 +10,8 @@ import { dateDisplay } from "@/lib/helper/date-format";
 import { EMOJI_OPTIONS } from "@/app/kategori/components/emoji-option";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 
-// ─── Constants ────────────────────────────────────────────────────
-
 const tableHeaders: TableHeader[] = [
-  { title: "Aksi", value: "_action", width: "100px" },
+  { title: "Aksi", value: "action", width: "100px" },
   { title: "Tanggal", value: "date", width: "90px" },
   { title: "Deskripsi", value: "description", width: "220px" },
   { title: "Icon", value: "category_icon", width: "50px" },
@@ -30,14 +28,10 @@ const tableHeaders: TableHeader[] = [
   },
 ];
 
-// ─── Props ────────────────────────────────────────────────────────
-
 interface TabelTransaksiProps {
   onEdit: (t: Transaction) => void;
   onDelete: (t: Transaction) => void;
 }
-
-// ─── Component ───────────────────────────────────────────────────
 
 const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
   onEdit,
@@ -47,7 +41,7 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
   const loading = useTransaksiStore((s) => s.loading);
 
   const renderCell = (trx: Transaction, header: TableHeader) => {
-    if (header.value === "_action") {
+    if (header.value === "action") {
       return (
         <div className="flex gap-1">
           <Button
@@ -77,35 +71,43 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
     } else if (header.value === "description") {
       return (
         <div>
-          <p className="text-[11px] font-bold">{trx.description}</p>
+          <p className="text-[11px] font-bold text-foreground">
+            {trx.description}
+          </p>
           {trx.note && (
             <p className="text-[10px] text-muted-foreground">{trx.note}</p>
           )}
         </div>
       );
     } else if (header.value === "category_icon") {
-      const icon = trx.category?.icon ?? null;
+      const cat = trx.category;
+
+      const icon = cat?.icon ?? null;
       const emojiMeta = icon
         ? EMOJI_OPTIONS.find((e) => e.hexcode === icon)
         : null;
 
       return (
         <div
-          className="w-8 h-8  shadow-brutal-sm flex items-center justify-center"
-          style={{ background: (trx.category?.color ?? "#6366f1") + "22" }}
+          className="w-8 h-8 shadow-brutal-sm flex items-center justify-center"
+          style={{
+            background: (cat?.color ?? "#6366f1") + "22",
+          }}
         >
           {icon ? (
             <OpenmojiImg
               hexcode={icon}
-              size={16}
+              size={18}
               alt={emojiMeta?.label ?? icon}
             />
           ) : (
             <span
-              className="text-[10px] font-black"
-              style={{ color: trx.category?.color ?? "#888" }}
+              className="text-[11px] font-black"
+              style={{
+                color: cat?.color ?? "#6366f1",
+              }}
             >
-              {trx.category?.name.charAt(0).toUpperCase() ?? "—"}
+              {cat?.name?.charAt(0).toUpperCase() ?? "?"}
             </span>
           )}
         </div>
@@ -123,11 +125,11 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
       );
     } else if (header.value === "tags") {
       return (
-        <div className="flex gap-1">
+        <div className="flex gap-1 flex-wrap">
           {trx.tags.slice(0, 2).map((tag) => (
             <span
               key={tag.id}
-              className="px-1.5 py-px border border-current text-[9px]"
+              className="px-1.5 py-px border border-border text-foreground/60 text-[9px]"
             >
               #{tag.name}
             </span>
@@ -146,8 +148,8 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
           className={[
             "inline-flex items-center border-2 px-2 py-0.5 text-[9px] font-black tracking-widest",
             trx.type === "income"
-              ? "border-emerald-600 text-emerald-700 bg-emerald-50"
-              : "border-red-500 text-red-600 bg-red-50",
+              ? "border-[var(--color-success)] text-[var(--color-success)] bg-[var(--color-success)]/10"
+              : "border-destructive text-destructive bg-destructive/10",
           ].join(" ")}
         >
           {trx.type === "income" ? "PEMASUKAN" : "PENGELUARAN"}
@@ -156,7 +158,13 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
     } else if (header.value === "amount") {
       return (
         <span
-          className={`text-[13px] font-bold ${trx.type === "income" ? "text-green-800" : "text-red-800"}`}
+          className="text-[13px] font-bold"
+          style={{
+            color:
+              trx.type === "income"
+                ? "var(--color-success)"
+                : "var(--color-danger)",
+          }}
         >
           {trx.type === "income" ? "+" : "−"} {formatIDR(trx.amount)}
         </span>

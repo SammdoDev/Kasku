@@ -101,17 +101,17 @@ const DateRangePicker = ({ value, onChange }: DateRangePickerProps) => {
   };
 
   return (
-    <div className="w-full border-2 border-black bg-white">
+    <div className="w-full border-2 border-border bg-card">
       {/* Mode tabs */}
-      <div className="flex border-b-2 border-black">
+      <div className="flex border-b-2 border-border">
         <button
           type="button"
           onClick={() => setSelecting("start")}
           className={cn(
-            "flex-1 px-3 py-2.5 text-left border-r-2 border-black transition-colors duration-75",
+            "flex-1 px-3 py-2.5 text-left border-r-2 border-border transition-colors duration-75",
             selecting === "start"
               ? "bg-[#1a1a1a]"
-              : "bg-white hover:bg-[#f5f0e8]",
+              : "bg-card hover:bg-[#f5f0e8]",
           )}
         >
           <div
@@ -136,9 +136,7 @@ const DateRangePicker = ({ value, onChange }: DateRangePickerProps) => {
           onClick={() => setSelecting("end")}
           className={cn(
             "flex-1 px-3 py-2.5 text-left transition-colors duration-75",
-            selecting === "end"
-              ? "bg-[#1a1a1a]"
-              : "bg-white hover:bg-[#f5f0e8]",
+            selecting === "end" ? "bg-[#1a1a1a]" : "bg-card hover:bg-[#f5f0e8]",
           )}
         >
           <div
@@ -174,7 +172,7 @@ const DateRangePicker = ({ value, onChange }: DateRangePickerProps) => {
           <button
             type="button"
             onClick={prevMonth}
-            className="w-8 h-8 flex items-center justify-center border-2 border-black font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+            className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
           >
             ‹
           </button>
@@ -201,7 +199,7 @@ const DateRangePicker = ({ value, onChange }: DateRangePickerProps) => {
           <button
             type="button"
             onClick={nextMonth}
-            className="w-8 h-8 flex items-center justify-center border-2 border-black font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+            className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
           >
             ›
           </button>
@@ -261,7 +259,7 @@ const DateRangePicker = ({ value, onChange }: DateRangePickerProps) => {
               onChange({ ...value, end_date: "" });
               setSelecting("end");
             }}
-            className="mt-2 w-full text-[9px] font-black tracking-widest text-black/40 hover:text-black transition-colors py-1 border-t border-black/10"
+            className="mt-2 w-full text-[9px] font-black tracking-widest text-black/40 hover:text-black transition-colors py-1 border-t border-border/10"
           >
             HAPUS TANGGAL BERAKHIR ×
           </button>

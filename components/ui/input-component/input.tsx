@@ -20,9 +20,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={inputType}
           className={cn(
-            // height 34px → sejajar month-nav & tombol TAMBAH
-            "flex h-[34px] w-full border-2 border-[#1a1a1a] bg-white px-3 text-[11px] font-mono font-bold tracking-wide placeholder:text-[#1a1a1a]/30",
-            "shadow-[3px_3px_0_#1a1a1a] focus:outline-none focus:shadow-[1px_1px_0_#1a1a1a] focus:translate-x-0.5 focus:translate-y-0.5",
+            "flex h-[34px] w-full border-2 border-border bg-card px-3 text-[11px] font-mono font-bold tracking-wide",
+            "text-foreground placeholder:text-foreground/30",
+            "shadow-[3px_3px_0_hsl(var(--border))] focus:outline-none focus:shadow-[1px_1px_0_hsl(var(--border))] focus:translate-x-0.5 focus:translate-y-0.5",
             "transition-all duration-100 disabled:cursor-not-allowed disabled:opacity-50",
             isPassword && showPasswordToggle && "pr-10",
             className,
@@ -34,7 +34,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground transition-colors"
             tabIndex={-1}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >

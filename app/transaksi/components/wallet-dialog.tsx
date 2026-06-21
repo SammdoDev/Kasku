@@ -73,8 +73,8 @@ const WalletDialog = ({
           className={[
             "w-full flex items-center justify-between px-3 py-2.5 border-2 transition-all duration-75 text-left",
             draft === ""
-              ? "border-black bg-[#1a1a1a] text-white"
-              : "border-black/20 bg-white text-black/40 hover:border-black hover:text-black",
+              ? "border-border bg-[#1a1a1a] text-white"
+              : "border-border/20 bg-card text-black/40 hover:border-border hover:text-black",
           ].join(" ")}
         >
           <span className="text-[11px] font-black tracking-wider">
@@ -104,8 +104,8 @@ const WalletDialog = ({
               className={[
                 "w-full flex items-center justify-between px-3 py-2.5 border-2 transition-all duration-75 text-left",
                 draft === w.id
-                  ? "border-black bg-[#1a1a1a] text-white shadow-none translate-x-[2px] translate-y-[2px]"
-                  : "border-black bg-white text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none",
+                  ? "border-border bg-[#1a1a1a] text-white shadow-none translate-x-[2px] translate-y-[2px]"
+                  : "border-border bg-card text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none",
               ].join(" ")}
             >
               <div className="flex flex-col gap-0.5">

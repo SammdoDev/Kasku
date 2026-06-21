@@ -23,7 +23,7 @@ const BottomNavbar = () => {
     <>
       <nav
         aria-label="Navigasi bawah"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 h-[68px] bg-white border-t-[3px] border-black flex items-center"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 h-[68px] bg-card border-t-[3px] border-border flex items-center"
       >
         {NAV_ITEMS.slice(0, 2).map((item) => {
           const isActive =
@@ -43,7 +43,7 @@ const BottomNavbar = () => {
                 className={[
                   "flex items-center justify-center w-9 h-9 border-[2.5px] transition-all duration-100",
                   isActive
-                    ? "border-black shadow-[2px_2px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
+                    ? "border-border shadow-[2px_2px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
                     : "border-transparent",
                 ].join(" ")}
                 style={
@@ -74,11 +74,11 @@ const BottomNavbar = () => {
             onClick={() => setOpen(true)}
             aria-label="Tambah transaksi baru"
             className={[
-              "flex items-center justify-center w-14 h-14 border-[3px] border-black",
+              "flex items-center justify-center w-14 h-14 border-[3px] border-border",
               "shadow-[3px_3px_0px_#ffde59] hover:shadow-[1px_1px_0px_#ffde59]",
               "hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
-              open ? "bg-white" : "bg-black",
+              open ? "bg-card" : "bg-black",
             ].join(" ")}
           >
             {open ? (
@@ -104,7 +104,7 @@ const BottomNavbar = () => {
                 className={[
                   "flex items-center justify-center w-9 h-9 border-[2.5px] transition-all duration-100",
                   isActive
-                    ? "border-black shadow-[2px_2px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
+                    ? "border-border shadow-[2px_2px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
                     : "border-transparent",
                 ].join(" ")}
                 style={

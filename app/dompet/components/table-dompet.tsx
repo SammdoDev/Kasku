@@ -54,16 +54,20 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
         </div>
       );
     } else if (header.value === "name") {
-      return <span className="text-[12px] font-bold">{item.name}</span>;
+      return (
+        <span className="text-[12px] font-bold text-foreground">
+          {item.name}
+        </span>
+      );
     } else if (header.value === "type") {
       return (
-        <span className="inline-flex border-2 border-black px-2 py-0.5 text-[9px] font-black tracking-widest bg-white">
+        <span className="inline-flex border-2 border-border px-2 py-0.5 text-[9px] font-black tracking-widest bg-card text-foreground">
           {item.type ? (TYPE_LABEL[item.type] ?? item.type.toUpperCase()) : "—"}
         </span>
       );
     } else if (header.value === "icon") {
       return (
-        <span className="text-[11px] text-black/50 font-mono">
+        <span className="text-[11px] text-foreground/50 font-mono">
           {item.icon ?? "—"}
         </span>
       );

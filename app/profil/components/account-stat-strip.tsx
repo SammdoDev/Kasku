@@ -14,7 +14,6 @@ interface DashboardSummary {
 
 interface DashboardResponse {
   summary: DashboardSummary;
-  // tambah field lain kalau perlu
 }
 
 type Stat = {
@@ -26,7 +25,7 @@ type Stat = {
 };
 
 const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`rounded bg-black/10 animate-pulse ${className}`} />
+  <div className={`rounded bg-foreground/10 animate-pulse ${className}`} />
 );
 
 const formatIDR = (n: number) =>
@@ -83,7 +82,7 @@ const AccountStatStrip = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 border-[3px] border-black shadow-[6px_6px_0_#000] overflow-hidden">
+    <div className="grid grid-cols-2 md:grid-cols-4 border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] overflow-hidden">
       {stats.map((stat, i) => {
         const isLastRow = i >= stats.length - 2;
         const isLastCol2 = i % 2 === 1;
@@ -94,19 +93,29 @@ const AccountStatStrip = () => {
             key={stat.label}
             className={[
               "px-4 py-4",
-              // border kanan: di mobile tiap kolom ganjil (0,2), di desktop semua kecuali terakhir
-              !isLastCol2 ? "border-r-[3px] border-black" : "",
-              "md:border-r-[3px] md:border-black",
+              !isLastCol2 ? "border-r-[3px] border-border" : "",
+              "md:border-r-[3px] md:border-border",
               isLastCol4 ? "md:border-r-0" : "",
-              // border bawah: di mobile row pertama (i < 2)
-              !isLastRow ? "border-b-[3px] border-black" : "",
+              !isLastRow ? "border-b-[3px] border-border" : "",
               "md:border-b-0",
             ]
               .filter(Boolean)
               .join(" ")}
-            style={{ background: stat.highlight ? "#CBFF4D" : "#fff" }}
+            style={
+              stat.highlight
+                ? { background: "var(--accent-bg)" }
+                : { background: "var(--stat-card-bg, var(--card))" }
+            }
           >
-            <p className="text-[9px] font-black uppercase tracking-[0.15em] text-black/45 mb-1.5">
+            <p
+              className="text-[9px] font-black uppercase tracking-[0.15em] mb-1.5"
+              style={{
+                color: stat.highlight
+                  ? "var(--accent-fg-muted)"
+                  : "var(--foreground)",
+                opacity: stat.highlight ? 1 : 0.45,
+              }}
+            >
               {stat.label}
             </p>
             {loading ? (
@@ -116,18 +125,33 @@ const AccountStatStrip = () => {
               </>
             ) : (
               <>
-                <p className="text-lg md:text-xl font-black tracking-tight leading-none">
+                <p
+                  className="text-lg md:text-xl font-black tracking-tight leading-none"
+                  style={{
+                    color: stat.highlight
+                      ? "var(--accent-fg)"
+                      : "var(--foreground)",
+                  }}
+                >
                   {stat.value}
                 </p>
                 <p
-                  className={[
-                    "text-[10px] font-bold mt-1",
+                  className="text-[10px] font-bold mt-1"
+                  style={
                     stat.statusColor
-                      ? summary && summary.net >= 0
-                        ? "text-green-700"
-                        : "text-red-600"
-                      : "text-black/45",
-                  ].join(" ")}
+                      ? {
+                          color:
+                            summary && summary.net >= 0
+                              ? "var(--color-success)"
+                              : "var(--color-danger)",
+                        }
+                      : {
+                          color: stat.highlight
+                            ? "var(--accent-fg)"
+                            : "var(--foreground)",
+                          opacity: 0.45,
+                        }
+                  }
                 >
                   {stat.sub}
                 </p>

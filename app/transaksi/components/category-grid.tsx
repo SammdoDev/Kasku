@@ -22,8 +22,8 @@ interface CategoryGridProps {
 
 const SkeletonCell = () => (
   <div className="flex flex-col items-center gap-2 p-3 animate-pulse">
-    <div className="w-11 h-11 bg-gray-100 border-2 border-[#e5e5e5]" />
-    <div className="h-2 w-10 bg-gray-100" />
+    <div className="w-11 h-11 bg-foreground/10 border-2 border-border/20" />
+    <div className="h-2 w-10 bg-foreground/10" />
   </div>
 );
 
@@ -37,7 +37,7 @@ const CategoryGrid = ({
 }: CategoryGridProps) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-4 border-b-2 border-black">
+      <div className="grid grid-cols-4 border-b-2 border-border">
         {Array.from({ length: 8 }).map((_, i) => (
           <SkeletonCell key={i} />
         ))}
@@ -46,10 +46,10 @@ const CategoryGrid = ({
   }
 
   return (
-    <div className="border-b-2 border-black">
+    <div className="border-b-2 border-border">
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-10">
-          <span className="text-[10px] font-black tracking-widest text-black/25 uppercase">
+          <span className="text-[10px] font-black tracking-widest text-foreground/25 uppercase">
             Belum Ada Kategori
           </span>
           {onAddCategory && (
@@ -59,7 +59,7 @@ const CategoryGrid = ({
                 e.stopPropagation();
                 onAddCategory?.();
               }}
-              className="flex items-center gap-1.5 border-2 border-black bg-white px-3 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-[#1a1a1a] hover:text-white transition-colors duration-75 shadow-[2px_2px_0px_#000] active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
+              className="flex items-center gap-1.5 border-2 border-border bg-card text-foreground px-3 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-foreground hover:text-background transition-colors duration-75 shadow-brutal-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
               <Plus size={11} strokeWidth={3} />
               Tambah Kategori
@@ -86,16 +86,16 @@ const CategoryGrid = ({
                 e.stopPropagation();
                 onAddCategory?.();
               }}
-              className="flex flex-col items-center justify-center gap-2 p-3 border-r-[1.5px] border-b-[1.5px] border-dashed border-black/30 hover:bg-[#f5f0e8] active:bg-[#1a1a1a] group transition-colors duration-75"
+              className="flex flex-col items-center justify-center gap-2 p-3 border-r-[1.5px] border-b-[1.5px] border-dashed border-border/30 hover:bg-[var(--sidebar-bg)] active:bg-foreground group transition-colors duration-75"
             >
-              <div className="w-11 h-11 flex items-center justify-center border-[1.5px] border-dashed border-black/30 group-hover:border-black group-active:border-white transition-colors">
+              <div className="w-11 h-11 flex items-center justify-center border-[1.5px] border-dashed border-border/30 group-hover:border-border group-active:border-background transition-colors">
                 <Plus
                   size={16}
                   strokeWidth={2}
-                  className="text-black/30 group-hover:text-black group-active:text-white"
+                  className="text-foreground/30 group-hover:text-foreground group-active:text-background"
                 />
               </div>
-              <span className="text-[9px] font-black uppercase tracking-wide text-black/30 group-hover:text-black group-active:text-white">
+              <span className="text-[9px] font-black uppercase tracking-wide text-foreground/30 group-hover:text-foreground group-active:text-background">
                 Tambah
               </span>
             </button>

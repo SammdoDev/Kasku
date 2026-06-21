@@ -158,7 +158,7 @@ const ChartCard = ({
 
   return (
     <div
-      className={`relative bg-white border-[3px] border-[#0a0a0a] shadow-[5px_5px_0_#0a0a0a] p-4 font-mono ${className}`}
+      className={`relative bg-card border-[3px] border-[#0a0a0a] shadow-[5px_5px_0_#0a0a0a] p-4 font-mono ${className}`}
     >
       {/* Top accent bar */}
       <div
@@ -190,7 +190,7 @@ const ChartCard = ({
                 } ${
                   type === key
                     ? "bg-[#0a0a0a] text-white"
-                    : "bg-white text-[#0a0a0a]"
+                    : "bg-card text-[#0a0a0a]"
                 }`}
               >
                 {key.toUpperCase()}

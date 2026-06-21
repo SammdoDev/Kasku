@@ -166,8 +166,8 @@ export default function ModalKategori({
               className={[
                 "w-7 h-7 border-2 transition-all duration-100",
                 color === c
-                  ? "border-black scale-110 shadow-[2px_2px_0px_#000]"
-                  : "border-transparent hover:border-black/40",
+                  ? "border-border scale-110 shadow-[2px_2px_0px_#000]"
+                  : "border-transparent hover:border-border/40",
               ].join(" ")}
               style={{ background: c }}
             />
@@ -177,10 +177,10 @@ export default function ModalKategori({
               type="color"
               value={color}
               onChange={(e) => setColor(e.target.value)}
-              className="w-7 h-7 border-2 border-black cursor-pointer opacity-0 absolute inset-0"
+              className="w-7 h-7 border-2 border-border cursor-pointer opacity-0 absolute inset-0"
             />
             <div
-              className="w-7 h-7 border-2 border-black border-dashed flex items-center justify-center text-[8px] font-black"
+              className="w-7 h-7 border-2 border-border border-dashed flex items-center justify-center text-[8px] font-black"
               style={{ background: color }}
             >
               +
@@ -195,11 +195,11 @@ export default function ModalKategori({
       <div className="flex flex-col gap-1.5">
         <Label>PREVIEW</Label>
         <div
-          className="flex items-center gap-3 border-2 border-black p-3"
+          className="flex items-center gap-3 border-2 border-border p-3"
           style={{ background: color + "11" }}
         >
           <div
-            className="w-9 h-9 border-2 border-black flex items-center justify-center shrink-0"
+            className="w-9 h-9 border-2 border-border flex items-center justify-center shrink-0"
             style={{ background: color + "33" }}
           >
             {icon ? (

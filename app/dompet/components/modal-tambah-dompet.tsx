@@ -110,10 +110,10 @@ const ModalTambahDompet = ({ onClose, onSuccess, editTarget }: Props) => {
               type="button"
               onClick={() => set({ type: opt.value })}
               className={[
-                "px-3 py-1.5 border-2 border-black text-[11px] font-black tracking-wider transition-all",
+                "px-3 py-1.5 border-2 border-border text-[11px] font-black tracking-wider transition-all",
                 form.type === opt.value
                   ? "bg-black text-white shadow-none translate-x-[2px] translate-y-[2px]"
-                  : "bg-white text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none",
+                  : "bg-card text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none",
               ].join(" ")}
             >
               {opt.label}

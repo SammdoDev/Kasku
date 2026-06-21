@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTheme } from "next-themes";
 import { get, patch, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
@@ -17,10 +18,13 @@ interface ApiUser {
 }
 
 const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`rounded bg-black/10 animate-pulse ${className}`} />
+  <div className={`rounded bg-foreground/10 animate-pulse ${className}`} />
 );
 
 const BudgetPreferencesCard = () => {
+  const { theme, setTheme } = useTheme();
+  const [mountedTheme, setMountedTheme] = useState(false);
+
   const [currency, setCurrency] = useState("IDR");
   const [language, setLanguage] = useState("id");
   const [cycleStartDate, setCycleStartDate] = useState(1);
@@ -29,6 +33,8 @@ const BudgetPreferencesCard = () => {
   const [loading, setLoading] = useState(true);
   const [cycleModalOpen, setCycleModalOpen] = useState(false);
   const [currencyLangModalOpen, setCurrencyLangModalOpen] = useState(false);
+
+  useEffect(() => setMountedTheme(true), []);
 
   const fetchProfile = useCallback(async () => {
     setLoading(true);
@@ -69,15 +75,15 @@ const BudgetPreferencesCard = () => {
   return (
     <>
       <div
-        className="bg-white border-[3px] border-black shadow-[6px_6px_0_#000] p-5"
+        className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] p-5"
         style={{ fontFamily: DASHBOARD_FONT }}
       >
-        <span className="inline-block bg-[#CBFF4D] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-black px-2.5 py-1 mb-3">
+        <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3">
           Preferensi Budgeting
         </span>
 
         {/* Currency & Bahasa — 1 row, 1 tombol edit */}
-        <div className="flex items-center justify-between py-3 border-b-[3px] border-black">
+        <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <div>
             <span className="text-[11px] font-black uppercase tracking-wide block">
               Currency &amp; Bahasa
@@ -94,7 +100,7 @@ const BudgetPreferencesCard = () => {
             <button
               type="button"
               onClick={() => setCurrencyLangModalOpen(true)}
-              className="flex items-center gap-1.5 text-[11px] font-black border-[2px] border-black px-3 py-1 bg-white hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-100"
+              className="flex items-center gap-1.5 text-[11px] font-black border-[2px] border-border px-3 py-1 bg-card hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-100"
             >
               Ubah
               <Pencil size={10} strokeWidth={2.5} />
@@ -103,7 +109,7 @@ const BudgetPreferencesCard = () => {
         </div>
 
         {/* Cycle Start Date */}
-        <div className="flex items-center justify-between py-3 border-b-[3px] border-black">
+        <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
             Cycle Start Date
           </span>
@@ -113,7 +119,7 @@ const BudgetPreferencesCard = () => {
             <button
               type="button"
               onClick={() => setCycleModalOpen(true)}
-              className="flex items-center gap-1.5 text-[12px] font-black border-[2px] border-black px-3 py-1 bg-white hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#000] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-100"
+              className="flex items-center gap-1.5 text-[12px] font-black border-[2px] border-border px-3 py-1 bg-card hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-100"
             >
               Tgl {cycleStartDate}
               <Pencil size={10} strokeWidth={2.5} />
@@ -122,7 +128,7 @@ const BudgetPreferencesCard = () => {
         </div>
 
         {/* Notifikasi Budget */}
-        <div className="flex items-center justify-between py-3 border-b-[3px] border-black">
+        <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
             Notifikasi Budget
           </span>
@@ -134,7 +140,7 @@ const BudgetPreferencesCard = () => {
         </div>
 
         {/* Identity Reminder */}
-        <div className="flex items-center justify-between py-3 border-b-[3px] border-black">
+        <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
             Identity Reminder
           </span>
@@ -150,9 +156,15 @@ const BudgetPreferencesCard = () => {
           <span className="text-[11px] font-black uppercase tracking-wide">
             Dark Mode
           </span>
-          <span className="text-[9px] font-black text-black/30 uppercase tracking-wider">
-            Coming Soon
-          </span>
+          {!mountedTheme ? (
+            <Skeleton className="h-5 w-9" />
+          ) : (
+            <NbToggle
+              checked={theme === "dark"}
+              onChange={(v) => setTheme(v ? "dark" : "light")}
+              label="Dark Mode"
+            />
+          )}
         </div>
       </div>
 

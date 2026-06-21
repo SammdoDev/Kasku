@@ -118,14 +118,14 @@ export default function AuthCallbackPage() {
 
   return (
     <div className="min-h-svh flex items-center justify-center bg-[#f5f0e8] px-4">
-      <div className="w-full max-w-sm border-[3px] border-black bg-white shadow-[6px_6px_0px_#000] p-8 flex flex-col items-center gap-6">
+      <div className="w-full max-w-sm border-[3px] border-border bg-card shadow-[6px_6px_0px_#000] p-8 flex flex-col items-center gap-6">
         {/* Icon */}
         <div className="relative">
           {status === "loading" && (
-            <div className="w-16 h-16 border-[4px] border-black border-t-[#ffd447] rounded-full animate-spin" />
+            <div className="w-16 h-16 border-[4px] border-border border-t-[#ffd447] rounded-full animate-spin" />
           )}
           {status === "success" && (
-            <div className="w-16 h-16 border-[4px] border-black bg-[#ffd447] shadow-[4px_4px_0px_#000] flex items-center justify-center">
+            <div className="w-16 h-16 border-[4px] border-border bg-[#ffd447] shadow-[4px_4px_0px_#000] flex items-center justify-center">
               <svg
                 width="28"
                 height="28"
@@ -141,7 +141,7 @@ export default function AuthCallbackPage() {
             </div>
           )}
           {status === "error" && (
-            <div className="w-16 h-16 border-[4px] border-black bg-[#ff4d4d] shadow-[4px_4px_0px_#000] flex items-center justify-center">
+            <div className="w-16 h-16 border-[4px] border-border bg-[#ff4d4d] shadow-[4px_4px_0px_#000] flex items-center justify-center">
               <svg
                 width="28"
                 height="28"
@@ -175,12 +175,12 @@ export default function AuthCallbackPage() {
               <div key={i} className="flex items-center gap-2.5">
                 <div
                   className={[
-                    "w-2.5 h-2.5 border-[2px] border-black flex-shrink-0 transition-colors duration-200",
+                    "w-2.5 h-2.5 border-[2px] border-border flex-shrink-0 transition-colors duration-200",
                     i < step
                       ? "bg-[#ffd447]"
                       : i === step
                         ? "bg-[#ffd447] animate-pulse"
-                        : "bg-white",
+                        : "bg-card",
                   ].join(" ")}
                 />
                 <span
@@ -198,7 +198,7 @@ export default function AuthCallbackPage() {
 
         {/* Progress bar — loading only */}
         {status === "loading" && (
-          <div className="w-full h-2 border-[2px] border-black bg-white overflow-hidden">
+          <div className="w-full h-2 border-[2px] border-border bg-card overflow-hidden">
             <div className="h-full bg-[#ffd447] animate-[progress_1.5s_ease-in-out_infinite]" />
           </div>
         )}
@@ -219,13 +219,13 @@ export default function AuthCallbackPage() {
             </p>
             <button
               onClick={handleRetry}
-              className="w-full py-2.5 border-[3px] border-black bg-[#ffd447] font-black text-[12px] uppercase tracking-wide shadow-[4px_4px_0px_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_#000] transition-all duration-100"
+              className="w-full py-2.5 border-[3px] border-border bg-[#ffd447] font-black text-[12px] uppercase tracking-wide shadow-[4px_4px_0px_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_#000] transition-all duration-100"
             >
               Coba lagi
             </button>
             <button
               onClick={handleGoLogin}
-              className="w-full py-2.5 border-[3px] border-black bg-white font-bold text-[12px] uppercase tracking-wide shadow-[4px_4px_0px_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_#000] transition-all duration-100"
+              className="w-full py-2.5 border-[3px] border-border bg-card font-bold text-[12px] uppercase tracking-wide shadow-[4px_4px_0px_#000] hover:-translate-x-px hover:-translate-y-px hover:shadow-[5px_5px_0px_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[2px_2px_0px_#000] transition-all duration-100"
             >
               Kembali ke login
             </button>

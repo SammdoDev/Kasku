@@ -52,10 +52,10 @@ function SortIcon({ dir }: { dir: SortDirection }) {
 
 function SkeletonRow({ count }: { count: number }) {
   return (
-    <tr>
+    <tr className="border-b border-border last:border-b-0">
       {Array.from({ length: count }).map((_, i) => (
         <td key={i} className="px-4 py-3">
-          <span className="block h-2.5 w-3/4 bg-current opacity-10 animate-pulse" />
+          <span className="block h-2.5 w-3/4 bg-foreground/10 animate-pulse rounded" />
         </td>
       ))}
     </tr>
@@ -88,7 +88,7 @@ export function TableDataComponent<T = Record<string, unknown>>({
 
   return (
     <div
-      className={`overflow-x-auto border-2 border-current shadow-[4px_4px_0_currentColor] ${className}`}
+      className={`overflow-x-auto border-[3px] border-border shadow-[4px_4px_0_hsl(var(--border))] ${className}`}
     >
       <table className="w-full border-collapse">
         <thead>
@@ -99,7 +99,9 @@ export function TableDataComponent<T = Record<string, unknown>>({
                 style={{ width: h.width, textAlign: h.align ?? "left" }}
                 className={[
                   "px-4 py-3 text-[11px] font-bold uppercase tracking-widest whitespace-nowrap select-none",
-                  h.sortable ? "cursor-pointer hover:opacity-75" : "",
+                  h.sortable
+                    ? "cursor-pointer hover:opacity-75 transition-opacity"
+                    : "",
                 ].join(" ")}
                 onClick={h.sortable ? () => handleSort(h.value) : undefined}
               >
@@ -133,9 +135,9 @@ export function TableDataComponent<T = Record<string, unknown>>({
               <tr
                 key={dataKey ? String(get(row, dataKey)) : index}
                 className={[
-                  "border-b border-border last:border-b-0 transition-colors duration-75",
+                  "border-b border-border last:border-b-0 transition-colors duration-75 text-foreground",
                   onRowClick
-                    ? "cursor-pointer hover:bg-muted"
+                    ? "cursor-pointer hover:bg-accent/20"
                     : "hover:bg-muted/50",
                 ].join(" ")}
                 onClick={
