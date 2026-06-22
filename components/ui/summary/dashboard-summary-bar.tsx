@@ -19,7 +19,7 @@ const DashboardSummaryBar = ({
   monthLabel,
   loading = false,
 }: Props) => {
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
   const net = income - expense;
   const expPct =
     income > 0 ? Math.min(100, Math.round((expense / income) * 100)) : null;
@@ -33,7 +33,7 @@ const DashboardSummaryBar = ({
       <div className="flex items-center justify-between gap-3 mb-3">
         <div>
           <p className="text-[9px] font-black tracking-[0.25em] text-foreground/40 uppercase">
-            {C.summary}
+            {CONSTANT.summary}
           </p>
           <p className="text-[11px] font-black text-foreground uppercase tracking-tight leading-tight">
             {monthLabel}
@@ -56,7 +56,7 @@ const DashboardSummaryBar = ({
               <TrendingUp size={10} strokeWidth={3} style={{ color: "var(--color-success)" }} />
             </div>
             <span className="text-[9px] font-black tracking-widest text-foreground/40 uppercase">
-              {C.income}
+              {CONSTANT.income}
             </span>
           </div>
           {loading ? (
@@ -78,7 +78,7 @@ const DashboardSummaryBar = ({
               <TrendingDown size={10} strokeWidth={3} style={{ color: "var(--color-danger)" }} />
             </div>
             <span className="text-[9px] font-black tracking-widest text-foreground/40 uppercase">
-              {C.expense}
+              {CONSTANT.expense}
             </span>
           </div>
           {loading ? (
@@ -97,7 +97,7 @@ const DashboardSummaryBar = ({
           <div className="border-t-[1.5px] border-dashed border-border/30 mt-3 mb-2.5" />
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[9px] font-black text-foreground/40 tracking-widest uppercase">
-              {C.net}
+              {CONSTANT.net}
             </span>
             <span
               className="text-[11px] font-black tracking-tight"
@@ -138,7 +138,7 @@ const DashboardSummaryBar = ({
           )}
           {expPct !== null && (
             <p className="text-[8px] text-foreground/25 mt-1 font-bold">
-              {expPct}% {C.thisMonth} terpakai
+              {expPct}% {CONSTANT.thisMonth} terpakai
             </p>
           )}
         </>

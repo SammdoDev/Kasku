@@ -15,12 +15,7 @@ import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper
 import TransferPanel from "./transfer-panel";
 import TagChips from "./tag-chips";
 import CalendarDialog from "./calendar-dialog";
-
-const TIPE_OPTIONS = [
-  { label: "PENGELUARAN", value: "expense" },
-  { label: "PEMASUKAN", value: "income" },
-  { label: "TRANSFER", value: "transfer" },
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface ModalTambahTransaksiProps {
   onSuccess?: () => void;
@@ -31,6 +26,7 @@ const ModalTambahTransaksi = ({
   onSuccess,
   onClose,
 }: ModalTambahTransaksiProps) => {
+  const CONSTANT = useTranslate();
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<"income" | "expense" | "transfer">(
     "expense",
@@ -45,15 +41,19 @@ const ModalTambahTransaksi = ({
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [walletDialogOpen, setWalletDialogOpen] = useState(false);
   const [showModalKategori, setShowModalKategori] = useState(false);
-
   const [transferFromId, setTransferFromId] = useState<string | null>(null);
   const [transferToId, setTransferToId] = useState<string | null>(null);
-
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loadingCats, setLoadingCats] = useState(false);
   const [calendarDialogOpen, setCalendarDialogOpen] = useState(false);
 
   const setEditTarget = useKategoriStore((s) => s.setEditTarget);
+
+  const TIPE_OPTIONS = [
+    { label: CONSTANT.expense.toUpperCase(), value: "expense" },
+    { label: CONSTANT.income.toUpperCase(), value: "income" },
+    { label: "TRANSFER", value: "transfer" },
+  ];
 
   const fetchCats = async () => {
     if (type === "transfer") return;
@@ -65,7 +65,7 @@ const ModalTambahTransaksi = ({
       );
       setCategories(res.categories);
     } catch (err) {
-      toast.error("Gagal memuat kategori", getApiError(err));
+      toast.error(CONSTANT.failedLoadPreferences, getApiError(err));
     } finally {
       setLoadingCats(false);
     }
@@ -76,18 +76,10 @@ const ModalTambahTransaksi = ({
   }, [type]);
 
   const handleNumPress = (key: string) => {
-    if (key === "day") return;
-    if (key === "acc") {
-      setWalletDialogOpen(true);
-      return;
-    }
-    if (key === "bank") return;
+    if (key === "day" || key === "acc" || key === "bank") return;
     if (key === "." && amount.includes(".")) return;
-    if (amount === "0" && key !== ".") {
-      setAmount(key);
-    } else {
-      setAmount((prev) => prev + key);
-    }
+    if (amount === "0" && key !== ".") setAmount(key);
+    else setAmount((prev) => prev + key);
   };
 
   const handleBackspace = () => setAmount((prev) => prev.slice(0, -1));
@@ -107,17 +99,17 @@ const ModalTambahTransaksi = ({
 
   const handleSubmit = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      toast.error("Jumlah harus diisi dan lebih dari 0");
+      toast.error(CONSTANT.amountRequired ?? "Jumlah harus diisi dan lebih dari 0");
       return;
     }
 
     if (type === "transfer") {
       if (!transferFromId) {
-        toast.error("Pilih dompet asal");
+        toast.error(CONSTANT.selectSourceWallet ?? "Pilih dompet asal");
         return;
       }
       if (!transferToId) {
-        toast.error("Pilih dompet tujuan");
+        toast.error(CONSTANT.selectDestWallet ?? "Pilih dompet tujuan");
         return;
       }
       setLoading(true);
@@ -129,12 +121,12 @@ const ModalTambahTransaksi = ({
           note: note || undefined,
           date,
         });
-        toast.success("Transfer berhasil dicatat");
+        toast.success(CONSTANT.transferSuccess ?? "Transfer berhasil dicatat");
         reset();
         onSuccess?.();
         onClose();
       } catch (err) {
-        toast.error("Gagal menyimpan transfer", getApiError(err));
+        toast.error(CONSTANT.failedUpdate, getApiError(err));
       } finally {
         setLoading(false);
       }
@@ -142,7 +134,7 @@ const ModalTambahTransaksi = ({
     }
 
     if (!categoryId) {
-      toast.error("Pilih kategori terlebih dahulu");
+      toast.error(CONSTANT.selectCategoryFirst ?? "Pilih kategori terlebih dahulu");
       return;
     }
 
@@ -157,12 +149,12 @@ const ModalTambahTransaksi = ({
         payment_method_id: paymentMethodId || undefined,
         tag_ids: tagIds.length > 0 ? tagIds : undefined,
       });
-      toast.success("Transaksi ditambahkan");
+      toast.success(CONSTANT.transactionAdded ?? "Transaksi ditambahkan");
       reset();
       onSuccess?.();
       onClose();
     } catch (err) {
-      toast.error("Gagal menyimpan", getApiError(err));
+      toast.error(CONSTANT.failedUpdate, getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -172,7 +164,6 @@ const ModalTambahTransaksi = ({
     setEditTarget(null);
     setShowModalKategori(true);
   };
-
   const handleOpenEditKategori = (id: string) => {
     const cat = categories.find((c) => c.id === id);
     if (!cat) return;
@@ -205,7 +196,6 @@ const ModalTambahTransaksi = ({
         onConfirm={(val) => setNote(val)}
         onClose={() => setNoteDialogOpen(false)}
       />
-
       <WalletDialog
         open={walletDialogOpen}
         selectedId={paymentMethodId}
@@ -219,7 +209,7 @@ const ModalTambahTransaksi = ({
       <ChildModalWrapper
         open={showModalKategori}
         onClose={() => setShowModalKategori(false)}
-        title="TAMBAH KATEGORI"
+        title={`${CONSTANT.add} ${CONSTANT.category}`.toUpperCase()}
         width="full"
       >
         <ModalKategori
@@ -249,11 +239,9 @@ const ModalTambahTransaksi = ({
             onEditCategory={handleOpenEditKategori}
           />
         )}
-
         {type !== "transfer" && (
           <TagChips selected={tagIds} onChange={setTagIds} />
         )}
-
         <div className="h-[220px]" />
       </div>
 
@@ -270,7 +258,6 @@ const ModalTambahTransaksi = ({
           note={note}
           onNoteClick={() => setNoteDialogOpen(true)}
         />
-
         <NumPad
           onPress={handleNumPress}
           onBackspace={handleBackspace}

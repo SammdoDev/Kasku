@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 export interface QuickAccessItem {
   href: string;
@@ -11,34 +12,6 @@ export interface QuickAccessItem {
   bgColor: string;
   badge?: number;
 }
-
-const DEFAULT_ITEMS: QuickAccessItem[] = [
-  {
-    href: "/dompet",
-    label: "Dompet",
-    icon: "/best-seller.svg",
-    bgColor: "#F9C74F",
-  },
-  { href: "/tag", label: "Tag", icon: "/calendar.svg", bgColor: "#90E0EF" },
-  {
-    href: "/kategori",
-    label: "Kategori",
-    icon: "/hamburger.svg",
-    bgColor: "#F4A261",
-  },
-  {
-    href: "/anggaran",
-    label: "Anggaran",
-    icon: "/cash-flow.svg",
-    bgColor: "#B7E4C7",
-  },
-  {
-    href: "/ringkasan",
-    label: "Ringkasan",
-    icon: "/bar-graph.svg",
-    bgColor: "#C77DFF",
-  },
-];
 
 type Props = {
   items?: QuickAccessItem[];
@@ -52,7 +25,39 @@ const SkeletonItem = () => (
   </div>
 );
 
-const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
+const QuickAccessGrid = ({ items, loading = false }: Props) => {
+  const C = useTranslate();
+
+  const DEFAULT_ITEMS: QuickAccessItem[] = [
+    {
+      href: "/dompet",
+      label: C.wallet,
+      icon: "/best-seller.svg",
+      bgColor: "#F9C74F",
+    },
+    { href: "/tag", label: C.tag, icon: "/calendar.svg", bgColor: "#90E0EF" },
+    {
+      href: "/kategori",
+      label: C.category,
+      icon: "/hamburger.svg",
+      bgColor: "#F4A261",
+    },
+    {
+      href: "/anggaran",
+      label: C.budget,
+      icon: "/cash-flow.svg",
+      bgColor: "#B7E4C7",
+    },
+    {
+      href: "/ringkasan",
+      label: C.summary,
+      icon: "/bar-graph.svg",
+      bgColor: "#C77DFF",
+    },
+  ];
+
+  const resolvedItems = items ?? DEFAULT_ITEMS;
+
   return (
     <div
       className="bg-card border-[2.5px] border-border shadow-brutal-lg px-4 py-4 lg:px-3 lg:py-3"
@@ -61,12 +66,12 @@ const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
       <div
         className="grid gap-3 lg:gap-1.5"
         style={{
-          gridTemplateColumns: `repeat(${Math.min(items.length, 5)}, minmax(0, 1fr))`,
+          gridTemplateColumns: `repeat(${Math.min(resolvedItems.length, 5)}, minmax(0, 1fr))`,
         }}
       >
         {loading
           ? Array.from({ length: 5 }).map((_, i) => <SkeletonItem key={i} />)
-          : items.map((item) => (
+          : resolvedItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -87,7 +92,6 @@ const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
                     </span>
                   )}
                 </div>
-
                 <span className="text-[11px] lg:text-[9px] font-bold text-foreground/70 text-center leading-[1.15] min-h-[26px]">
                   {item.label}
                 </span>
@@ -99,4 +103,3 @@ const QuickAccessGrid = ({ items = DEFAULT_ITEMS, loading = false }: Props) => {
 };
 
 export default QuickAccessGrid;
-export { DEFAULT_ITEMS };

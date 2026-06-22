@@ -9,6 +9,7 @@ import {
 import formatIDR from "@/lib/helper/currency-format";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import MonthFilter from "../input-component/month-filter/month-filter";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface SummaryData {
   balance: number;
@@ -34,6 +35,7 @@ export const SummaryHeaderMobile = ({
   summary,
   loading,
 }: Props) => {
+  const C = useTranslate();
   const month = monthLabel.split(" ")[0];
 
   return (
@@ -48,10 +50,10 @@ export const SummaryHeaderMobile = ({
             <TrendingDown
               size={11}
               strokeWidth={2.5}
-              className="text-red-400"
+              style={{ color: "var(--color-danger)" }}
             />
             <span className="text-[10px] font-bold text-foreground/50">
-              {month} · Pengeluaran
+              {month} · {C.expense}
             </span>
           </div>
           {loading ? (
@@ -68,10 +70,10 @@ export const SummaryHeaderMobile = ({
             <TrendingUp
               size={11}
               strokeWidth={2.5}
-              className="text-green-500"
+              style={{ color: "var(--color-success)" }}
             />
             <span className="text-[10px] font-bold text-foreground/50">
-              {month} · Pendapatan
+              {month} · {C.income}
             </span>
           </div>
           {loading ? (
@@ -90,7 +92,7 @@ export const SummaryHeaderMobile = ({
             {formatIDR(summary.balance)}
           </span>
           <span className="text-[9px] text-foreground/30 font-bold">
-            saldo total
+            {C.totalBalance.toLowerCase()}
           </span>
         </div>
       )}
@@ -104,63 +106,67 @@ export const SummaryCardsDesktop = ({
   loading,
   onPrev,
   onNext,
-}: Props) => (
-  <div style={{ fontFamily: DASHBOARD_FONT }}>
-    <div className="flex items-center justify-between mb-5">
-      <div>
-        <h1 className="text-xl font-black leading-none tracking-tight text-foreground uppercase">
-          Dashboard
-        </h1>
-        <p className="mt-1 text-[9px] tracking-wide text-foreground/40 uppercase">
-          {loading ? "Memuat data..." : `${monthLabel} · Cashora`}
-        </p>
-      </div>
+}: Props) => {
+  const C = useTranslate();
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onPrev}
-          className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-          aria-label="Bulan sebelumnya"
-        >
-          <ChevronLeft size={14} strokeWidth={3} />
-        </button>
-        <div className="h-8 px-4 border-[2.5px] border-border bg-card flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))]">
-          <span className="text-[11px] font-black uppercase tracking-widest text-foreground">
-            {monthLabel}
-          </span>
+  return (
+    <div style={{ fontFamily: DASHBOARD_FONT }}>
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-xl font-black leading-none tracking-tight text-foreground uppercase">
+            {C.dashboard}
+          </h1>
+          <p className="mt-1 text-[9px] tracking-wide text-foreground/40 uppercase">
+            {loading ? C.loading : `${monthLabel} · Cashora`}
+          </p>
         </div>
-        <button
-          onClick={onNext}
-          className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
-          aria-label="Bulan berikutnya"
-        >
-          <ChevronRight size={14} strokeWidth={3} />
-        </button>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onPrev}
+            className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            aria-label="Bulan sebelumnya"
+          >
+            <ChevronLeft size={14} strokeWidth={3} />
+          </button>
+          <div className="h-8 px-4 border-[2.5px] border-border bg-card flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))]">
+            <span className="text-[11px] font-black uppercase tracking-widest text-foreground">
+              {monthLabel}
+            </span>
+          </div>
+          <button
+            onClick={onNext}
+            className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+            aria-label="Bulan berikutnya"
+          >
+            <ChevronRight size={14} strokeWidth={3} />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard
+          label={C.totalBalance}
+          value={summary?.balance ?? 0}
+          loading={loading}
+          positive={(summary?.balance ?? 0) >= 0}
+        />
+        <StatCard
+          label={C.income}
+          value={summary?.total_income ?? 0}
+          loading={loading}
+          positive={true}
+        />
+        <StatCard
+          label={C.expense}
+          value={summary?.total_expense ?? 0}
+          loading={loading}
+          positive={false}
+        />
       </div>
     </div>
-
-    <div className="grid grid-cols-3 gap-3">
-      <StatCard
-        label="Saldo Total"
-        value={summary?.balance ?? 0}
-        loading={loading}
-        positive={(summary?.balance ?? 0) >= 0}
-      />
-      <StatCard
-        label="Pemasukan"
-        value={summary?.total_income ?? 0}
-        loading={loading}
-        positive={true}
-      />
-      <StatCard
-        label="Pengeluaran"
-        value={summary?.total_expense ?? 0}
-        loading={loading}
-        positive={false}
-      />
-    </div>
-  </div>
-);
+  );
+};
 
 const StatCard = ({
   label,

@@ -2,29 +2,32 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useMonthFilter } from "./store/month-filter-store";
-
-const MONTHS = [
-  "JAN",
-  "FEB",
-  "MAR",
-  "APR",
-  "MEI",
-  "JUN",
-  "JUL",
-  "AGU",
-  "SEP",
-  "OKT",
-  "NOV",
-  "DES",
-];
-const pad = (n: number) => String(n).padStart(2, "0");
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface MonthFilterProps {
   size?: "sm" | "md";
 }
 
+const pad = (n: number) => String(n).padStart(2, "0");
+
 const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
   const { month, setMonth } = useMonthFilter();
+  const CONSTANT = useTranslate();
+
+  const MONTHS = [
+    CONSTANT.january ?? "JAN",
+    CONSTANT.february ?? "FEB",
+    CONSTANT.march ?? "MAR",
+    CONSTANT.april ?? "APR",
+    CONSTANT.may ?? "MEI",
+    CONSTANT.june ?? "JUN",
+    CONSTANT.july ?? "JUL",
+    CONSTANT.august ?? "AGU",
+    CONSTANT.september ?? "SEP",
+    CONSTANT.october ?? "OKT",
+    CONSTANT.november ?? "NOV",
+    CONSTANT.december ?? "DES",
+  ];
 
   const [yearStr, monthStr] = month.split("-");
   const year = parseInt(yearStr, 10);
@@ -44,9 +47,8 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
 
   const navCls = [
     "inline-flex items-center justify-center font-black border-2 border-border",
-    "bg-card text-black transition-all",
-    "shadow-[4px_4px_0px_#000]",
-    "hover:shadow-[2px_2px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px]",
+    "bg-card text-foreground transition-all",
+    "shadow-brutal hover:shadow-brutal-hover hover:translate-x-[2px] hover:translate-y-[2px]",
     "active:translate-x-[3px] active:translate-y-[3px] active:shadow-none",
     h,
     sm ? "w-9" : "w-10",
@@ -61,12 +63,11 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
       >
         <ChevronLeft size={iconSize} />
       </button>
-
       <div
         className={[
           "inline-flex items-center justify-center whitespace-nowrap",
           "font-black tracking-wide font-mono border-2 border-border bg-card",
-          "shadow-[4px_4px_0px_#000]",
+          "shadow-brutal",
           h,
           px,
           textSize,
@@ -74,7 +75,6 @@ const MonthFilter = ({ size = "md" }: MonthFilterProps) => {
       >
         {label}
       </div>
-
       <button
         onClick={() => navigate(1)}
         aria-label="Bulan berikutnya"

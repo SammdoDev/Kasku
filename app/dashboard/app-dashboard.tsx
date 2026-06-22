@@ -5,7 +5,8 @@ import { del, get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { X } from "lucide-react";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
+import { makeMonthLabel, useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 import CategorySpendCard from "@/components/ui/button-component/category-spend-card";
 import RecentTransactionsCard, {
@@ -85,71 +86,75 @@ const ErrorBanner = ({
 }: {
   onRetry: () => void;
   mobile?: boolean;
-}) => (
-  <div
-    className={`flex items-center justify-between gap-3 ${
-      mobile
-        ? "border-2 border-red-400 bg-red-50 rounded-2xl px-3.5 py-2.5"
-        : "border-[2.5px] border-red-500 bg-red-100 px-3.5 py-2.5 mb-4"
-    }`}
-    style={{ fontFamily: DASHBOARD_FONT }}
-  >
-    <span
-      className={`flex items-center gap-1.5 font-black ${mobile ? "text-[10px] text-red-700" : "text-[10px] text-red-900"}`}
-    >
-      <X size={mobile ? 11 : 12} strokeWidth={3} /> Gagal memuat data
-    </span>
-    <button
-      onClick={onRetry}
-      className={`font-black text-white ${
+}) => {
+  const CONSTANT = useTranslate();
+  return (
+    <div
+      className={`flex items-center justify-between gap-3 ${
         mobile
-          ? "border border-red-600 bg-red-600 px-2.5 py-0.5 text-[9px] rounded-lg"
-          : "border-2 border-red-900 bg-red-900 px-2.5 py-0.5 text-[9px] hover:bg-red-800"
+          ? "border-2 border-destructive bg-destructive/10 rounded-2xl px-3.5 py-2.5"
+          : "border-[2.5px] border-destructive bg-destructive/10 px-3.5 py-2.5 mb-4"
       }`}
+      style={{ fontFamily: DASHBOARD_FONT }}
     >
-      RETRY
-    </button>
-  </div>
-);
+      <span className="flex items-center gap-1.5 font-black text-[10px] text-destructive">
+        <X size={mobile ? 11 : 12} strokeWidth={3} />
+        {CONSTANT.failedLoadSummary}
+      </span>
+      <button
+        onClick={onRetry}
+        className="font-black text-[9px] border-2 border-destructive bg-destructive text-destructive-foreground px-2.5 py-0.5 hover:opacity-90"
+      >
+        RETRY
+      </button>
+    </div>
+  );
+};
 
 const AppDashboard = () => {
-  const { month, monthLabel, prevMonth, nextMonth } = useMonthFilter();
+  const { month, prevMonth, nextMonth } = useMonthFilter();
+  const CONSTANT = useTranslate();
+  const monthLabel = makeMonthLabel(month, CONSTANT);
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
   const [txLimit, setTxLimit] = useState(5);
   const [transactions, setTransactions] = useState<RawTransaction[]>([]);
   const [txLoading, setTxLoading] = useState(true);
 
-  const fetchTransactions = useCallback(async (m: string, lim: number) => {
-    setTxLoading(true);
-    try {
-      const res = await get<{ transactions: RawTransaction[] }>(
-        `/transactions?month=${m}&limit=${lim}&page=1`,
-      );
-      setTransactions(res.transactions);
-    } catch (err) {
-      toast.error("Gagal memuat transaksi", getApiError(err));
-    } finally {
-      setTxLoading(false);
-    }
-  }, []);
+  const fetchTransactions = useCallback(
+    async (m: string, lim: number) => {
+      setTxLoading(true);
+      try {
+        const res = await get<{ transactions: RawTransaction[] }>(
+          `/transactions?month=${m}&limit=${lim}&page=1`,
+        );
+        setTransactions(res.transactions);
+      } catch (err) {
+        toast.error(CONSTANT.failedLoadSummary, getApiError(err));
+      } finally {
+        setTxLoading(false);
+      }
+    },
+    [CONSTANT],
+  );
 
-  // fetch dashboard tetap seperti biasa tanpa limit
-  const fetchDashboard = useCallback(async (m: string) => {
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await get<DashboardResponse>(`/dashboard?month=${m}`);
-      setData(res);
-    } catch (err) {
-      setError(true);
-      toast.error("Gagal memuat dashboard", getApiError(err));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchDashboard = useCallback(
+    async (m: string) => {
+      setLoading(true);
+      setError(false);
+      try {
+        const res = await get<DashboardResponse>(`/dashboard?month=${m}`);
+        setData(res);
+      } catch (err) {
+        setError(true);
+        toast.error(CONSTANT.failedLoadSummary, getApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [CONSTANT],
+  );
 
   useEffect(() => {
     fetchDashboard(month);
@@ -170,26 +175,18 @@ const AppDashboard = () => {
   }, [month, txLimit]);
 
   const summary = data?.summary;
-
-  const sparkIncome = data?.daily_trend.map((d) => d.income) ?? [];
-  const sparkExpense = data?.daily_trend.map((d) => d.expense) ?? [];
-  const sparkBalance = data?.daily_trend.map((d) => d.net) ?? [];
-
   const monthNavProps = {
     monthLabel,
     summary,
     loading,
     onPrev: prevMonth,
     onNext: nextMonth,
-    sparkIncome,
-    sparkExpense,
-    sparkBalance,
   };
 
   const recentTransactions: RecentTransaction[] = transactions.map((t) => ({
     id: t.id,
     date: t.date,
-    description: t.note ?? t.category?.name ?? "Transaksi",
+    description: t.note ?? t.category?.name ?? CONSTANT.transaction,
     category_name: t.category?.name ?? null,
     category_icon: t.category?.icon ?? null,
     category_color: t.category?.color ?? null,
@@ -207,12 +204,13 @@ const AppDashboard = () => {
       onLimitChange={(lim) => setTxLimit(lim)}
       onDelete={async (id) => {
         await del(`/transactions/${id}`);
-        toast.success("Transaksi dihapus");
+        toast.success(CONSTANT.success);
         fetchDashboard(month);
         fetchTransactions(month, txLimit);
       }}
     />
   );
+
   return (
     <div
       className="card md:m-4 p-4 md:p-6"

@@ -9,6 +9,7 @@ import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 import { confirm } from "@/components/layout/for-pages/confirm-dialog";
 import { formatRelativeDate } from "@/lib/helper/date-format";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 export interface RecentTransaction {
   id: string;
@@ -32,12 +33,6 @@ type Props = {
 };
 
 const LIMIT_OPTIONS = [5, 10, 20, 50];
-
-const TYPE_FILTER_OPTIONS = [
-  { label: "PEMASUKAN", value: "income" },
-  { label: "PENGELUARAN", value: "expense" },
-  { label: "TRANSFER", value: "transfer" },
-];
 
 function resolveHexcode(icon: string | null): string {
   if (icon && icon.trim().length > 0) return icon;
@@ -64,21 +59,23 @@ function TransactionRow({
   idx: number;
   onDelete?: (id: string) => Promise<void> | void;
 }) {
+  const CONSTANT = useTranslate();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const startPress = useCallback(() => {
     if (!onDelete) return;
     timer.current = setTimeout(async () => {
       const ok = await confirm.show({
-        title: "Hapus Transaksi?",
-        message: `"${txn.description}" akan dihapus permanen.`,
-        confirmLabel: "HAPUS",
-        cancelLabel: "BATAL",
+        title: `${CONSTANT.delete} ${CONSTANT.transaction}?`,
+        message: `"${txn.description}" ${CONSTANT.deleteConfirmSuffix ?? "akan dihapus permanen."}`,
+        confirmLabel: CONSTANT.delete,
+        cancelLabel: CONSTANT.cancel,
         variant: "danger",
       });
       if (ok) await onDelete(txn.id);
     }, 500);
-  }, [txn, onDelete]);
+  }, [txn, onDelete, CONSTANT]);
 
   const cancelPress = useCallback(() => {
     if (timer.current) {
@@ -172,8 +169,15 @@ const RecentTransactionsCard = ({
   onLimitChange,
   onDelete,
 }: Props) => {
+  const CONSTANT = useTranslate();
   const [filterOpen, setFilterOpen] = useState(false);
   const [typeFilter, setTypeFilter] = useState("");
+
+  const TYPE_FILTER_OPTIONS = [
+    { label: CONSTANT.income.toUpperCase(), value: "income" },
+    { label: CONSTANT.expense.toUpperCase(), value: "expense" },
+    { label: "TRANSFER", value: "transfer" },
+  ];
 
   const filtered = transactions.filter((t) => {
     if (typeFilter === "") return true;
@@ -193,7 +197,7 @@ const RecentTransactionsCard = ({
       {/* Header */}
       <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2">
         <span className="text-[10px] font-black tracking-[0.3px] text-foreground uppercase">
-          Transaksi Terkini
+          {CONSTANT.recentTransaction ?? "Transaksi Terkini"}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -218,7 +222,7 @@ const RecentTransactionsCard = ({
             href="/transaksi"
             className="flex items-center gap-1 text-[9px] font-black text-foreground/50 hover:text-foreground uppercase tracking-widest transition-colors group"
           >
-            Semua
+            {CONSTANT.all}
             <ChevronRight
               size={13}
               strokeWidth={3}
@@ -233,7 +237,7 @@ const RecentTransactionsCard = ({
           value={typeFilter}
           onChange={setTypeFilter}
           options={TYPE_FILTER_OPTIONS}
-          allLabel="SEMUA"
+          allLabel={CONSTANT.all.toUpperCase()}
           showAll={true}
         />
       </div>
@@ -242,7 +246,7 @@ const RecentTransactionsCard = ({
       {filterOpen && (
         <div className="px-3.5 pb-2.5 border-b-2 border-dashed border-border/40">
           <p className="text-[8px] font-black tracking-widest text-foreground/30 uppercase mb-1.5">
-            Tampilkan
+            {CONSTANT.show ?? "Tampilkan"}
           </p>
           <div className="flex items-center gap-1.5">
             {LIMIT_OPTIONS.map((opt) => (
@@ -264,7 +268,7 @@ const RecentTransactionsCard = ({
               </button>
             ))}
             <span className="text-[8px] font-bold text-foreground/30 ml-1">
-              transaksi
+              {CONSTANT.transaction.toLowerCase()}
             </span>
           </div>
         </div>
@@ -279,7 +283,7 @@ const RecentTransactionsCard = ({
         ) : filtered.length === 0 ? (
           <div className="py-8 text-center">
             <span className="text-[10px] font-black text-foreground/30 tracking-widest uppercase">
-              Belum ada transaksi
+              {CONSTANT.noData}
             </span>
           </div>
         ) : (
@@ -297,7 +301,8 @@ const RecentTransactionsCard = ({
       {!loading && filtered.length > 0 && (
         <div className="shrink-0 border-t-[1.5px] border-dashed border-border/40 mx-3.5 mt-1 mb-3.5 pt-2.5 flex items-center justify-between">
           <span className="text-[8px] font-black text-foreground/30 tracking-widest uppercase">
-            {filtered.length} transaksi ditampilkan
+            {filtered.length} {CONSTANT.transaction.toLowerCase()}{" "}
+            {CONSTANT.shown ?? "ditampilkan"}
           </span>
         </div>
       )}

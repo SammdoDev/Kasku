@@ -2,22 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-const DAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-const MONTHS_ID = [
-  "Januari",
-  "Februari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "Juli",
-  "Agustus",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
@@ -37,12 +22,37 @@ interface CalendarPickerProps {
 }
 
 const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
+  const CONSTANT = useTranslate();
   const parsed = value ? new Date(value) : new Date();
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
   const [viewMonth, setViewMonth] = useState(parsed.getMonth());
 
-  const cells = getCalendarDays(viewYear, viewMonth);
+  const DAYS = [
+    CONSTANT.daySun ?? "Sen",
+    CONSTANT.dayMon ?? "Sel",
+    CONSTANT.dayTue ?? "Rab",
+    CONSTANT.dayWed ?? "Kam",
+    CONSTANT.dayThu ?? "Jum",
+    CONSTANT.dayFri ?? "Sab",
+    CONSTANT.daySat ?? "Min",
+  ];
 
+  const MONTHS = [
+    CONSTANT.january,
+    CONSTANT.february,
+    CONSTANT.march,
+    CONSTANT.april,
+    CONSTANT.may,
+    CONSTANT.june,
+    CONSTANT.july,
+    CONSTANT.august,
+    CONSTANT.september,
+    CONSTANT.october,
+    CONSTANT.november,
+    CONSTANT.december,
+  ];
+
+  const cells = getCalendarDays(viewYear, viewMonth);
   const makeDate = (day: number) =>
     `${viewYear}-${String(viewMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
@@ -52,7 +62,6 @@ const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
       setViewYear((y) => y - 1);
     } else setViewMonth((m) => m - 1);
   };
-
   const nextMonth = () => {
     if (viewMonth === 11) {
       setViewMonth(0);
@@ -62,49 +71,51 @@ const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
 
   return (
     <div className="w-full border-2 border-border bg-card p-3">
-      {/* Month nav */}
       <div className="flex items-center justify-between mb-3">
         <button
           type="button"
           onClick={prevMonth}
-          className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+          className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-foreground/5 active:brightness-90 transition-colors"
         >
           ‹
         </button>
         <div className="flex items-center gap-2">
           <span className="text-[12px] font-black tracking-wider">
-            {MONTHS_ID[viewMonth]} {viewYear}
+            {MONTHS[viewMonth]} {viewYear}
           </span>
           <button
             type="button"
             onClick={() => onChange(todayStr)}
-            className="text-[9px] font-black tracking-widest text-[#713f12] bg-[#fef9c3] border-2 border-[#713f12]/30 px-2 py-0.5 hover:bg-[#fef08a] active:brightness-90 transition-colors"
+            className="text-[9px] font-black tracking-widest px-2 py-0.5 border-2 transition-colors"
+            style={{
+              background: "var(--accent-bg)",
+              color: "var(--accent-fg)",
+              borderColor: "var(--accent-bg)",
+            }}
           >
-            HARI INI
+            {CONSTANT.today.toUpperCase()}
           </button>
         </div>
         <button
           type="button"
           onClick={nextMonth}
-          className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-[#f5f0e8] active:brightness-90 transition-colors"
+          className="w-8 h-8 flex items-center justify-center border-2 border-border font-black text-lg hover:bg-foreground/5 active:brightness-90 transition-colors"
         >
           ›
         </button>
       </div>
 
-      {/* Day headers */}
       <div className="grid grid-cols-7 mb-1">
         {DAYS.map((d) => (
           <div
             key={d}
-            className="text-center text-[9px] font-black text-black/40 py-1"
+            className="text-center text-[9px] font-black text-foreground/40 py-1"
           >
             {d}
           </div>
         ))}
       </div>
 
-      {/* Date cells */}
       <div className="grid grid-cols-7 gap-y-1">
         {cells.map((day, i) => {
           if (!day) return <div key={i} />;
@@ -119,11 +130,19 @@ const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
               className={cn(
                 "text-[12px] font-black py-2 transition-colors duration-75 active:brightness-90",
                 isSelected
-                  ? "bg-[#1a1a1a] text-white"
+                  ? "bg-foreground text-background"
                   : isToday
-                    ? "bg-[#fef9c3] text-[#713f12] hover:bg-[#fef08a]"
-                    : "hover:bg-[#f5f0e8] text-[#1a1a1a]",
+                    ? "text-foreground"
+                    : "hover:bg-foreground/5 text-foreground",
               )}
+              style={
+                isToday && !isSelected
+                  ? {
+                      background: "var(--accent-bg)",
+                      color: "var(--accent-fg)",
+                    }
+                  : undefined
+              }
             >
               {day}
             </button>

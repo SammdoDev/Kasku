@@ -27,24 +27,28 @@ import {
   SIZE_SCALES,
   type SizeScale,
 } from "@/lib/hooks/use-theme-config";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 type NavbarProps = {
   onMenuToggle: () => void;
   isSidebarOpen: boolean;
 };
 
-const ROUTE_LABELS: Record<string, string> = {
-  "/": "Dashboard",
-  "/transaksi": "Transaksi",
-  "/kategori": "Kategori",
-  "/tag-transaksi": "Tag Transaksi",
-  "/metode-pembayaran": "Dompet",
-  "/anggaran": "Anggaran",
-  "/ringkasan": "Ringkasan",
-  "/saya": "Profil",
-};
+function getPageLabel(
+  pathname: string,
+  C: ReturnType<typeof useTranslate>,
+): string {
+  const ROUTE_LABELS: Record<string, string> = {
+    "/": C.dashboard,
+    "/transaksi": C.transaction,
+    "/kategori": C.category,
+    "/tag-transaksi": C.tag,
+    "/metode-pembayaran": C.wallet,
+    "/anggaran": C.budget,
+    "/ringkasan": C.summary,
+    "/profil": C.profile,
+  };
 
-function getPageLabel(pathname: string): string {
   if (ROUTE_LABELS[pathname]) return ROUTE_LABELS[pathname];
   const match = Object.keys(ROUTE_LABELS)
     .filter((k) => k !== "/" && pathname.startsWith(k))
@@ -70,9 +74,9 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
   const [drawer, setDrawer] = useState<DrawerType>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const { config, update } = useThemeConfig();
+  const CONSTANT = useTranslate();
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUser(getSessionUser());
   }, []);
 
@@ -91,7 +95,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
     setDrawer(null);
   }, [pathname]);
 
-  const pageLabel = getPageLabel(pathname);
+  const pageLabel = getPageLabel(pathname, CONSTANT);
   const initials = user ? getInitials(user.full_name) : "??";
   const showBadge =
     NAVBAR_CONFIG.showNotificationDot && NAVBAR_CONFIG.notificationCount > 0;
@@ -108,7 +112,6 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
       <header
         style={{ backgroundColor: "var(--navbar-bg)" }}
         className="sticky top-0 z-30 flex items-center gap-3 px-4 md:px-5 border-b-[3px] border-border shrink-0"
-        // height via CSS var
       >
         <div
           style={{ height: "var(--navbar-h)" }}
@@ -117,7 +120,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
           {/* Hamburger */}
           <button
             onClick={onMenuToggle}
-            aria-label={isSidebarOpen ? "Tutup menu" : "Buka menu"}
+            aria-label={isSidebarOpen ? CONSTANT.closeMenu : CONSTANT.openMenu}
             aria-expanded={isSidebarOpen}
             className={[
               "hidden md:flex lg:hidden items-center justify-center w-9 h-9 border-[3px] border-border font-black text-foreground",
@@ -152,7 +155,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
           <div className="flex items-center gap-2 shrink-0">
             {/* Bell */}
             <button
-              aria-label={`Notifikasi${showBadge ? `, ${NAVBAR_CONFIG.notificationCount} baru` : ""}`}
+              aria-label={`${CONSTANT.notification}${showBadge ? `, ${NAVBAR_CONFIG.notificationCount} baru` : ""}`}
               className="relative flex items-center justify-center w-9 h-9 border-[3px] border-border bg-card text-foreground shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
             >
               <Bell size={16} strokeWidth={2.5} />
@@ -174,7 +177,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
             {/* Theme picker button */}
             <button
               onClick={() => toggleDrawer("theme")}
-              aria-label="Theme"
+              aria-label={CONSTANT.appearance}
               className={[
                 "flex items-center justify-center w-9 h-9 border-[3px] border-border font-black",
                 "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
@@ -197,7 +200,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
             {/* User chip */}
             <button
               onClick={() => toggleDrawer("profile")}
-              aria-label="Buka profil"
+              aria-label={CONSTANT.openProfile}
               className={[
                 "flex items-center gap-2 px-2 py-1 border-[3px] border-border bg-card shadow-brutal",
                 "hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
@@ -278,7 +281,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                 className="font-black text-sm uppercase tracking-widest"
                 style={{ color: "var(--accent-fg)" }}
               >
-                PROFIL
+                {CONSTANT.profile}
               </span>
               <button
                 onClick={() => setDrawer(null)}
@@ -287,7 +290,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                   background: "var(--accent-fg)",
                   color: "var(--accent-bg)",
                 }}
-                aria-label="Tutup"
+                aria-label={CONSTANT.close}
               >
                 <X size={14} strokeWidth={3} />
               </button>
@@ -319,10 +322,10 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
 
             <nav className="flex-1 px-3 py-4 space-y-[3px]">
               {[
-                { href: "/profil", label: "Lihat Profil", icon: User },
+                { href: "/profil", label: CONSTANT.viewProfile, icon: User },
                 {
                   href: "/profil/pengaturan",
-                  label: "Pengaturan",
+                  label: CONSTANT.settings,
                   icon: Settings,
                 },
               ].map(({ href, label, icon: Icon }) => (
@@ -351,7 +354,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                 className="w-full flex items-center gap-3 px-3 py-[10px] text-[13px] font-bold border-[2px] border-transparent text-foreground/55 hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-100"
               >
                 <LogOut size={15} strokeWidth={2.5} className="shrink-0" />
-                <span>Logout</span>
+                <span>{CONSTANT.logout}</span>
               </button>
             </div>
           </>
@@ -368,7 +371,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                 className="font-black text-sm uppercase tracking-widest"
                 style={{ color: "var(--accent-fg)" }}
               >
-                TAMPILAN
+                {CONSTANT.appearance}
               </span>
               <button
                 onClick={() => setDrawer(null)}
@@ -377,7 +380,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                   background: "var(--accent-fg)",
                   color: "var(--accent-bg)",
                 }}
-                aria-label="Tutup"
+                aria-label={CONSTANT.close}
               >
                 <X size={14} strokeWidth={3} />
               </button>
@@ -387,7 +390,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
               {/* Warna Aksen */}
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.18em] text-foreground/40 mb-3">
-                  WARNA AKSEN
+                  {CONSTANT.accentColor}
                 </p>
                 <div className="grid grid-cols-4 gap-2">
                   {ACCENT_COLORS.map((color) => {
@@ -420,7 +423,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
               {/* Ukuran */}
               <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.18em] text-foreground/40 mb-3">
-                  UKURAN
+                  {CONSTANT.size}
                 </p>
                 <div className="flex gap-2">
                   {sizes.map(([key, scale]) => {
@@ -450,7 +453,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                   })}
                 </div>
                 <p className="text-[10px] font-bold text-foreground/35 mt-2">
-                  Mempengaruhi tinggi navbar, lebar sidebar, dan ukuran font.
+                  {CONSTANT.sizeDescription}
                 </p>
               </div>
             </div>

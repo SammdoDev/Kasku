@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslate } from "@/lib/i18n/use-translate";
+
 interface TabOption {
   label: string;
   value: string;
@@ -13,14 +15,10 @@ interface TabFilterProps {
   showAll?: boolean;
 }
 
-const TabFilter = ({
-  value,
-  onChange,
-  options,
-  allLabel = "SEMUA",
-  showAll = true,
-}: TabFilterProps) => {
-  const all = showAll ? [{ label: allLabel, value: "" }, ...options] : options;
+const TabFilter = ({ value, onChange, options, allLabel, showAll = true }: TabFilterProps) => {
+  const C = useTranslate();
+  const resolvedAllLabel = allLabel ?? C.active.toUpperCase().replace("AKTIF", "SEMUA");
+  const all = showAll ? [{ label: resolvedAllLabel, value: "" }, ...options] : options;
 
   return (
     <div className="overflow-x-auto">
@@ -48,13 +46,19 @@ const TabFilter = ({
 
 export default TabFilter;
 
-export const TIPE_OPTIONS: TabOption[] = [
-  { label: "PEMASUKAN", value: "income" },
-  { label: "PENGELUARAN", value: "expense" },
-];
+export const useTipeOptions = (): TabOption[] => {
+  const CONSTANT = useTranslate();
+  return [
+    { label: CONSTANT.income.toUpperCase(), value: "income" },
+    { label: CONSTANT.expense.toUpperCase(), value: "expense" },
+  ];
+};
 
-export const STATUS_OPTIONS: TabOption[] = [
-  { label: "AKTIF", value: "active" },
-  { label: "SELESAI", value: "done" },
-  { label: "BATAL", value: "cancelled" },
-];
+export const useStatusOptions = (): TabOption[] => {
+  const CONSTANT = useTranslate();
+  return [
+    { label: CONSTANT.active.toUpperCase(), value: "active" },
+    { label: "SELESAI", value: "done" },
+    { label: CONSTANT.cancel?.toUpperCase() ?? "BATAL", value: "cancelled" },
+  ];
+};

@@ -8,7 +8,10 @@ import {
   type Transaction,
   type TransactionListResponse,
 } from "./store/transaksi-store";
-import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
+import {
+  useMonthFilter,
+  makeMonthLabel,
+} from "@/components/ui/input-component/month-filter/store/month-filter-store";
 import TabelTransaksi from "./components/table-transaksi";
 import { Plus } from "lucide-react";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
@@ -22,11 +25,7 @@ import {
   SummaryCardsDesktop,
   SummaryHeaderMobile,
 } from "@/components/ui/card/summary-header";
-
-const TYPE_FILTER_OPTIONS = [
-  { label: "KELUAR", value: "expense" },
-  { label: "MASUK", value: "income" },
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 function buildQuery(
   filter: ReturnType<typeof useTransaksiStore.getState>["filter"],
@@ -42,6 +41,7 @@ function buildQuery(
 }
 
 const AppTransaksi = () => {
+  const CONSTANT = useTranslate();
   const filter = useTransaksiStore((s) => s.filter);
   const summary = useTransaksiStore((s) => s.summary);
   const loading = useTransaksiStore((s) => s.loading);
@@ -52,8 +52,14 @@ const AppTransaksi = () => {
   const openEdit = useTransaksiStore((s) => s.openEdit);
   const removeTransaction = useTransaksiStore((s) => s.removeTransaction);
 
-  const { monthLabel, prevMonth, nextMonth } = useMonthFilter();
+  const { month, prevMonth, nextMonth } = useMonthFilter();
+  const monthLabel = makeMonthLabel(month, CONSTANT);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const TYPE_FILTER_OPTIONS = [
+    { label: CONSTANT.expense.toUpperCase(), value: "expense" },
+    { label: CONSTANT.income.toUpperCase(), value: "income" },
+  ];
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -64,11 +70,11 @@ const AppTransaksi = () => {
       setList(res);
     } catch (err) {
       setError(true);
-      toast.error("Gagal memuat transaksi", getApiError(err));
+      toast.error(CONSTANT.failedLoadSummary, getApiError(err));
     } finally {
       setLoading(false);
     }
-  }, [filter, setList, setLoading, setError]);
+  }, [filter, setList, setLoading, setError, CONSTANT]);
 
   useEffect(() => {
     fetchData();
@@ -76,28 +82,25 @@ const AppTransaksi = () => {
 
   const handleDelete = async (t: Transaction) => {
     const ok = await confirm.show({
-      title: "Hapus Transaksi?",
-      message: `"${t.description}" akan dihapus permanen.`,
-      confirmLabel: "HAPUS",
-      cancelLabel: "BATAL",
+      title: `${CONSTANT.delete} ${CONSTANT.transaction}?`,
+      message: `"${t.description}" ${CONSTANT.deleteConfirmSuffix ?? "akan dihapus permanen."}`,
+      confirmLabel: CONSTANT.delete,
+      cancelLabel: CONSTANT.cancel,
       variant: "danger",
     });
     if (!ok) return;
     try {
       await del(`/transactions/${t.id}`);
-      toast.success("Transaksi dihapus");
+      toast.success(CONSTANT.success);
       removeTransaction(t.id);
     } catch (err) {
-      toast.error("Gagal menghapus", getApiError(err));
+      toast.error(CONSTANT.failedUpdate, getApiError(err));
     }
   };
-
-  const handleOpenTambah = () => setModalOpen(true);
 
   const summaryForHeader = summary
     ? { ...summary, balance: summary.net }
     : null;
-
   const headerProps = {
     monthLabel,
     summary: summaryForHeader,
@@ -114,7 +117,6 @@ const AppTransaksi = () => {
       <div className="lg:hidden mb-4">
         <SummaryHeaderMobile {...headerProps} />
       </div>
-
       <div className="hidden lg:block mb-4">
         <SummaryCardsDesktop {...headerProps} />
       </div>
@@ -133,15 +135,15 @@ const AppTransaksi = () => {
               })
             }
             options={TYPE_FILTER_OPTIONS}
-            allLabel="SEMUA"
+            allLabel={CONSTANT.all.toUpperCase()}
           />
         }
         rightComponent={
           <Button
             size="sm"
             leftIcon={<Plus size={12} />}
-            onClick={handleOpenTambah}
-            label="TAMBAH TRANSAKSI"
+            onClick={() => setModalOpen(true)}
+            label={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
             className="w-full sm:w-auto"
           />
         }
@@ -152,8 +154,8 @@ const AppTransaksi = () => {
       <ChildModalWrapper
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        title="TAMBAH TRANSAKSI"
-        subtitle="ISI DETAIL TRANSAKSI BARU"
+        title={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
+        subtitle={CONSTANT.transactionAddSubtitle ?? "ISI DETAIL TRANSAKSI BARU"}
         width="full"
       >
         <ModalTambahTransaksi

@@ -17,7 +17,7 @@ const BottomNavbar = () => {
     { href: "/", label: CONSTANT.dashboard, icon: Home },
     { href: "/transaksi", label: CONSTANT.transaction, icon: ArrowLeftRight },
     { href: "/anggaran", label: CONSTANT.budget, icon: Wallet },
-    { href: "/profile", label: CONSTANT.profile, icon: PieChart },
+    { href: "/profil", label: CONSTANT.profile, icon: PieChart },
   ];
 
   return (

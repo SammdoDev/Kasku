@@ -2,6 +2,7 @@
 
 import { Plus } from "lucide-react";
 import CategoryButton from "./category-button";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 export interface CategoryItem {
   id: string;
@@ -35,6 +36,8 @@ const CategoryGrid = ({
   onEditCategory,
   loading = false,
 }: CategoryGridProps) => {
+  const CONSTANT = useTranslate();
+
   if (loading) {
     return (
       <div className="grid grid-cols-4 border-b-2 border-border">
@@ -50,7 +53,7 @@ const CategoryGrid = ({
       {categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-10">
           <span className="text-[10px] font-black tracking-widest text-foreground/25 uppercase">
-            Belum Ada Kategori
+            {CONSTANT.noData}
           </span>
           {onAddCategory && (
             <button
@@ -62,7 +65,7 @@ const CategoryGrid = ({
               className="flex items-center gap-1.5 border-2 border-border bg-card text-foreground px-3 py-2 text-[10px] font-black tracking-widest uppercase hover:bg-foreground hover:text-background transition-colors duration-75 shadow-brutal-sm active:shadow-none active:translate-x-[2px] active:translate-y-[2px]"
             >
               <Plus size={11} strokeWidth={3} />
-              Tambah Kategori
+              {CONSTANT.add} {CONSTANT.category}
             </button>
           )}
         </div>
@@ -96,7 +99,7 @@ const CategoryGrid = ({
                 />
               </div>
               <span className="text-[9px] font-black uppercase tracking-wide text-foreground/30 group-hover:text-foreground group-active:text-background">
-                Tambah
+                {CONSTANT.add}
               </span>
             </button>
           )}

@@ -6,21 +6,7 @@ import {
 } from "@/components/ui/table-component/table-data-component";
 import { Button } from "@/components/ui/button-component/button";
 import { useDompetStore, type PaymentMethod } from "../store/dompet-store";
-
-const TABLE_HEADERS: TableHeader[] = [
-  { title: "Aksi", value: "_action", width: "110px" },
-  { title: "Nama", value: "name", width: "180px" },
-  { title: "Tipe", value: "type", width: "110px" },
-  { title: "Icon", value: "icon", width: "100px" },
-];
-
-const TYPE_LABEL: Record<string, string> = {
-  bank: "Bank",
-  ewallet: "E-Wallet",
-  cash: "Cash",
-  credit: "Kartu Kredit",
-  other: "Lainnya",
-};
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface Props {
   onEdit: (item: PaymentMethod) => void;
@@ -28,15 +14,31 @@ interface Props {
 }
 
 const TabelDompet = ({ onEdit, onDelete }: Props) => {
+  const CONSTANT = useTranslate();
   const list = useDompetStore((s) => s.list);
   const loading = useDompetStore((s) => s.loading);
+
+  const TYPE_LABEL: Record<string, string> = {
+    bank: "Bank",
+    ewallet: "E-Wallet",
+    cash: "Cash",
+    credit: CONSTANT.creditCard ?? "Kartu Kredit",
+    other: CONSTANT.other ?? "Lainnya",
+  };
+
+  const TABLE_HEADERS: TableHeader[] = [
+    { title: CONSTANT.action ?? "Aksi", value: "_action", width: "110px" },
+    { title: CONSTANT.name ?? "Nama", value: "name", width: "180px" },
+    { title: CONSTANT.type ?? "Tipe", value: "type", width: "110px" },
+    { title: "Icon", value: "icon", width: "100px" },
+  ];
 
   const renderCell = (item: PaymentMethod, header: TableHeader) => {
     if (header.value === "_action") {
       return (
         <div className="flex gap-1">
           <Button
-            label="EDIT"
+            label={CONSTANT.edit}
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
@@ -44,7 +46,7 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
             }}
           />
           <Button
-            label="HAPUS"
+            label={CONSTANT.delete}
             variant="destructive"
             onClick={(e) => {
               e.stopPropagation();
@@ -82,7 +84,7 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
       dataKey="id"
       loading={loading}
       loadingRows={5}
-      emptyMessage="Belum ada dompet"
+      emptyMessage={CONSTANT.walletEmpty ?? "Belum ada dompet"}
     />
   );
 };

@@ -2,6 +2,7 @@
 
 import formatIDR from "@/lib/helper/currency-format";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 export interface BudgetItem {
   id: string;
@@ -19,10 +20,11 @@ type Props = {
 };
 
 export const BudgetRow = ({ b }: { b: BudgetItem }) => {
+  const C = useTranslate();
   const barColor = b.over_budget
     ? "var(--color-danger)"
     : b.percent_used > 80
-      ? "#f97316"
+      ? "var(--color-warning)"
       : "var(--color-success)";
 
   return (
@@ -32,9 +34,7 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
           {b.name}
         </span>
         <span
-          className={`flex items-center gap-1.5 text-[9px] font-bold ${
-            b.over_budget ? "text-destructive" : "text-foreground/60"
-          }`}
+          className={`flex items-center gap-1.5 text-[9px] font-bold ${b.over_budget ? "text-destructive" : "text-foreground/60"}`}
         >
           {formatIDR(b.spent)} / {formatIDR(b.amount)}
           {b.over_budget && (
@@ -56,13 +56,15 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
       </div>
 
       <p className="mt-0.5 text-[8px] text-foreground/40">
-        {b.percent_used}% terpakai · Sisa {formatIDR(Math.max(0, b.remaining))}
+        {b.percent_used}% {C.active.toLowerCase()} ·{" "}
+        {C.totalBalance.split(" ")[0]} {formatIDR(Math.max(0, b.remaining))}
       </p>
     </div>
   );
 };
 
 const BudgetSummaryCard = ({ budgets, variant = "mobile" }: Props) => {
+  const C = useTranslate();
   const overCount = budgets.filter((b) => b.over_budget).length;
 
   return (
@@ -72,17 +74,13 @@ const BudgetSummaryCard = ({ budgets, variant = "mobile" }: Props) => {
     >
       <div className="flex items-center justify-between mb-3">
         <span
-          className={`font-black uppercase tracking-tight text-foreground ${
-            variant === "mobile" ? "text-[11px]" : "text-[10px]"
-          }`}
+          className={`font-black uppercase tracking-tight text-foreground ${variant === "mobile" ? "text-[11px]" : "text-[10px]"}`}
         >
-          Ringkasan Anggaran
+          {C.summary} {C.budget}
         </span>
         {overCount > 0 && (
           <span
-            className={`border border-destructive bg-destructive/10 text-destructive font-black px-2 py-0.5 text-[8px] ${
-              variant === "mobile" ? "rounded-full" : ""
-            }`}
+            className={`border border-destructive bg-destructive/10 text-destructive font-black px-2 py-0.5 text-[8px] ${variant === "mobile" ? "rounded-full" : ""}`}
           >
             {overCount} OVER
           </span>

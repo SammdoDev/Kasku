@@ -12,15 +12,15 @@ import { useMonthFilter } from "@/components/ui/input-component/month-filter/sto
 import MonthFilter from "@/components/ui/input-component/month-filter/month-filter";
 import { Button } from "@/components/ui/button-component/button";
 import { Plus, RotateCcw } from "lucide-react";
-import TabFilter, {
-  TIPE_OPTIONS,
-} from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
+import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface FilterTransaksiProps {
   onOpenCreate: () => void;
 }
 
 const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
+  const CONSTANT = useTranslate();
   const filter = useTransaksiStore((s) => s.filter);
   const tags = useTransaksiStore((s) => s.tags);
   const setFilter = useTransaksiStore((s) => s.setFilter);
@@ -28,6 +28,7 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
   const setReference = useTransaksiStore((s) => s.setReference);
 
   const { month } = useMonthFilter();
+
   useEffect(() => {
     setFilter({ month, page: 1 });
   }, [month, setFilter]);
@@ -62,13 +63,18 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
     !!filter.tag_id ||
     !!filter.search;
 
+  const TIPE_OPTIONS = [
+    { label: CONSTANT.expense.toUpperCase(), value: "expense" },
+    { label: CONSTANT.income.toUpperCase(), value: "income" },
+  ];
+
   return (
     <div className="flex flex-col gap-2.5">
       {/* Row 1 */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center">
         <input
           type="text"
-          placeholder="Cari transaksi..."
+          placeholder={`${CONSTANT.search} ${CONSTANT.transaction.toLowerCase()}...`}
           defaultValue={filter.search}
           onChange={(e) => handleSearch(e.target.value)}
           className={[
@@ -87,7 +93,7 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
             size="sm"
             leftIcon={<Plus size={12} />}
             onClick={onOpenCreate}
-            label="TAMBAH"
+            label={CONSTANT.add}
           />
         </div>
       </div>
@@ -100,7 +106,7 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
             setFilter({ type: (val || "all") as typeof filter.type, page: 1 })
           }
           options={TIPE_OPTIONS}
-          allLabel="SEMUA"
+          allLabel={CONSTANT.all.toUpperCase()}
         />
 
         {tags.map((tag) => (
@@ -135,7 +141,7 @@ const FilterTransaksi = ({ onOpenCreate }: FilterTransaksiProps) => {
         {hasActiveFilter && (
           <Button
             size="sm"
-            label="RESET"
+            label={CONSTANT.reset ?? "RESET"}
             variant="outline"
             onClick={resetFilter}
             leftIcon={<RotateCcw size={10} />}

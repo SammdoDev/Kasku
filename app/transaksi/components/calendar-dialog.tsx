@@ -3,22 +3,7 @@
 import { useState } from "react";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import { cn } from "@/lib/utils";
-
-const DAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-const MONTHS_ID = [
-  "Januari",
-  "Februari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "Juli",
-  "Agustus",
-  "September",
-  "Oktober",
-  "November",
-  "Desember",
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 function getCalendarDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
@@ -42,12 +27,37 @@ const CalendarDialog = ({
   onConfirm,
   onClose,
 }: CalendarDialogProps) => {
+  const CONSTANT = useTranslate();
   const parsed = date ? new Date(date) : new Date();
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
   const [viewMonth, setViewMonth] = useState(parsed.getMonth());
 
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const DAYS = [
+    CONSTANT.daySun,
+    CONSTANT.dayMon,
+    CONSTANT.dayTue,
+    CONSTANT.dayWed,
+    CONSTANT.dayThu,
+    CONSTANT.dayFri,
+    CONSTANT.daySat,
+  ];
+  const MONTHS = [
+    CONSTANT.january,
+    CONSTANT.february,
+    CONSTANT.march,
+    CONSTANT.april,
+    CONSTANT.may,
+    CONSTANT.june,
+    CONSTANT.july,
+    CONSTANT.august,
+    CONSTANT.september,
+    CONSTANT.october,
+    CONSTANT.november,
+    CONSTANT.december,
+  ];
 
   const cells = getCalendarDays(viewYear, viewMonth);
   const makeDate = (day: number) =>
@@ -75,12 +85,11 @@ const CalendarDialog = ({
     <ChildModalWrapper
       open={open}
       onClose={onClose}
-      title="PILIH TANGGAL"
-      subtitle="TANGGAL TRANSAKSI"
+      title={CONSTANT.chooseDate.toUpperCase()}
+      subtitle={CONSTANT.transactionDate.toUpperCase()}
       width="sm"
     >
       <div className="pt-3 pb-1">
-        {/* Month nav */}
         <div className="flex items-center justify-between mb-3">
           <button
             type="button"
@@ -89,10 +98,9 @@ const CalendarDialog = ({
           >
             ‹
           </button>
-
           <div className="flex items-center gap-2">
             <span className="text-[13px] font-black tracking-wider text-foreground">
-              {MONTHS_ID[viewMonth]} {viewYear}
+              {MONTHS[viewMonth]} {viewYear}
             </span>
             <button
               type="button"
@@ -102,15 +110,14 @@ const CalendarDialog = ({
               }}
               className="text-[9px] font-black tracking-widest px-2 py-0.5 border-2 transition-colors"
               style={{
-                color: "var(--brand-accent-fg)",
-                background: "var(--brand-accent)",
-                borderColor: "var(--brand-accent)",
+                color: "var(--accent-fg)",
+                background: "var(--accent-bg)",
+                borderColor: "var(--accent-bg)",
               }}
             >
-              HARI INI
+              {CONSTANT.today.toUpperCase()}
             </button>
           </div>
-
           <button
             type="button"
             onClick={nextMonth}
@@ -120,7 +127,6 @@ const CalendarDialog = ({
           </button>
         </div>
 
-        {/* Day headers */}
         <div className="grid grid-cols-7 mb-1">
           {DAYS.map((d) => (
             <div
@@ -132,7 +138,6 @@ const CalendarDialog = ({
           ))}
         </div>
 
-        {/* Date cells */}
         <div className="grid grid-cols-7 gap-y-1">
           {cells.map((day, i) => {
             if (!day) return <div key={i} />;
@@ -155,8 +160,8 @@ const CalendarDialog = ({
                 style={
                   isTodayCell && !isSelected
                     ? {
-                        background: "var(--brand-accent)",
-                        color: "var(--brand-accent-fg)",
+                        background: "var(--accent-bg)",
+                        color: "var(--accent-fg)",
                       }
                     : undefined
                 }

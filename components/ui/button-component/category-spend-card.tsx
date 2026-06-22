@@ -3,6 +3,7 @@
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import formatIDR from "@/lib/helper/currency-format";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 export interface CategorySpend {
   id: string;
@@ -44,6 +45,7 @@ const CategorySpendCard = ({
   loading = false,
   onEdit,
 }: Props) => {
+  const C = useTranslate();
   const top5 = categories.slice(0, 5);
 
   return (
@@ -53,7 +55,7 @@ const CategorySpendCard = ({
     >
       <div className="mb-3.5 flex items-center justify-between">
         <span className="text-[10px] font-black tracking-[0.3px] text-foreground">
-          PENGELUARAN PER KATEGORI
+          {C.expenseByCategory}
         </span>
         <span className="text-[8px] font-bold text-foreground/40">
           {monthLabel.toUpperCase()}
@@ -65,13 +67,12 @@ const CategorySpendCard = ({
           Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)
         ) : top5.length === 0 ? (
           <div className="py-6 text-center text-[10px] font-bold text-foreground/30 tracking-widest">
-            BELUM ADA DATA
+            {C.noData}
           </div>
         ) : (
           top5.map((c) => {
             const hexcode = resolveHexcode(c.icon);
             const barColor = c.color ?? "#888";
-
             return (
               <div key={c.id} className="flex items-center gap-3">
                 <div
@@ -81,7 +82,6 @@ const CategorySpendCard = ({
                 >
                   <OpenmojiImg hexcode={hexcode} size={20} alt={c.name} />
                 </div>
-
                 <div className="flex-1 min-w-0">
                   <div className="mb-1 flex items-center justify-between gap-1 flex-wrap">
                     <span className="text-[10px] font-extrabold text-foreground truncate max-w-[110px]">
@@ -94,7 +94,6 @@ const CategorySpendCard = ({
                       </span>
                     </span>
                   </div>
-
                   <div className="h-[5px] overflow-hidden border-[1.5px] border-border bg-foreground/[0.06]">
                     <div
                       className="h-full transition-[width] duration-500"
@@ -111,7 +110,7 @@ const CategorySpendCard = ({
       {!loading && top5.length > 0 && (
         <div className="mt-3.5 pt-2.5 border-t-[1.5px] border-dashed border-border/50 flex items-center justify-between">
           <span className="text-[8px] font-black text-foreground/30 tracking-widest">
-            TOTAL {top5.length} KATEGORI TERATAS
+            TOTAL {top5.length} {C.category.toUpperCase()}
           </span>
           <span className="text-[10px] font-black text-foreground">
             {formatIDR(top5.reduce((s, c) => s + c.total, 0))}
