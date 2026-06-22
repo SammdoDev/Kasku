@@ -11,13 +11,13 @@ import { useTranslate } from "@/lib/i18n/use-translate";
 const BottomNavbar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
 
   const NAV_ITEMS = [
-    { href: "/", label: C.dashboard, icon: Home },
-    { href: "/transaksi", label: C.transaction, icon: ArrowLeftRight },
-    { href: "/anggaran", label: C.budget, icon: Wallet },
-    { href: "/saya", label: C.profile, icon: PieChart },
+    { href: "/", label: CONSTANT.dashboard, icon: Home },
+    { href: "/transaksi", label: CONSTANT.transaction, icon: ArrowLeftRight },
+    { href: "/anggaran", label: CONSTANT.budget, icon: Wallet },
+    { href: "/profile", label: CONSTANT.profile, icon: PieChart },
   ];
 
   return (
