@@ -4,20 +4,21 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, ArrowLeftRight, PieChart, Wallet, Plus, X } from "lucide-react";
 import { useState } from "react";
-import { SIDEBAR_CONFIG } from "../sidebar/sidebar-menu-constant";
 import ModalTambahTransaksi from "@/app/transaksi/components/modal-tambah-transaksi";
 import ChildModalWrapper from "../for-pages/child-modal-wrapper";
-
-const NAV_ITEMS = [
-  { href: "/", label: "Beranda", icon: Home },
-  { href: "/transaksi", label: "Transaksi", icon: ArrowLeftRight },
-  { href: "/anggaran", label: "Anggaran", icon: Wallet },
-  { href: "/saya", label: "Saya", icon: PieChart },
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 const BottomNavbar = () => {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const C = useTranslate();
+
+  const NAV_ITEMS = [
+    { href: "/", label: C.dashboard, icon: Home },
+    { href: "/transaksi", label: C.transaction, icon: ArrowLeftRight },
+    { href: "/anggaran", label: C.budget, icon: Wallet },
+    { href: "/saya", label: C.profile, icon: PieChart },
+  ];
 
   return (
     <>
@@ -37,29 +38,28 @@ const BottomNavbar = () => {
               key={item.href}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              className="flex-1 flex flex-col items-center justify-center gap-[3px] h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
+              className="flex-1 flex flex-col items-center justify-center gap-[3px] h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
             >
               <div
                 className={[
                   "flex items-center justify-center w-9 h-9 border-[2.5px] transition-all duration-100",
                   isActive
-                    ? "border-border shadow-[2px_2px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
+                    ? "border-border shadow-[2px_2px_0px_hsl(var(--border))] -translate-x-[1px] -translate-y-[1px]"
                     : "border-transparent",
                 ].join(" ")}
-                style={
-                  isActive ? { background: SIDEBAR_CONFIG.accentColor } : {}
-                }
+                style={isActive ? { background: "var(--accent-bg)" } : {}}
               >
                 <Icon
                   size={18}
                   strokeWidth={2.5}
-                  className={isActive ? "text-black" : "text-black/40"}
+                  style={isActive ? { color: "var(--accent-fg)" } : undefined}
+                  className={isActive ? "" : "text-foreground/40"}
                 />
               </div>
               <span
                 className={[
                   "text-[10px] font-black uppercase tracking-tight leading-none",
-                  isActive ? "text-black" : "text-black/35",
+                  isActive ? "text-foreground" : "text-foreground/35",
                 ].join(" ")}
               >
                 {item.label}
@@ -75,16 +75,18 @@ const BottomNavbar = () => {
             aria-label="Tambah transaksi baru"
             className={[
               "flex items-center justify-center w-14 h-14 border-[3px] border-border",
-              "shadow-[3px_3px_0px_#ffde59] hover:shadow-[1px_1px_0px_#ffde59]",
               "hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black",
-              open ? "bg-card" : "bg-black",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
+              open ? "bg-card" : "bg-foreground",
             ].join(" ")}
+            style={{
+              boxShadow: open ? "none" : "3px 3px 0px var(--accent-bg)",
+            }}
           >
             {open ? (
-              <X size={24} strokeWidth={3} className="text-black" />
+              <X size={24} strokeWidth={3} className="text-foreground" />
             ) : (
-              <Plus size={24} strokeWidth={3} className="text-white" />
+              <Plus size={24} strokeWidth={3} className="text-background" />
             )}
           </button>
         </div>
@@ -98,29 +100,28 @@ const BottomNavbar = () => {
               key={item.href}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              className="flex-1 flex flex-col items-center justify-center gap-[3px] h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-inset"
+              className="flex-1 flex flex-col items-center justify-center gap-[3px] h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset"
             >
               <div
                 className={[
                   "flex items-center justify-center w-9 h-9 border-[2.5px] transition-all duration-100",
                   isActive
-                    ? "border-border shadow-[2px_2px_0px_#000] -translate-x-[1px] -translate-y-[1px]"
+                    ? "border-border shadow-[2px_2px_0px_hsl(var(--border))] -translate-x-[1px] -translate-y-[1px]"
                     : "border-transparent",
                 ].join(" ")}
-                style={
-                  isActive ? { background: SIDEBAR_CONFIG.accentColor } : {}
-                }
+                style={isActive ? { background: "var(--accent-bg)" } : {}}
               >
                 <Icon
                   size={18}
                   strokeWidth={2.5}
-                  className={isActive ? "text-black" : "text-black/40"}
+                  style={isActive ? { color: "var(--accent-fg)" } : undefined}
+                  className={isActive ? "" : "text-foreground/40"}
                 />
               </div>
               <span
                 className={[
                   "text-[10px] font-black uppercase tracking-tight leading-none",
-                  isActive ? "text-black" : "text-black/35",
+                  isActive ? "text-foreground" : "text-foreground/35",
                 ].join(" ")}
               >
                 {item.label}
