@@ -5,6 +5,7 @@ import { get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import { KeyRound, Mail } from "lucide-react";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface ApiUser {
   email: string;
@@ -16,6 +17,7 @@ const Skeleton = ({ className }: { className?: string }) => (
 );
 
 const LoginAccountCard = () => {
+  const CONSTANT = useTranslate();
   const [user, setUser] = useState<ApiUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -25,11 +27,11 @@ const LoginAccountCard = () => {
       const res = await get<{ user: ApiUser }>("/auth/profile");
       setUser(res.user);
     } catch (err) {
-      toast.error("Gagal memuat profil", getApiError(err));
+      toast.error(CONSTANT.failedLoadProfile, getApiError(err));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [CONSTANT]);
 
   useEffect(() => {
     fetchProfile();
@@ -44,44 +46,51 @@ const LoginAccountCard = () => {
     >
       <span
         style={{ background: "var(--accent-bg)" }}
-        className="inline-block  text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3"
+        className="inline-block bg-[var(--accent)] text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3"
       >
-        Login &amp; Akun
+        {CONSTANT.loginAndAccount}
       </span>
 
       {loading ? (
         <Skeleton className="h-[54px] w-full" />
       ) : (
-        <div className="flex items-center gap-3 border-[3px] border-border px-4 py-3 bg-[#F5F3EE]">
-          <div
-            className="w-8 h-8 border-[2px] border-border flex items-center justify-center shrink-0"
-            style={{ background: "var(--accent-fg)" }}
-          >
+        <div className="flex items-center gap-3 border-[3px] border-border px-4 py-3">
+          <div className="w-8 h-8 border-[2px] border-border flex items-center justify-center shrink-0">
             {isGoogleUser ? (
-              <Mail size={14} strokeWidth={2.5} />
+              <Mail
+                size={14}
+                strokeWidth={2.5}
+                style={{ color: "var(--accent)" }}
+              />
             ) : (
-              <KeyRound size={14} strokeWidth={2.5} />
+              <KeyRound
+                size={14}
+                strokeWidth={2.5}
+                style={{ color: "var(--accent)" }}
+              />
             )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[12px] font-black uppercase tracking-wide">
-              {isGoogleUser ? "Google" : "Username & Password"}
+              {isGoogleUser
+                ? CONSTANT.googleAccount
+                : CONSTANT.usernamePassword}
             </p>
-            <p className="text-[10px] font-bold text-black/45 mt-0.5 truncate">
-              {isGoogleUser ? user?.email : "Login manual aktif"}
+            <p className="text-[10px] font-bold mt-0.5 truncate">
+              {isGoogleUser ? user?.email : CONSTANT.loginManualActive}
             </p>
           </div>
-          <span className="text-[9px] font-black uppercase tracking-wider bg-black text-[var(--accent)] border-[2px] border-border px-2.5 py-1 whitespace-nowrap">
-            Aktif
+          <span className="text-[9px] font-black uppercase tracking-wider text-[var(--accent)] border-[2px] border-border px-2.5 py-1 whitespace-nowrap">
+            {CONSTANT.active}
           </span>
         </div>
       )}
 
       {!loading && (
-        <p className="text-[10px] font-bold text-black/35 mt-3">
+        <p className="text-[10px] font-bold  mt-3">
           {isGoogleUser
-            ? "Akun ini terdaftar melalui Google. Ganti password tidak tersedia."
-            : "Akun ini menggunakan username dan password untuk login."}
+            ? CONSTANT.accountRegisteredGoogle
+            : CONSTANT.accountUsesPassword}
         </p>
       )}
     </div>

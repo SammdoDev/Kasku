@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Edit, Lock, LogOut } from "lucide-react";
-import { get, post, getApiError } from "@/lib/helper/apiService";
+import { get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import ModalEditProfile from "./modal/modal-edit-profile";
 import ModalChangePassword from "./modal/modal-change-password";
 import { clearSession } from "@/lib/helper/session";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface ApiUser {
   id: string;
@@ -41,6 +42,7 @@ const formatMemberSince = (iso: string) =>
 type ModalType = "edit-profile" | "change-password" | null;
 
 const ProfileCard = () => {
+  const CONSTANT = useTranslate();
   const [user, setUser] = useState<ApiUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [logoutLoading, setLogoutLoading] = useState(false);
@@ -52,11 +54,11 @@ const ProfileCard = () => {
       const res = await get<{ user: ApiUser }>("/auth/profile");
       setUser(res.user);
     } catch (err) {
-      toast.error("Gagal memuat profil", getApiError(err));
+      toast.error(CONSTANT.failedLoadProfile, getApiError(err));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [CONSTANT]);
 
   useEffect(() => {
     fetchProfile();
@@ -75,8 +77,11 @@ const ProfileCard = () => {
         className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] p-5"
         style={{ fontFamily: DASHBOARD_FONT }}
       >
-        <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3">
-          Profil Pengguna
+        <span
+          style={{ background: "var(--accent-bg)" }}
+          className="inline-block bg-[var(--accent)] text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3"
+        >
+          {CONSTANT.userProfile}
         </span>
 
         <div className="flex gap-4 items-start">
@@ -87,7 +92,7 @@ const ProfileCard = () => {
             {loading ? (
               <Skeleton className="w-8 h-6" />
             ) : (
-              <span className="font-black text-lg md:text-xl text-black">
+              <span className="font-black text-lg md:text-xl">
                 {getInitials(displayName)}
               </span>
             )}
@@ -109,7 +114,8 @@ const ProfileCard = () => {
                   <p>@{user?.username}</p>
                   <p className="break-all">{user?.email}</p>
                   <p>
-                    Bergabung {user ? formatMemberSince(user.created_at) : ""}
+                    {CONSTANT.joined}{" "}
+                    {user ? formatMemberSince(user.created_at) : ""}
                   </p>
                 </div>
               </>
@@ -125,7 +131,7 @@ const ProfileCard = () => {
             className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border bg-card disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <Edit size={13} strokeWidth={2.5} />
-            Edit Profil
+            {CONSTANT.editProfile}
           </button>
           <button
             type="button"
@@ -134,7 +140,7 @@ const ProfileCard = () => {
             className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-border bg-foreground text-background disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <Lock size={13} strokeWidth={2.5} />
-            Ganti Password
+            {CONSTANT.changePassword}
           </button>
           <button
             type="button"
@@ -143,7 +149,7 @@ const ProfileCard = () => {
             className="inline-flex items-center gap-2 px-3 md:px-3.5 py-2 text-[10px] font-black uppercase tracking-wider border-[3px] border-red-600 bg-card text-red-600 disabled:opacity-40 transition-transform duration-100 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#dc2626] active:translate-x-0 active:translate-y-0 active:shadow-none"
           >
             <LogOut size={13} strokeWidth={2.5} />
-            {logoutLoading ? "KELUAR..." : "Logout"}
+            {logoutLoading ? CONSTANT.loggingOut : CONSTANT.logout}
           </button>
         </div>
       </div>
@@ -151,8 +157,8 @@ const ProfileCard = () => {
       <ChildModalWrapper
         open={activeModal === "edit-profile"}
         onClose={() => setActiveModal(null)}
-        title="EDIT PROFIL"
-        subtitle="PERBARUI NAMA LENGKAP"
+        title={CONSTANT.editProfile.toUpperCase()}
+        subtitle={CONSTANT.editProfileSubtitle.toUpperCase()}
         width="md"
       >
         <ModalEditProfile
@@ -167,8 +173,8 @@ const ProfileCard = () => {
       <ChildModalWrapper
         open={activeModal === "change-password"}
         onClose={() => setActiveModal(null)}
-        title="GANTI PASSWORD"
-        subtitle="MASUKKAN PASSWORD LAMA DAN BARU"
+        title={CONSTANT.changePassword.toUpperCase()}
+        subtitle={CONSTANT.changePasswordSubtitle.toUpperCase()}
         width="md"
       >
         <ModalChangePassword onClose={() => setActiveModal(null)} />

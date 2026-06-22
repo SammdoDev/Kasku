@@ -1,4 +1,3 @@
-// src/components/layout/app-shell.tsx (atau sesuai path project)
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { getSession, clearSession } from "@/lib/helper/session";
 import SidebarMenu from "@/components/layout/sidebar/sidebar-menu";
 import NavbarMenu from "@/components/layout/navbar/navbar-menu";
-import { SIDEBAR_CONFIG } from "@/components/layout/sidebar/sidebar-menu-constant";
 import { ToastProvider } from "./for-pages/toast";
 import { ConfirmDialogProvider } from "./for-pages/confirm-dialog";
 import BottomNavbar from "./bottom-navbar/bottom-navbar";
@@ -78,7 +76,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
   if (!mounted) {
     return (
       <div
-        style={{ background: SIDEBAR_CONFIG.bgColor }}
+        style={{ backgroundColor: "var(--sidebar-bg)" }}
         className="min-h-screen"
       />
     );
@@ -96,7 +94,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div
-      style={{ background: SIDEBAR_CONFIG.bgColor }}
+      style={{ backgroundColor: "var(--sidebar-bg)" }}
       className="flex h-screen overflow-hidden"
     >
       <SidebarMenu isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />

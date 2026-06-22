@@ -10,6 +10,7 @@ import NbToggle from "./nb-toggle";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import ModalCycleStart from "./modal/modal-cycle-start";
 import ModalCurrencyLang from "./modal/modal-currency-lang";
+import { useTranslate, setLang } from "@/lib/i18n/use-translate";
 
 interface ApiUser {
   currency: string;
@@ -24,6 +25,7 @@ const Skeleton = ({ className }: { className?: string }) => (
 const BudgetPreferencesCard = () => {
   const { theme, setTheme } = useTheme();
   const [mountedTheme, setMountedTheme] = useState(false);
+  const CONSTANT = useTranslate();
 
   const [currency, setCurrency] = useState("IDR");
   const [language, setLanguage] = useState("id");
@@ -44,11 +46,11 @@ const BudgetPreferencesCard = () => {
       setCycleStartDate(res.user.cycle_start_date ?? 1);
       setLanguage(res.user.language ?? "id");
     } catch (err) {
-      toast.error("Gagal memuat preferensi", getApiError(err));
+      toast.error(CONSTANT.failedLoadPreferences, getApiError(err));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [CONSTANT]);
 
   useEffect(() => {
     fetchProfile();
@@ -63,13 +65,13 @@ const BudgetPreferencesCard = () => {
       if (key === "budget_notifications") setBudgetNotifications(value);
       if (key === "identity_reminder") setIdentityReminder(value);
     } catch (err) {
-      toast.error("Gagal memperbarui", getApiError(err));
+      toast.error(CONSTANT.failedUpdate, getApiError(err));
     }
   };
 
   const LANGUAGE_LABEL: Record<string, string> = {
-    id: "Indonesia",
-    en: "English",
+    id: CONSTANT.indonesia,
+    en: CONSTANT.english,
   };
 
   return (
@@ -78,18 +80,21 @@ const BudgetPreferencesCard = () => {
         className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] p-5"
         style={{ fontFamily: DASHBOARD_FONT }}
       >
-        <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3">
-          Preferensi Budgeting
+        <span
+          style={{ background: "var(--accent-bg)" }}
+          className="inline-block text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3"
+        >
+          {CONSTANT.budgetingPreferences}
         </span>
 
-        {/* Currency & Bahasa — 1 row, 1 tombol edit */}
+        {/* Currency & Bahasa */}
         <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <div>
             <span className="text-[11px] font-black uppercase tracking-wide block">
-              Currency &amp; Bahasa
+              {CONSTANT.currencyAndLanguage}
             </span>
             {!loading && (
-              <span className="text-[10px] font-bold text-black/40">
+              <span className="text-[10px] font-bold text-foreground/40">
                 {currency} · {LANGUAGE_LABEL[language] ?? language}
               </span>
             )}
@@ -102,7 +107,7 @@ const BudgetPreferencesCard = () => {
               onClick={() => setCurrencyLangModalOpen(true)}
               className="flex items-center gap-1.5 text-[11px] font-black border-[2px] border-border px-3 py-1 bg-card hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-100"
             >
-              Ubah
+              {CONSTANT.change}
               <Pencil size={10} strokeWidth={2.5} />
             </button>
           )}
@@ -111,7 +116,7 @@ const BudgetPreferencesCard = () => {
         {/* Cycle Start Date */}
         <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
-            Cycle Start Date
+            {CONSTANT.cycleStartDate}
           </span>
           {loading ? (
             <Skeleton className="h-6 w-16" />
@@ -121,7 +126,7 @@ const BudgetPreferencesCard = () => {
               onClick={() => setCycleModalOpen(true)}
               className="flex items-center gap-1.5 text-[12px] font-black border-[2px] border-border px-3 py-1 bg-card hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_hsl(var(--border))] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-100"
             >
-              Tgl {cycleStartDate}
+              {CONSTANT.datePrefix} {cycleStartDate}
               <Pencil size={10} strokeWidth={2.5} />
             </button>
           )}
@@ -130,31 +135,31 @@ const BudgetPreferencesCard = () => {
         {/* Notifikasi Budget */}
         <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
-            Notifikasi Budget
+            {CONSTANT.budgetNotification}
           </span>
           <NbToggle
             checked={budgetNotifications}
             onChange={(v) => handleToggle("budget_notifications", v)}
-            label="Notifikasi Budget"
+            label={CONSTANT.budgetNotification}
           />
         </div>
 
         {/* Identity Reminder */}
         <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
-            Identity Reminder
+            {CONSTANT.identityReminder}
           </span>
           <NbToggle
             checked={identityReminder}
             onChange={(v) => handleToggle("identity_reminder", v)}
-            label="Identity Reminder"
+            label={CONSTANT.identityReminder}
           />
         </div>
 
         {/* Dark Mode */}
         <div className="flex items-center justify-between py-3">
           <span className="text-[11px] font-black uppercase tracking-wide">
-            Dark Mode
+            {CONSTANT.darkMode}
           </span>
           {!mountedTheme ? (
             <Skeleton className="h-5 w-9" />
@@ -162,7 +167,7 @@ const BudgetPreferencesCard = () => {
             <NbToggle
               checked={theme === "dark"}
               onChange={(v) => setTheme(v ? "dark" : "light")}
-              label="Dark Mode"
+              label={CONSTANT.darkMode}
             />
           )}
         </div>
@@ -171,8 +176,8 @@ const BudgetPreferencesCard = () => {
       <ChildModalWrapper
         open={cycleModalOpen}
         onClose={() => setCycleModalOpen(false)}
-        title="CYCLE START DATE"
-        subtitle="PILIH TANGGAL AWAL SIKLUS BUDGET"
+        title={CONSTANT.cycleStartDate}
+        subtitle={CONSTANT.chooseStartCycle}
         width="md"
       >
         <ModalCycleStart
@@ -185,8 +190,8 @@ const BudgetPreferencesCard = () => {
       <ChildModalWrapper
         open={currencyLangModalOpen}
         onClose={() => setCurrencyLangModalOpen(false)}
-        title="CURRENCY & BAHASA"
-        subtitle="ATUR MATA UANG DAN BAHASA APLIKASI"
+        title={CONSTANT.currencyAndLanguage}
+        subtitle={CONSTANT.setCurrencyLanguage}
         width="md"
       >
         <ModalCurrencyLang
@@ -196,6 +201,7 @@ const BudgetPreferencesCard = () => {
           onSuccess={(c, l) => {
             setCurrency(c);
             setLanguage(l);
+            setLang(l as "id" | "en");
           }}
         />
       </ChildModalWrapper>

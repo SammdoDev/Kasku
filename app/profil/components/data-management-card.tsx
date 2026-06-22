@@ -7,8 +7,10 @@ import { toast } from "@/components/layout/for-pages/toast";
 import { downloadFromApi } from "@/lib/helper/apiService";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import ModalImport from "./modal/modal-import";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 const DataManagementCard = () => {
+  const CONSTANT = useTranslate();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [importOpen, setImportOpen] = useState(false);
 
@@ -19,20 +21,20 @@ const DataManagementCard = () => {
       setLoadingKey(key);
       try {
         await downloadFromApi(url, filename);
-        toast.success("Berhasil diunduh");
+        toast.success(CONSTANT.downloadSuccess);
       } catch {
-        toast.error("Gagal mengunduh", "Coba lagi beberapa saat.");
+        toast.error(CONSTANT.failedDownload, CONSTANT.tryAgainLater);
       } finally {
         setLoadingKey(null);
       }
     },
-    [],
+    [CONSTANT],
   );
 
   const actions = [
     {
       key: "export-csv",
-      label: "Export CSV",
+      label: CONSTANT.exportCsv,
       icon: Download,
       onClick: () =>
         handle(
@@ -43,7 +45,7 @@ const DataManagementCard = () => {
     },
     {
       key: "export-report",
-      label: "Export Report",
+      label: CONSTANT.exportReport,
       icon: FileText,
       onClick: () =>
         handle(
@@ -54,14 +56,14 @@ const DataManagementCard = () => {
     },
     {
       key: "backup",
-      label: "Backup Data",
+      label: CONSTANT.backupData,
       icon: Database,
       onClick: () =>
         handle("backup", "/data/backup", `cashora-backup-${today}.json`),
     },
     {
       key: "import",
-      label: "Import Data",
+      label: CONSTANT.importData,
       icon: Upload,
       onClick: () => setImportOpen(true),
     },
@@ -70,16 +72,19 @@ const DataManagementCard = () => {
   return (
     <>
       <div
-        className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] overflow-hidden"
+        className="bg-card border-[3px] border-border shadow-[6px_6px_0_hsl(var(--border))] overflow-hidden flex flex-col h-full"
         style={{ fontFamily: DASHBOARD_FONT }}
       >
         <div className="px-5 pt-4 pb-3.5 border-b-[3px] border-border">
-          <span className="inline-block bg-[var(--accent)] text-black text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1">
-            Kelola Data
+          <span
+            style={{ background: "var(--accent-bg)" }}
+            className="inline-block text-[9px] font-black tracking-[0.22em] uppercase border-[2px] border-border px-2.5 py-1 mb-3"
+          >
+            {CONSTANT.dataManagement}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-2">
+        <div className="grid grid-cols-2 md:grid-cols-2 flex-1">
           {actions.map(({ key, label, icon: Icon, onClick }, i) => (
             <button
               key={key}
@@ -87,13 +92,14 @@ const DataManagementCard = () => {
               onClick={onClick}
               disabled={!!loadingKey}
               className={[
-                "flex flex-col items-center justify-center gap-2 py-5 px-2 bg-card transition-colors duration-100 hover:bg-[var(--accent)] disabled:opacity-50 disabled:pointer-events-none",
-                // border kanan: mobile tiap kolom kiri, desktop semua kecuali terakhir
+                "flex flex-col items-center justify-center gap-2 h-full py-5 px-2",
+                "bg-card transition-colors duration-100",
+                "hover:bg-[var(--accent)]",
+                "disabled:opacity-50 disabled:pointer-events-none",
                 i % 2 === 0 ? "border-r-[2px] border-border" : "",
                 "md:border-r-[2px] md:border-border",
                 i === actions.length - 1 ? "md:border-r-0" : "",
-                // border bawah: mobile row pertama
-                i < 2 ? "border-b-[2px] border-border md:border-b-0" : "",
+                i < 2 ? "border-b-[2px] border-border" : "",
               ].join(" ")}
             >
               {loadingKey === key ? (
@@ -112,8 +118,8 @@ const DataManagementCard = () => {
       <ChildModalWrapper
         open={importOpen}
         onClose={() => setImportOpen(false)}
-        title="IMPORT DATA"
-        subtitle="PULIHKAN DATA DARI FILE BACKUP"
+        title={CONSTANT.importData.toUpperCase()}
+        subtitle={CONSTANT.importDataSubtitle.toUpperCase()}
         width="md"
       >
         <ModalImport

@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
+import { useTranslate } from "@/lib/i18n/use-translate";
+import formatIDR from "@/lib/helper/currency-format";
 
 interface DashboardSummary {
   balance: number;
@@ -28,55 +30,58 @@ const Skeleton = ({ className }: { className?: string }) => (
   <div className={`rounded bg-foreground/10 animate-pulse ${className}`} />
 );
 
-const formatIDR = (n: number) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(n);
-
 const AccountStatStrip = () => {
   const { month } = useMonthFilter();
+  const CONSTANT = useTranslate();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchSummary = useCallback(async (m: string) => {
-    setLoading(true);
-    try {
-      const res = await get<DashboardResponse>(`/dashboard?month=${m}`);
-      setSummary(res.summary);
-    } catch (err) {
-      toast.error("Gagal memuat summary", getApiError(err));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchSummary = useCallback(
+    async (m: string) => {
+      setLoading(true);
+      try {
+        const res = await get<DashboardResponse>(`/dashboard?month=${m}`);
+        setSummary(res.summary);
+      } catch (err) {
+        toast.error(CONSTANT.failedLoadSummary, getApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [CONSTANT],
+  );
 
   useEffect(() => {
     fetchSummary(month);
-  }, [month]);
+  }, [month, fetchSummary]);
 
   const stats: Stat[] = [
     {
-      label: "Saldo Total",
+      label: CONSTANT.totalBalance,
       value: summary ? formatIDR(summary.balance) : "-",
-      sub: summary ? (summary.balance >= 0 ? "Positif" : "Negatif") : "-",
+      sub: summary
+        ? summary.balance >= 0
+          ? CONSTANT.positive
+          : CONSTANT.negative
+        : "-",
       highlight: true,
     },
     {
-      label: "Pemasukan",
+      label: CONSTANT.income,
       value: summary ? formatIDR(summary.total_income) : "-",
-      sub: "bulan ini",
+      sub: CONSTANT.thisMonth,
     },
     {
-      label: "Pengeluaran",
+      label: CONSTANT.expense,
       value: summary ? formatIDR(summary.total_expense) : "-",
-      sub: "bulan ini",
+      sub: CONSTANT.thisMonth,
     },
     {
-      label: "Net",
+      label: CONSTANT.net,
       value: summary ? formatIDR(summary.net) : "-",
-      sub: summary ? (summary.net >= 0 ? "● Surplus" : "● Defisit") : "-",
+      sub: summary
+        ? `● ${summary.net >= 0 ? CONSTANT.surplus : CONSTANT.deficit}`
+        : "-",
       statusColor: true,
     },
   ];
