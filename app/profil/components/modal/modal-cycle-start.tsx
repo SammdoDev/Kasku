@@ -1,10 +1,13 @@
+// src/components/settings/modal/modal-cycle-start.tsx
+
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { patch, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { Button } from "@/components/ui/button-component/button";
 import CalendarPicker from "@/components/ui/input-component/calendar-component/calendar-picker";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface Props {
   current: number;
@@ -25,28 +28,33 @@ export default function ModalCycleStart({
   onClose,
   onSuccess,
 }: Props) {
+  const CONSTANT = useTranslate();
   const [dateStr, setDateStr] = useState(toDateStr(current));
   const [loading, setLoading] = useState(false);
 
   const selectedDay = parseInt(dateStr.split("-")[2]);
   const isOver28 = selectedDay > 28;
 
+  useEffect(() => {
+    setDateStr(toDateStr(current));
+  }, [current]);
+
   const handleSubmit = async () => {
     if (isOver28) {
       toast.error(
-        "Validasi gagal",
+        CONSTANT.failed,
         "Tanggal maksimal 28 untuk kompatibilitas semua bulan.",
       );
       return;
     }
     setLoading(true);
     try {
-      await patch("/auth/profile", { cycle_start_date: selectedDay });
-      toast.success("Cycle start date diperbarui");
+      await patch("/auth/cycle-start", { cycle_start_date: selectedDay });
+      toast.success(CONSTANT.success);
       onSuccess(selectedDay);
       onClose();
     } catch (err) {
-      toast.error("Gagal memperbarui", getApiError(err));
+      toast.error(CONSTANT.failedUpdate, getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -56,33 +64,28 @@ export default function ModalCycleStart({
     <div className="flex flex-col gap-4 font-mono">
       <CalendarPicker value={dateStr} onChange={setDateStr} />
 
-      <div className="flex items-center gap-2 border-[2px] border-border px-3 py-2 bg-[#F5F3EE]">
-        <span className="text-[10px] font-bold text-black/50">
-          TANGGAL DIPILIH
-        </span>
+      <div className="flex items-center gap-2 border-[2px] border-border px-3 py-2">
+        <span className="text-[10px] font-bold">{CONSTANT.chooseDate}</span>
         <span className="text-[13px] font-black ml-auto">{selectedDay}</span>
         {isOver28 && (
-          <span className="text-[9px] font-black text-red-600 uppercase tracking-wide">
+          <span className="text-[9px] uppercase tracking-wide">
             Maks. 28
           </span>
         )}
       </div>
 
-      <p className="text-[10px] font-bold text-black/35">
-        Bulan dan tahun diabaikan — hanya tanggal yang disimpan sebagai awal
-        siklus budget.
-      </p>
+      <p className="text-[10px] font-bold">{CONSTANT.chooseStartCycle}</p>
 
       <div className="flex gap-2">
         <Button
           variant="outline"
-          label="BATAL"
+          label={CONSTANT.cancel}
           className="flex-1"
           onClick={onClose}
           disabled={loading}
         />
         <Button
-          label={loading ? "MENYIMPAN..." : "SIMPAN"}
+          label={loading ? CONSTANT.loading : CONSTANT.save}
           className="flex-1"
           onClick={handleSubmit}
           disabled={loading || isOver28}

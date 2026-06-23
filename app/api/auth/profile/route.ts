@@ -8,7 +8,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   const { data: user, error } = await supabase
     .from("users")
     .select(
-      "id, username, full_name, email, currency, avatar_url, created_at, updated_at, google_id", // pastikan google_id ada di sini
+      "id, username, full_name, email, currency, language, cycle_start_date, avatar_url, created_at, updated_at, google_id",
     )
     .eq("id", req.user.sub)
     .single();
@@ -29,7 +29,13 @@ export const PATCH = withAuth(async (req: AuthedRequest) => {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const allowed = ["full_name", "avatar_url", "currency"];
+  const allowed = [
+    "full_name",
+    "avatar_url",
+    "currency",
+    "language",
+    "cycle_start_date",
+  ];
   const updates: Record<string, unknown> = {};
 
   for (const key of allowed) {
@@ -49,7 +55,9 @@ export const PATCH = withAuth(async (req: AuthedRequest) => {
     .from("users")
     .update(updates)
     .eq("id", req.user.sub)
-    .select("id, username, full_name, email, currency, avatar_url, updated_at")
+    .select(
+      "id, username, full_name, email, currency, language, avatar_url, updated_at",
+    ) // ← tambah language
     .single();
 
   if (error || !user) {

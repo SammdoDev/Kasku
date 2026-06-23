@@ -6,10 +6,10 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
-import formatIDR from "@/lib/helper/currency-format";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import MonthFilter from "../input-component/month-filter/month-filter";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import { useCurrency } from "@/lib/helper/currency-format";
 
 interface SummaryData {
   balance: number;
@@ -35,7 +35,8 @@ export const SummaryHeaderMobile = ({
   summary,
   loading,
 }: Props) => {
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
+  const { format } = useCurrency();
   const month = monthLabel.split(" ")[0];
 
   return (
@@ -53,14 +54,14 @@ export const SummaryHeaderMobile = ({
               style={{ color: "var(--color-danger)" }}
             />
             <span className="text-[10px] font-bold text-foreground/50">
-              {month} · {C.expense}
+              {month} · {CONSTANT.expense}
             </span>
           </div>
           {loading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
             <p className="text-[22px] font-black text-foreground leading-none tracking-tight">
-              {formatIDR(summary?.total_expense ?? 0)}
+              {format(summary?.total_expense ?? 0)}
             </p>
           )}
         </div>
@@ -73,14 +74,14 @@ export const SummaryHeaderMobile = ({
               style={{ color: "var(--color-success)" }}
             />
             <span className="text-[10px] font-bold text-foreground/50">
-              {month} · {C.income}
+              {month} · {CONSTANT.income}
             </span>
           </div>
           {loading ? (
             <Skeleton className="h-8 w-28" />
           ) : (
             <p className="text-[22px] font-black text-foreground leading-none tracking-tight">
-              {formatIDR(summary?.total_income ?? 0)}
+              {format(summary?.total_income ?? 0)}
             </p>
           )}
         </div>
@@ -89,10 +90,10 @@ export const SummaryHeaderMobile = ({
       {!loading && summary && (
         <div className="flex items-center gap-1.5 mt-2">
           <span className="text-[11px] font-black text-foreground/40">
-            {formatIDR(summary.balance)}
+            {format(summary.balance)}
           </span>
           <span className="text-[9px] text-foreground/30 font-bold">
-            {C.totalBalance.toLowerCase()}
+            {CONSTANT.totalBalance.toLowerCase()}
           </span>
         </div>
       )}
@@ -107,17 +108,17 @@ export const SummaryCardsDesktop = ({
   onPrev,
   onNext,
 }: Props) => {
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
 
   return (
     <div style={{ fontFamily: DASHBOARD_FONT }}>
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-black leading-none tracking-tight text-foreground uppercase">
-            {C.dashboard}
+            {CONSTANT.dashboard}
           </h1>
           <p className="mt-1 text-[9px] tracking-wide text-foreground/40 uppercase">
-            {loading ? C.loading : `${monthLabel} · Cashora`}
+            {loading ? CONSTANT.loading : `${monthLabel} · Cashora`}
           </p>
         </div>
 
@@ -146,19 +147,19 @@ export const SummaryCardsDesktop = ({
 
       <div className="grid grid-cols-3 gap-3">
         <StatCard
-          label={C.totalBalance}
+          label={CONSTANT.totalBalance}
           value={summary?.balance ?? 0}
           loading={loading}
           positive={(summary?.balance ?? 0) >= 0}
         />
         <StatCard
-          label={C.income}
+          label={CONSTANT.income}
           value={summary?.total_income ?? 0}
           loading={loading}
           positive={true}
         />
         <StatCard
-          label={C.expense}
+          label={CONSTANT.expense}
           value={summary?.total_expense ?? 0}
           loading={loading}
           positive={false}
@@ -178,25 +179,28 @@ const StatCard = ({
   value: number;
   loading?: boolean;
   positive: boolean;
-}) => (
-  <div
-    className="border-[2.5px] border-border bg-card p-4 shadow-[3px_3px_0px_hsl(var(--border))]"
-    style={{ fontFamily: DASHBOARD_FONT }}
-  >
-    <p className="text-[9px] font-black tracking-widest text-foreground/40 uppercase mb-1">
-      {label}
-    </p>
-    {loading ? (
-      <div className="h-7 w-32 bg-foreground/10 animate-pulse rounded" />
-    ) : (
-      <p
-        className="text-2xl font-black tracking-tight"
-        style={{
-          color: positive ? "var(--color-success)" : "var(--color-danger)",
-        }}
-      >
-        {formatIDR(value)}
+}) => {
+  const { format } = useCurrency();
+  return (
+    <div
+      className="border-[2.5px] border-border bg-card p-4 shadow-[3px_3px_0px_hsl(var(--border))]"
+      style={{ fontFamily: DASHBOARD_FONT }}
+    >
+      <p className="text-[9px] font-black tracking-widest text-foreground/40 uppercase mb-1">
+        {label}
       </p>
-    )}
-  </div>
-);
+      {loading ? (
+        <div className="h-7 w-32 bg-foreground/10 animate-pulse rounded" />
+      ) : (
+        <p
+          className="text-2xl font-black tracking-tight"
+          style={{
+            color: positive ? "var(--color-success)" : "var(--color-danger)",
+          }}
+        >
+          {format(value)}
+        </p>
+      )}
+    </div>
+  );
+};

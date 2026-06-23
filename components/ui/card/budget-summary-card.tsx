@@ -1,6 +1,6 @@
 "use client";
 
-import formatIDR from "@/lib/helper/currency-format";
+import { useCurrency } from "@/lib/helper/currency-format";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import { useTranslate } from "@/lib/i18n/use-translate";
 
@@ -20,7 +20,8 @@ type Props = {
 };
 
 export const BudgetRow = ({ b }: { b: BudgetItem }) => {
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
+  const { format } = useCurrency();
   const barColor = b.over_budget
     ? "var(--color-danger)"
     : b.percent_used > 80
@@ -36,7 +37,7 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
         <span
           className={`flex items-center gap-1.5 text-[9px] font-bold ${b.over_budget ? "text-destructive" : "text-foreground/60"}`}
         >
-          {formatIDR(b.spent)} / {formatIDR(b.amount)}
+          {format(b.spent)} / {format(b.amount)}
           {b.over_budget && (
             <span className="border border-destructive bg-destructive/10 px-1 py-px text-[7px] font-black text-destructive rounded">
               OVER
@@ -56,15 +57,15 @@ export const BudgetRow = ({ b }: { b: BudgetItem }) => {
       </div>
 
       <p className="mt-0.5 text-[8px] text-foreground/40">
-        {b.percent_used}% {C.active.toLowerCase()} ·{" "}
-        {C.totalBalance.split(" ")[0]} {formatIDR(Math.max(0, b.remaining))}
+        {b.percent_used}% {CONSTANT.active.toLowerCase()} ·{" "}
+        {CONSTANT.totalBalance.split(" ")[0]} {format(Math.max(0, b.remaining))}
       </p>
     </div>
   );
 };
 
 const BudgetSummaryCard = ({ budgets, variant = "mobile" }: Props) => {
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
   const overCount = budgets.filter((b) => b.over_budget).length;
 
   return (
@@ -76,7 +77,7 @@ const BudgetSummaryCard = ({ budgets, variant = "mobile" }: Props) => {
         <span
           className={`font-black uppercase tracking-tight text-foreground ${variant === "mobile" ? "text-[11px]" : "text-[10px]"}`}
         >
-          {C.summary} {C.budget}
+          {CONSTANT.summary} {CONSTANT.budget}
         </span>
         {overCount > 0 && (
           <span

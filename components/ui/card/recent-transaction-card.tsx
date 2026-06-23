@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useRef, useCallback, useState } from "react";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-import formatIDR from "@/lib/helper/currency-format";
 import { ChevronRight, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 import { confirm } from "@/components/layout/for-pages/confirm-dialog";
 import { formatRelativeDate } from "@/lib/helper/date-format";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import { useCurrency } from "@/lib/helper/currency-format";
 
 export interface RecentTransaction {
   id: string;
@@ -60,6 +60,8 @@ function TransactionRow({
   onDelete?: (id: string) => Promise<void> | void;
 }) {
   const CONSTANT = useTranslate();
+  const { format } = useCurrency();
+
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // eslint-disable-next-line react-hooks/preserve-manual-memoization
@@ -155,7 +157,7 @@ function TransactionRow({
           ].join(" ")}
         >
           {isTransfer ? "⇄" : isIncome ? "+" : "-"}
-          {formatIDR(txn.amount)}
+          {format(txn.amount)}
         </span>
       </div>
     </div>

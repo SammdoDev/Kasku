@@ -134,8 +134,8 @@ const BottomNavbar = () => {
       <ChildModalWrapper
         open={open}
         onClose={() => setOpen(false)}
-        title="TAMBAH TRANSAKSI"
-        subtitle="Catat pemasukan atau pengeluaran baru"
+        title={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
+        subtitle={CONSTANT.transactionAddSubtitle}
         width="full"
       >
         <ModalTambahTransaksi

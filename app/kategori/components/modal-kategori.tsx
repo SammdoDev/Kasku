@@ -10,11 +10,7 @@ import { Button } from "@/components/ui/button-component/button";
 import { EMOJI_OPTIONS } from "./emoji-option";
 import InputText from "@/components/ui/input-component/input-text/input-text";
 import { Label } from "@/components/ui/input-component/label";
-
-const TYPE_OPTIONS = [
-  { label: "KELUAR", value: "expense" },
-  { label: "MASUK", value: "income" },
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 const COLOR_PRESETS = [
   "#ef4444",
@@ -40,14 +36,11 @@ interface ModalKategoriProps {
   onSuccess: () => void;
 }
 
-export default function ModalKategori({
-  onClose,
-  onSuccess,
-}: ModalKategoriProps) {
+const ModalKategori = ({ onClose, onSuccess }: ModalKategoriProps) => {
+  const CONSTANT = useTranslate();
   const editTarget = useKategoriStore((s) => s.editTarget);
   const addCategory = useKategoriStore((s) => s.addCategory);
   const updateCategory = useKategoriStore((s) => s.updateCategory);
-
   const isEdit = !!editTarget;
 
   const [name, setName] = useState("");
@@ -56,7 +49,11 @@ export default function ModalKategori({
   const [color, setColor] = useState<string>("#6366f1");
   const [loading, setLoading] = useState(false);
 
-  // Reset form setiap kali editTarget berubah (termasuk saat null = mode tambah)
+  const TYPE_OPTIONS = [
+    { label: CONSTANT.expense.toUpperCase(), value: "expense" },
+    { label: CONSTANT.income.toUpperCase(), value: "income" },
+  ];
+
   useEffect(() => {
     if (editTarget) {
       setName(editTarget.name);
@@ -64,7 +61,6 @@ export default function ModalKategori({
       setIcon(editTarget.icon ?? null);
       setColor(editTarget.color ?? "#6366f1");
     } else {
-      // Mode tambah — pastikan form bersih
       setName("");
       setType("expense");
       setIcon(null);
@@ -72,16 +68,14 @@ export default function ModalKategori({
     }
   }, [editTarget]);
 
-  const handleIconChange = (hexcode: string) => {
-    setIcon(hexcode);
-  };
-
   const handleSubmit = async () => {
     if (!name.trim()) {
-      toast.error("Validasi gagal", "Nama kategori wajib diisi.");
+      toast.error(
+        CONSTANT.failed,
+        `${CONSTANT.name} ${CONSTANT.category.toLowerCase()} wajib diisi.`,
+      );
       return;
     }
-
     setLoading(true);
     try {
       const payload = {
@@ -90,24 +84,22 @@ export default function ModalKategori({
         icon: icon ?? undefined,
         color,
       };
-
       if (isEdit && editTarget) {
         const res = await patch<{ category: Category }>(
           `/categories/${editTarget.id}`,
           payload,
         );
         updateCategory(res.category);
-        toast.success("Kategori diperbarui");
+        toast.success(CONSTANT.categoryUpdated ?? "Kategori diperbarui");
       } else {
         const res = await post<{ category: Category }>("/categories", payload);
         addCategory(res.category);
-        toast.success("Kategori ditambahkan");
+        toast.success(CONSTANT.categoryAdded ?? "Kategori ditambahkan");
       }
-
       onSuccess();
       onClose();
     } catch (err) {
-      toast.error("Gagal menyimpan", getApiError(err));
+      toast.error(CONSTANT.failedUpdate, getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -120,17 +112,18 @@ export default function ModalKategori({
   return (
     <div className="flex flex-col gap-5 font-mono">
       <div className="flex flex-col gap-1">
-        <Label>TIPE</Label>
+        <Label>{CONSTANT.type?.toUpperCase() ?? "TIPE"}</Label>
         <TabFilter
           value={type}
           onChange={(v) => setType((v || "expense") as "income" | "expense")}
           options={TYPE_OPTIONS}
+          showAll={false}
         />
       </div>
 
       <InputText
-        id="username"
-        label="NAMA KATEGORI"
+        id="kategori-name"
+        label={`${CONSTANT.name?.toUpperCase() ?? "NAMA"} ${CONSTANT.category.toUpperCase()}`}
         required
         type="text"
         placeholder="Contoh: Makan Siang"
@@ -146,17 +139,17 @@ export default function ModalKategori({
             <button
               type="button"
               onClick={() => setIcon(null)}
-              className="text-[9px] font-black text-black/30 hover:text-black transition-colors"
+              className="text-[9px] font-black text-foreground/30 hover:text-foreground transition-colors"
             >
-              HAPUS EMOJI
+              {CONSTANT.delete} EMOJI
             </button>
           )}
         </div>
-        <EmojiPicker value={icon} onChange={handleIconChange} />
+        <EmojiPicker value={icon} onChange={setIcon} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <Label>WARNA</Label>
+        <Label>{CONSTANT.accentColor?.toUpperCase() ?? "WARNA"}</Label>
         <div className="flex flex-wrap gap-2 items-center">
           {COLOR_PRESETS.map((c) => (
             <button
@@ -166,7 +159,7 @@ export default function ModalKategori({
               className={[
                 "w-7 h-7 border-2 transition-all duration-100",
                 color === c
-                  ? "border-border scale-110 shadow-[2px_2px_0px_#000]"
+                  ? "border-border scale-110 shadow-[2px_2px_0px_hsl(var(--border))]"
                   : "border-transparent hover:border-border/40",
               ].join(" ")}
               style={{ background: c }}
@@ -186,7 +179,7 @@ export default function ModalKategori({
               +
             </div>
           </div>
-          <span className="text-[10px] font-mono font-black text-black/40">
+          <span className="text-[10px] font-mono font-black text-foreground/40">
             {color}
           </span>
         </div>
@@ -216,13 +209,15 @@ export default function ModalKategori({
           </div>
           <div>
             <p className="text-[12px] font-black" style={{ color }}>
-              {name || "Nama Kategori"}
+              {name || CONSTANT.category}
             </p>
             <p
               className="text-[9px] font-bold tracking-widest"
               style={{ color: color + "99" }}
             >
-              {type === "income" ? "PEMASUKAN" : "PENGELUARAN"}
+              {type === "income"
+                ? CONSTANT.income.toUpperCase()
+                : CONSTANT.expense.toUpperCase()}
             </p>
           </div>
         </div>
@@ -231,13 +226,13 @@ export default function ModalKategori({
       <div className="flex gap-2 pt-1">
         <Button
           variant="outline"
-          label="BATAL"
+          label={CONSTANT.cancel}
           className="flex-1"
           onClick={onClose}
           disabled={loading}
         />
         <Button
-          label={loading ? "MENYIMPAN..." : isEdit ? "SIMPAN" : "TAMBAH"}
+          label={loading ? CONSTANT.loading : isEdit ? CONSTANT.save : CONSTANT.add}
           className="flex-1"
           onClick={handleSubmit}
           disabled={loading}
@@ -245,4 +240,5 @@ export default function ModalKategori({
       </div>
     </div>
   );
-}
+};
+export default ModalKategori;

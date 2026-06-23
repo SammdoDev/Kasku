@@ -7,15 +7,9 @@ import {
 import { Button } from "@/components/ui/button-component/button";
 import { useAnggaranStore, type Anggaran } from "../store/anggaran-store";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
-import formatIDR from "@/lib/helper/currency-format";
+import { useCurrency } from "@/lib/helper/currency-format";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-
-const PERIOD_LABEL: Record<string, string> = {
-  daily: "Harian",
-  weekly: "Mingguan",
-  monthly: "Bulanan",
-  yearly: "Tahunan",
-};
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface Props {
   onEdit: (item: Anggaran) => void;
@@ -23,18 +17,27 @@ interface Props {
 }
 
 const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
+  const CONSTANT = useTranslate();
+  const { format } = useCurrency();
   const list = useAnggaranStore((s) => s.list);
   const loading = useAnggaranStore((s) => s.loading);
 
+  const PERIOD_LABEL: Record<string, string> = {
+    daily: CONSTANT.daily ?? "Harian",
+    weekly: CONSTANT.weekly ?? "Mingguan",
+    monthly: CONSTANT.monthly ?? "Bulanan",
+    yearly: CONSTANT.yearly ?? "Tahunan",
+  };
+
   const TABLE_HEADERS: TableHeader[] = [
-    { title: "Aksi", value: "_action", width: "110px" },
-    { title: "Nama", value: "name", width: "160px" },
-    { title: "Kategori", value: "category", width: "140px" },
-    { title: "Periode", value: "period", width: "100px" },
-    { title: "Anggaran", value: "amount", width: "130px" },
-    { title: "Terpakai", value: "spent", width: "130px" },
-    { title: "Sisa", value: "remaining", width: "130px" },
-    { title: "Progress", value: "progress", width: "160px" },
+    { title: CONSTANT.action ?? "Aksi", value: "_action", width: "110px" },
+    { title: CONSTANT.name ?? "Nama", value: "name", width: "160px" },
+    { title: CONSTANT.category, value: "category", width: "140px" },
+    { title: CONSTANT.period ?? "Periode", value: "period", width: "100px" },
+    { title: CONSTANT.budget, value: "amount", width: "130px" },
+    { title: CONSTANT.spent ?? "Terpakai", value: "spent", width: "130px" },
+    { title: CONSTANT.remaining ?? "Sisa", value: "remaining", width: "130px" },
+    { title: CONSTANT.progress ?? "Progress", value: "progress", width: "160px" },
   ];
 
   const renderCell = (item: Anggaran, header: TableHeader) => {
@@ -42,7 +45,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
       return (
         <div className="flex gap-1">
           <Button
-            label="EDIT"
+            label={CONSTANT.edit}
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
@@ -50,7 +53,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
             }}
           />
           <Button
-            label="HAPUS"
+            label={CONSTANT.delete}
             variant="destructive"
             onClick={(e) => {
               e.stopPropagation();
@@ -67,7 +70,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
         >
           <span className="text-[12px] font-black">{item.name}</span>
           {item.end_date && (
-            <span className="text-[9px] text-black/40 font-bold">
+            <span className="text-[9px] text-foreground/40 font-bold">
               s/d {item.end_date}
             </span>
           )}
@@ -76,7 +79,9 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
     } else if (header.value === "category") {
       if (!item.category)
         return (
-          <span className="text-[10px] text-black/30 font-bold">Semua</span>
+          <span className="text-[10px] text-foreground/30 font-bold">
+            {CONSTANT.all}
+          </span>
         );
       return (
         <div className="flex items-center gap-1.5">
@@ -99,13 +104,16 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
     } else if (header.value === "amount") {
       return (
         <span className="text-[12px] font-black font-mono">
-          {formatIDR(item.amount)}
+          {format(item.amount)}
         </span>
       );
     } else if (header.value === "spent") {
       return (
-        <span className="text-[12px] font-black font-mono text-[#991b1b]">
-          {formatIDR(item.spent ?? 0)}
+        <span
+          className="text-[12px] font-black font-mono"
+          style={{ color: "var(--color-danger)" }}
+        >
+          {format(item.spent ?? 0)}
         </span>
       );
     } else if (header.value === "remaining") {
@@ -113,10 +121,13 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
       const over = rem < 0;
       return (
         <span
-          className={`text-[12px] font-black font-mono ${over ? "text-red-600" : "text-[#166534]"}`}
+          className="text-[12px] font-black font-mono"
+          style={{
+            color: over ? "var(--color-danger)" : "var(--color-success)",
+          }}
         >
           {over ? "-" : ""}
-          {formatIDR(Math.abs(rem))}
+          {format(Math.abs(rem))}
         </span>
       );
     } else if (header.value === "progress") {
@@ -129,14 +140,26 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
         >
           <div className="w-full h-3 border-2 border-border bg-card">
             <div
-              className={`h-full transition-all ${over ? "bg-red-500" : pct >= 80 ? "bg-yellow-400" : "bg-[#1a1a1a]"}`}
-              style={{ width: `${Math.min(pct, 100)}%` }}
+              className="h-full transition-all"
+              style={{
+                width: `${Math.min(pct, 100)}%`,
+                background: over
+                  ? "var(--color-danger)"
+                  : pct >= 80
+                    ? "var(--color-warning)"
+                    : "hsl(var(--foreground))",
+              }}
             />
           </div>
           <span
-            className={`text-[9px] font-black ${over ? "text-red-600" : "text-black/50"}`}
+            className="text-[9px] font-black"
+            style={{
+              color: over
+                ? "var(--color-danger)"
+                : "var(--color-muted-foreground, #666)",
+            }}
           >
-            {pct}%{over ? " — MELEBIHI!" : ""}
+            {pct}%{over ? ` — ${CONSTANT.overBudget ?? "MELEBIHI!"}` : ""}
           </span>
         </div>
       );
@@ -151,7 +174,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
       dataKey="id"
       loading={loading}
       loadingRows={5}
-      emptyMessage="Belum ada anggaran"
+      emptyMessage={CONSTANT.budgetEmpty ?? "Belum ada anggaran"}
     />
   );
 };

@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Delete } from "lucide-react";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface NumPadProps {
   onPress: (key: string) => void;
@@ -57,6 +58,7 @@ const NumPad = ({
   onDateClick,
   onWalletClick,
 }: NumPadProps) => {
+  const CONSTANT = useTranslate();
   const today = new Date().toISOString().split("T")[0];
   const isToday = date === today;
 
@@ -90,21 +92,21 @@ const NumPad = ({
           <div className="flex flex-col items-center gap-0.5">
             <span
               className="text-[10px] font-black tracking-[0.1em]"
-              style={{ color: "var(--brand-accent-fg)" }}
+              style={{ color: "var(--accent-fg)" }}
             >
-              HARI
+              {CONSTANT.day.toUpperCase()}
             </span>
             <span
               className="text-[8px] font-bold opacity-60"
-              style={{ color: "var(--brand-accent-fg)" }}
+              style={{ color: "var(--accent-fg)" }}
             >
-              {isToday ? "hari ini" : formatShort(date)}
+              {isToday ? CONSTANT.today.toLowerCase() : formatShort(date)}
             </span>
           </div>
         }
         onClick={onDateClick}
         className="hover:brightness-95"
-        style={{ background: "var(--brand-accent)" } as React.CSSProperties}
+        style={{ background: "var(--accent-bg)" } as React.CSSProperties}
       />
 
       {/* Row 2 */}
@@ -128,7 +130,7 @@ const NumPad = ({
         label={
           <div className="flex flex-col items-center gap-0.5">
             <span className="text-[10px] font-black tracking-[0.1em] text-foreground">
-              AKUN
+              {CONSTANT.account.toUpperCase()}
             </span>
             {walletName && (
               <span className="text-[7px] font-bold tracking-wide text-foreground/50 max-w-[48px] truncate">
@@ -161,7 +163,7 @@ const NumPad = ({
       <NumKey
         label={
           <span className="text-[10px] font-black tracking-[0.1em] text-foreground">
-            DOMPET
+            {CONSTANT.wallet.toUpperCase()}
           </span>
         }
         onClick={onWalletClick}

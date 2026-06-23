@@ -1,7 +1,7 @@
 "use client";
 
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-import formatIDR from "@/lib/helper/currency-format";
+import { useCurrency } from "@/lib/helper/currency-format";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 import { useTranslate } from "@/lib/i18n/use-translate";
 
@@ -45,7 +45,8 @@ const CategorySpendCard = ({
   loading = false,
   onEdit,
 }: Props) => {
-  const C = useTranslate();
+  const CONSTANT = useTranslate();
+  const { format } = useCurrency();
   const top5 = categories.slice(0, 5);
 
   return (
@@ -55,7 +56,7 @@ const CategorySpendCard = ({
     >
       <div className="mb-3.5 flex items-center justify-between">
         <span className="text-[10px] font-black tracking-[0.3px] text-foreground">
-          {C.expenseByCategory}
+          {CONSTANT.expenseByCategory}
         </span>
         <span className="text-[8px] font-bold text-foreground/40">
           {monthLabel.toUpperCase()}
@@ -67,7 +68,7 @@ const CategorySpendCard = ({
           Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)
         ) : top5.length === 0 ? (
           <div className="py-6 text-center text-[10px] font-bold text-foreground/30 tracking-widest">
-            {C.noData}
+            {CONSTANT.noData}
           </div>
         ) : (
           top5.map((c) => {
@@ -88,7 +89,7 @@ const CategorySpendCard = ({
                       {c.name}
                     </span>
                     <span className="text-[9px] text-foreground/60 font-bold shrink-0">
-                      {formatIDR(c.total)}
+                      {format(c.total)}
                       <span className="ml-1 text-foreground/30">
                         · {c.percent}%
                       </span>
@@ -110,10 +111,10 @@ const CategorySpendCard = ({
       {!loading && top5.length > 0 && (
         <div className="mt-3.5 pt-2.5 border-t-[1.5px] border-dashed border-border/50 flex items-center justify-between">
           <span className="text-[8px] font-black text-foreground/30 tracking-widest">
-            TOTAL {top5.length} {C.category.toUpperCase()}
+            TOTAL {top5.length} {CONSTANT.category.toUpperCase()}
           </span>
           <span className="text-[10px] font-black text-foreground">
-            {formatIDR(top5.reduce((s, c) => s + c.total, 0))}
+            {format(top5.reduce((s, c) => s + c.total, 0))}
           </span>
         </div>
       )}

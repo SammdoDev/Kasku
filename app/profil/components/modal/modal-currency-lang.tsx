@@ -5,6 +5,7 @@ import { patch, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { Button } from "@/components/ui/button-component/button";
 import { Label } from "@/components/ui/input-component/label";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 const CURRENCY_OPTIONS = [
   { value: "IDR", label: "IDR — Rupiah Indonesia" },
@@ -33,6 +34,7 @@ export default function ModalCurrencyLang({
   onClose,
   onSuccess,
 }: Props) {
+  const C = useTranslate();
   const [currency, setCurrency] = useState(currentCurrency);
   const [language, setLanguage] = useState(currentLanguage);
   const [loading, setLoading] = useState(false);
@@ -41,11 +43,11 @@ export default function ModalCurrencyLang({
     setLoading(true);
     try {
       await patch("/auth/profile", { currency, language });
-      toast.success("Preferensi diperbarui");
+      toast.success(C.success);
       onSuccess(currency, language);
       onClose();
     } catch (err) {
-      toast.error("Gagal memperbarui", getApiError(err));
+      toast.error(C.failedUpdate, getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ export default function ModalCurrencyLang({
   return (
     <div className="flex flex-col gap-5 font-mono">
       <div className="flex flex-col gap-2">
-        <Label>MATA UANG</Label>
+        <Label>{C.currency.toUpperCase()}</Label>
         <div className="flex flex-col gap-1.5">
           {CURRENCY_OPTIONS.map((c) => (
             <button
@@ -78,7 +80,7 @@ export default function ModalCurrencyLang({
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label>BAHASA</Label>
+        <Label>{C.language.toUpperCase()}</Label>
         <div className="flex flex-col gap-1.5">
           {LANGUAGE_OPTIONS.map((l) => (
             <button
@@ -104,13 +106,13 @@ export default function ModalCurrencyLang({
       <div className="flex gap-2 pt-1">
         <Button
           variant="outline"
-          label="BATAL"
+          label={C.cancel}
           className="flex-1"
           onClick={onClose}
           disabled={loading}
         />
         <Button
-          label={loading ? "MENYIMPAN..." : "SIMPAN"}
+          label={loading ? C.loading : C.save}
           className="flex-1"
           onClick={handleSubmit}
           disabled={loading}

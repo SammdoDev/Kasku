@@ -10,7 +10,13 @@ import NbToggle from "./nb-toggle";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import ModalCycleStart from "./modal/modal-cycle-start";
 import ModalCurrencyLang from "./modal/modal-currency-lang";
-import { useTranslate, setLang } from "@/lib/i18n/use-translate";
+import {
+  useTranslate,
+  setLang,
+  getLang,
+  getCurrency,
+  setCurrencyLocal,
+} from "@/lib/i18n/use-translate";
 
 interface ApiUser {
   currency: string;
@@ -27,8 +33,8 @@ const BudgetPreferencesCard = () => {
   const [mountedTheme, setMountedTheme] = useState(false);
   const CONSTANT = useTranslate();
 
-  const [currency, setCurrency] = useState("IDR");
-  const [language, setLanguage] = useState("id");
+  const [currency, setCurrency] = useState(() => getCurrency());
+  const [language, setLanguage] = useState(() => getLang());
   const [cycleStartDate, setCycleStartDate] = useState(1);
   const [budgetNotifications, setBudgetNotifications] = useState(false);
   const [identityReminder, setIdentityReminder] = useState(false);
@@ -42,15 +48,20 @@ const BudgetPreferencesCard = () => {
     setLoading(true);
     try {
       const res = await get<{ user: ApiUser }>("/auth/profile");
-      setCurrency(res.user.currency ?? "IDR");
+      const fetchedLang = (res.user.language ?? "id") as "id" | "en";
+      const fetchedCurrency = res.user.currency ?? "IDR";
+
+      setCurrency(fetchedCurrency);
       setCycleStartDate(res.user.cycle_start_date ?? 1);
-      setLanguage(res.user.language ?? "id");
+      setLanguage(fetchedLang);
+      setLang(fetchedLang);
+      setCurrencyLocal(fetchedCurrency);
     } catch (err) {
-      toast.error(CONSTANT.failedLoadPreferences, getApiError(err));
+      toast.error("Gagal memuat preferensi", getApiError(err));
     } finally {
       setLoading(false);
     }
-  }, [CONSTANT]);
+  }, []);
 
   useEffect(() => {
     fetchProfile();
@@ -87,7 +98,7 @@ const BudgetPreferencesCard = () => {
           {CONSTANT.budgetingPreferences}
         </span>
 
-        {/* Currency & Bahasa */}
+        {/* Currency & Language */}
         <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <div>
             <span className="text-[11px] font-black uppercase tracking-wide block">
@@ -132,7 +143,7 @@ const BudgetPreferencesCard = () => {
           )}
         </div>
 
-        {/* Notifikasi Budget */}
+        {/* Budget Notification */}
         <div className="flex items-center justify-between py-3 border-b-[3px] border-border">
           <span className="text-[11px] font-black uppercase tracking-wide">
             {CONSTANT.budgetNotification}
@@ -200,8 +211,9 @@ const BudgetPreferencesCard = () => {
           onClose={() => setCurrencyLangModalOpen(false)}
           onSuccess={(c, l) => {
             setCurrency(c);
-            setLanguage(l);
+            setLanguage(l as "id" | "en");
             setLang(l as "id" | "en");
+            setCurrencyLocal(c);
           }}
         />
       </ChildModalWrapper>

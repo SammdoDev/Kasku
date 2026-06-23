@@ -4,6 +4,7 @@ import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper
 import { Button } from "@/components/ui/button-component/button";
 import InputText from "@/components/ui/input-component/input-text/input-text";
 import { useEffect, useRef, useState } from "react";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface NoteDialogProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface NoteDialogProps {
 }
 
 const NoteDialog = ({ open, value, onConfirm, onClose }: NoteDialogProps) => {
+  const CONSTANT = useTranslate();
   const [draft, setDraft] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,34 +44,31 @@ const NoteDialog = ({ open, value, onConfirm, onClose }: NoteDialogProps) => {
     <ChildModalWrapper
       open={open}
       onClose={onClose}
-      title="Tambah Catatan"
+      title={CONSTANT.addNote ?? "Tambah Catatan"}
       width="sm"
     >
       <div>
-        <div>
-          <InputText
-            id="note"
-            label="Catatan"
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="Contoh: makan siang bareng tim..."
-            maxLength={100}
-            autoFocus
-          />
-          <p className="mt-1.5 text-right text-[9px] font-bold text-foreground/30">
-            {draft.length}/100
-          </p>
-        </div>
-
+        <InputText
+          id="note"
+          label={CONSTANT.note ?? "Catatan"}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Contoh: makan siang bareng tim..."
+          maxLength={100}
+          autoFocus
+        />
+        <p className="mt-1.5 text-right text-[9px] font-bold text-foreground/30">
+          {draft.length}/100
+        </p>
         <div className="mt-4 flex gap-2">
           <Button
-            label="Batal"
+            label={CONSTANT.cancel}
             variant="outline"
             onClick={onClose}
             className="flex-1"
           />
           <Button
-            label="Simpan"
+            label={CONSTANT.save}
             onClick={() => {
               onConfirm(draft);
               onClose();

@@ -1,10 +1,10 @@
 "use client";
 
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-import formatIDR from "@/lib/helper/currency-format";
 import MonthFilter from "@/components/ui/input-component/month-filter/month-filter";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import { useCurrency } from "@/lib/helper/currency-format";
 
 type Props = {
   income: number;
@@ -20,6 +20,7 @@ const DashboardSummaryBar = ({
   loading = false,
 }: Props) => {
   const CONSTANT = useTranslate();
+  const { format } = useCurrency();
   const net = income - expense;
   const expPct =
     income > 0 ? Math.min(100, Math.round((expense / income) * 100)) : null;
@@ -53,7 +54,11 @@ const DashboardSummaryBar = ({
               className="w-5 h-5 border-[2px] border-border flex items-center justify-center shrink-0"
               style={{ background: "#bbf7d0" }}
             >
-              <TrendingUp size={10} strokeWidth={3} style={{ color: "var(--color-success)" }} />
+              <TrendingUp
+                size={10}
+                strokeWidth={3}
+                style={{ color: "var(--color-success)" }}
+              />
             </div>
             <span className="text-[9px] font-black tracking-widest text-foreground/40 uppercase">
               {CONSTANT.income}
@@ -63,7 +68,7 @@ const DashboardSummaryBar = ({
             <div className="h-6 w-24 bg-foreground/10 animate-pulse" />
           ) : (
             <span className="text-[17px] font-black text-foreground leading-none tracking-tight">
-              {formatIDR(income)}
+              {format(income)}
             </span>
           )}
         </div>
@@ -75,7 +80,11 @@ const DashboardSummaryBar = ({
               className="w-5 h-5 border-[2px] border-border flex items-center justify-center shrink-0"
               style={{ background: "#fca5a5" }}
             >
-              <TrendingDown size={10} strokeWidth={3} style={{ color: "var(--color-danger)" }} />
+              <TrendingDown
+                size={10}
+                strokeWidth={3}
+                style={{ color: "var(--color-danger)" }}
+              />
             </div>
             <span className="text-[9px] font-black tracking-widest text-foreground/40 uppercase">
               {CONSTANT.expense}
@@ -85,7 +94,7 @@ const DashboardSummaryBar = ({
             <div className="h-6 w-24 bg-foreground/10 animate-pulse" />
           ) : (
             <span className="text-[17px] font-black text-foreground leading-none tracking-tight">
-              {formatIDR(expense)}
+              {format(expense)}
             </span>
           )}
         </div>
@@ -111,7 +120,7 @@ const DashboardSummaryBar = ({
               }}
             >
               {net >= 0 ? "+" : ""}
-              {formatIDR(net)}
+              {format(net)}
             </span>
           </div>
 

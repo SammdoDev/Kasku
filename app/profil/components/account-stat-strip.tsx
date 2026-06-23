@@ -5,7 +5,7 @@ import { get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
 import { useTranslate } from "@/lib/i18n/use-translate";
-import formatIDR from "@/lib/helper/currency-format";
+import { useCurrency } from "@/lib/helper/currency-format";
 
 interface DashboardSummary {
   balance: number;
@@ -32,7 +32,8 @@ const Skeleton = ({ className }: { className?: string }) => (
 
 const AccountStatStrip = () => {
   const { month } = useMonthFilter();
-  const CONSTANT = useTranslate();
+  const C = useTranslate();
+  const { format } = useCurrency();
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -43,12 +44,12 @@ const AccountStatStrip = () => {
         const res = await get<DashboardResponse>(`/dashboard?month=${m}`);
         setSummary(res.summary);
       } catch (err) {
-        toast.error(CONSTANT.failedLoadSummary, getApiError(err));
+        toast.error(C.failedLoadSummary, getApiError(err));
       } finally {
         setLoading(false);
       }
     },
-    [CONSTANT],
+    [C],
   );
 
   useEffect(() => {
@@ -57,31 +58,25 @@ const AccountStatStrip = () => {
 
   const stats: Stat[] = [
     {
-      label: CONSTANT.totalBalance,
-      value: summary ? formatIDR(summary.balance) : "-",
-      sub: summary
-        ? summary.balance >= 0
-          ? CONSTANT.positive
-          : CONSTANT.negative
-        : "-",
+      label: C.totalBalance,
+      value: summary ? format(summary.balance) : "-",
+      sub: summary ? (summary.balance >= 0 ? C.positive : C.negative) : "-",
       highlight: true,
     },
     {
-      label: CONSTANT.income,
-      value: summary ? formatIDR(summary.total_income) : "-",
-      sub: CONSTANT.thisMonth,
+      label: C.income,
+      value: summary ? format(summary.total_income) : "-",
+      sub: C.thisMonth,
     },
     {
-      label: CONSTANT.expense,
-      value: summary ? formatIDR(summary.total_expense) : "-",
-      sub: CONSTANT.thisMonth,
+      label: C.expense,
+      value: summary ? format(summary.total_expense) : "-",
+      sub: C.thisMonth,
     },
     {
-      label: CONSTANT.net,
-      value: summary ? formatIDR(summary.net) : "-",
-      sub: summary
-        ? `● ${summary.net >= 0 ? CONSTANT.surplus : CONSTANT.deficit}`
-        : "-",
+      label: C.net,
+      value: summary ? format(summary.net) : "-",
+      sub: summary ? `● ${summary.net >= 0 ? C.surplus : C.deficit}` : "-",
       statusColor: true,
     },
   ];
@@ -116,7 +111,7 @@ const AccountStatStrip = () => {
               className="text-[9px] font-black uppercase tracking-[0.15em] mb-1.5"
               style={{
                 color: stat.highlight
-                  ? "var(--accent-fg-muted)"
+                  ? "var(--accent-fg)"
                   : "var(--foreground)",
                 opacity: stat.highlight ? 1 : 0.45,
               }}

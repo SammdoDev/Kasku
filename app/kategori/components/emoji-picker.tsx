@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { EMOJI_OPTIONS } from "./emoji-option";
+import { getEmojiOptions } from "./emoji-option";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 export function openmojiUrl(hexcode: string): string {
   return `https://cdn.jsdelivr.net/npm/openmoji@15.0.0/color/svg/${hexcode.toUpperCase()}.svg`;
@@ -33,18 +34,20 @@ export function OpenmojiImg({
   );
 }
 
-const GROUPS = Array.from(new Set(EMOJI_OPTIONS.map((e) => e.group)));
-
 interface EmojiPickerProps {
   value: string | null;
   onChange: (hexcode: string) => void;
 }
 
 const EmojiPicker = ({ value, onChange }: EmojiPickerProps) => {
+  const C = useTranslate();
+  const emojiOptions = getEmojiOptions(C);
+  const GROUPS = Array.from(new Set(emojiOptions.map((e) => e.group)));
+
   return (
     <div className="border-2 border-border bg-card max-h-64 overflow-y-auto">
       {GROUPS.map((group) => {
-        const emojis = EMOJI_OPTIONS.filter((e) => e.group === group);
+        const emojis = emojiOptions.filter((e) => e.group === group);
         return (
           <div key={group}>
             <div className="px-3 py-1.5 bg-card border-b border-border/10 sticky top-0 z-10">

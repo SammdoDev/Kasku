@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useTranslate } from "@/lib/i18n/use-translate";
 
@@ -23,7 +23,7 @@ interface CalendarPickerProps {
 
 const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
   const CONSTANT = useTranslate();
-  const parsed = value ? new Date(value) : new Date();
+  const parsed = value ? new Date(value + "T00:00:00") : new Date();
   const [viewYear, setViewYear] = useState(parsed.getFullYear());
   const [viewMonth, setViewMonth] = useState(parsed.getMonth());
 
@@ -68,6 +68,13 @@ const CalendarPicker = ({ value, onChange }: CalendarPickerProps) => {
       setViewYear((y) => y + 1);
     } else setViewMonth((m) => m + 1);
   };
+
+  useEffect(() => {
+    const d = value ? new Date(value + "T00:00:00") : new Date();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setViewYear(d.getFullYear());
+    setViewMonth(d.getMonth());
+  }, [value]);
 
   return (
     <div className="w-full border-2 border-border bg-card p-3">

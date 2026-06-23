@@ -3,30 +3,13 @@
 import React from "react";
 import { TableDataComponent } from "@/components/ui/table-component/table-data-component";
 import type { TableHeader } from "@/components/ui/table-component/table-data-component";
-import formatIDR from "@/lib/helper/currency-format";
+import { useCurrency } from "@/lib/helper/currency-format";
 import { useTransaksiStore, type Transaction } from "../store/transaksi-store";
 import { Button } from "@/components/ui/button-component/button";
 import { dateDisplay } from "@/lib/helper/date-format";
-import { EMOJI_OPTIONS } from "@/app/kategori/components/emoji-option";
+import { getEmojiOptions } from "@/app/kategori/components/emoji-option";
 import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
-
-const tableHeaders: TableHeader[] = [
-  { title: "Aksi", value: "action", width: "100px" },
-  { title: "Tanggal", value: "date", width: "90px" },
-  { title: "Deskripsi", value: "description", width: "220px" },
-  { title: "Icon", value: "category_icon", width: "50px" },
-  { title: "Kategori", value: "category_name", width: "130px" },
-  { title: "Tags", value: "tags", width: "150px" },
-  { title: "Metode", value: "payment_method", width: "100px" },
-  { title: "Tipe", value: "type", width: "90px" },
-  {
-    title: "Jumlah",
-    value: "amount",
-    width: "130px",
-    align: "right",
-    sortable: true,
-  },
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface TabelTransaksiProps {
   onEdit: (t: Transaction) => void;
@@ -37,15 +20,40 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const CONSTANT = useTranslate();
+  const { format } = useCurrency();
   const list = useTransaksiStore((s) => s.list);
   const loading = useTransaksiStore((s) => s.loading);
+  const emojiOptions = getEmojiOptions(CONSTANT);
+
+  const tableHeaders: TableHeader[] = [
+    { title: CONSTANT.action ?? "Aksi", value: "action", width: "100px" },
+    { title: CONSTANT.date, value: "date", width: "90px" },
+    {
+      title: CONSTANT.description ?? "Deskripsi",
+      value: "description",
+      width: "220px",
+    },
+    { title: "Icon", value: "category_icon", width: "50px" },
+    { title: CONSTANT.category, value: "category_name", width: "130px" },
+    { title: CONSTANT.tag, value: "tags", width: "150px" },
+    { title: CONSTANT.method ?? "Metode", value: "payment_method", width: "100px" },
+    { title: CONSTANT.type ?? "Tipe", value: "type", width: "90px" },
+    {
+      title: CONSTANT.amount ?? "Jumlah",
+      value: "amount",
+      width: "130px",
+      align: "right",
+      sortable: true,
+    },
+  ];
 
   const renderCell = (trx: Transaction, header: TableHeader) => {
     if (header.value === "action") {
       return (
         <div className="flex gap-1">
           <Button
-            label="EDIT"
+            label={CONSTANT.edit}
             variant="outline"
             onClick={(e) => {
               e.stopPropagation();
@@ -53,7 +61,7 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
             }}
           />
           <Button
-            label="HAPUS"
+            label={CONSTANT.delete}
             variant="destructive"
             onClick={(e) => {
               e.stopPropagation();
@@ -81,18 +89,14 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
       );
     } else if (header.value === "category_icon") {
       const cat = trx.category;
-
       const icon = cat?.icon ?? null;
       const emojiMeta = icon
-        ? EMOJI_OPTIONS.find((e) => e.hexcode === icon)
+        ? emojiOptions.find((e) => e.hexcode === icon)
         : null;
-
       return (
         <div
           className="w-8 h-8 shadow-brutal-sm flex items-center justify-center"
-          style={{
-            background: (cat?.color ?? "#6366f1") + "22",
-          }}
+          style={{ background: (cat?.color ?? "#6366f1") + "22" }}
         >
           {icon ? (
             <OpenmojiImg
@@ -103,9 +107,7 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
           ) : (
             <span
               className="text-[11px] font-black"
-              style={{
-                color: cat?.color ?? "#6366f1",
-              }}
+              style={{ color: cat?.color ?? "#6366f1" }}
             >
               {cat?.name?.charAt(0).toUpperCase() ?? "?"}
             </span>
@@ -152,7 +154,9 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
               : "border-destructive text-destructive bg-destructive/10",
           ].join(" ")}
         >
-          {trx.type === "income" ? "PEMASUKAN" : "PENGELUARAN"}
+          {trx.type === "income"
+            ? CONSTANT.income.toUpperCase()
+            : CONSTANT.expense.toUpperCase()}
         </span>
       );
     } else if (header.value === "amount") {
@@ -166,7 +170,7 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
                 : "var(--color-danger)",
           }}
         >
-          {trx.type === "income" ? "+" : "−"} {formatIDR(trx.amount)}
+          {trx.type === "income" ? "+" : "−"} {format(trx.amount)}
         </span>
       );
     }
@@ -180,7 +184,7 @@ const TabelTransaksi: React.FC<TabelTransaksiProps> = ({
       dataKey="id"
       loading={loading}
       loadingRows={8}
-      emptyMessage="Tidak ada transaksi ditemukan"
+      emptyMessage={CONSTANT.noData}
     />
   );
 };
