@@ -32,10 +32,10 @@ const QuickAccessGrid = ({ items, loading = false }: Props) => {
     {
       href: "/dompet",
       label: C.wallet,
-      icon: "/best-seller.svg",
+      icon: "/wallet.svg",
       bgColor: "#F9C74F",
     },
-    { href: "/tag", label: C.tag, icon: "/calendar.svg", bgColor: "#90E0EF" },
+    { href: "/tag", label: C.tag, icon: "/tag.svg", bgColor: "#90E0EF" },
     {
       href: "/kategori",
       label: C.category,
@@ -45,13 +45,13 @@ const QuickAccessGrid = ({ items, loading = false }: Props) => {
     {
       href: "/anggaran",
       label: C.budget,
-      icon: "/cash-flow.svg",
+      icon: "/grafik.svg",
       bgColor: "#B7E4C7",
     },
     {
       href: "/ringkasan",
       label: C.summary,
-      icon: "/bar-graph.svg",
+      icon: "/summary.svg",
       bgColor: "#C77DFF",
     },
   ];

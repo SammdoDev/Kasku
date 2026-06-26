@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect } from "react";
 import { get, del, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import {
@@ -50,11 +50,14 @@ const AppTransaksi = () => {
   const setError = useTransaksiStore((s) => s.setError);
   const setFilter = useTransaksiStore((s) => s.setFilter);
   const openEdit = useTransaksiStore((s) => s.openEdit);
+  const openCreate = useTransaksiStore((s) => s.openCreate);
+  const closeModal = useTransaksiStore((s) => s.closeModal);
+  const modalOpen = useTransaksiStore((s) => s.modalOpen);
+  const editingTransaction = useTransaksiStore((s) => s.editingTransaction);
   const removeTransaction = useTransaksiStore((s) => s.removeTransaction);
   const { month, prevMonth, nextMonth } = useMonthFilter();
 
   const monthLabel = makeMonthLabel(month, CONSTANT);
-  const [modalOpen, setModalOpen] = useState(false);
 
   const TYPE_FILTER_OPTIONS = [
     { label: CONSTANT.expense.toUpperCase(), value: "expense" },
@@ -147,7 +150,7 @@ const AppTransaksi = () => {
             <Button
               size="sm"
               leftIcon={<Plus size={12} />}
-              onClick={() => setModalOpen(true)}
+              onClick={() => openCreate()}
               label={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
               className="w-full sm:w-auto"
             />
@@ -158,17 +161,20 @@ const AppTransaksi = () => {
 
         <ChildModalWrapper
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          title={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
+          onClose={closeModal}
+          title={
+            editingTransaction
+              ? `${CONSTANT.edit} ${CONSTANT.transaction}`.toUpperCase()
+              : `${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()
+          }
           subtitle={
-            CONSTANT.transactionAddSubtitle ?? "ISI DETAIL TRANSAKSI BARU"
+            editingTransaction
+              ? "EDIT DETAIL TRANSAKSI"
+              : (CONSTANT.transactionAddSubtitle ?? "ISI DETAIL TRANSAKSI BARU")
           }
           width="full"
         >
-          <ModalTambahTransaksi
-            onClose={() => setModalOpen(false)}
-            onSuccess={fetchData}
-          />
+          <ModalTambahTransaksi onClose={closeModal} onSuccess={fetchData} />
         </ChildModalWrapper>
       </div>
     </div>

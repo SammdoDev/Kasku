@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { get, post, getApiError } from "@/lib/helper/apiService";
+import { get, post, patch, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
 import CategoryGrid, { CategoryItem } from "./category-grid";
@@ -16,6 +16,7 @@ import TransferPanel from "./transfer-panel";
 import TagChips from "./tag-chips";
 import CalendarDialog from "./calendar-dialog";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import { useTransaksiStore } from "../store/transaksi-store";
 
 interface ModalTambahTransaksiProps {
   onSuccess?: () => void;
@@ -27,17 +28,32 @@ const ModalTambahTransaksi = ({
   onClose,
 }: ModalTambahTransaksiProps) => {
   const CONSTANT = useTranslate();
+  const editingTransaction = useTransaksiStore((s) => s.editingTransaction);
+  const isEdit = !!editingTransaction;
+
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState<"income" | "expense" | "transfer">(
-    "expense",
+    editingTransaction?.type ?? "expense",
   );
-  const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [paymentMethodId, setPaymentMethodId] = useState("");
-  const [paymentMethodName, setPaymentMethodName] = useState("");
-  const [tagIds, setTagIds] = useState<string[]>([]);
+  const [amount, setAmount] = useState(
+    editingTransaction ? String(editingTransaction.amount) : "",
+  );
+  const [note, setNote] = useState(editingTransaction?.note ?? "");
+  const [date, setDate] = useState(
+    editingTransaction?.date ?? new Date().toISOString().split("T")[0],
+  );
+  const [categoryId, setCategoryId] = useState<string | null>(
+    editingTransaction?.category?.id ?? null,
+  );
+  const [paymentMethodId, setPaymentMethodId] = useState(
+    editingTransaction?.payment_method?.id ?? "",
+  );
+  const [paymentMethodName, setPaymentMethodName] = useState(
+    editingTransaction?.payment_method?.name ?? "",
+  );
+  const [tagIds, setTagIds] = useState<string[]>(
+    editingTransaction?.tags?.map((t) => t.id) ?? [],
+  );
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [walletDialogOpen, setWalletDialogOpen] = useState(false);
   const [showModalKategori, setShowModalKategori] = useState(false);
@@ -55,13 +71,13 @@ const ModalTambahTransaksi = ({
     { label: "TRANSFER", value: "transfer" },
   ];
 
-  const fetchCats = async () => {
-    if (type === "transfer") return;
+  const fetchCats = async (forType?: "income" | "expense" | "transfer") => {
+    const t = forType ?? type;
+    if (t === "transfer") return;
     setLoadingCats(true);
-    setCategoryId(null);
     try {
       const res = await get<{ categories: CategoryItem[] }>(
-        `/categories?type=${type}`,
+        `/categories?type=${t}`,
       );
       setCategories(res.categories);
     } catch (err) {
@@ -71,9 +87,17 @@ const ModalTambahTransaksi = ({
     }
   };
 
+  // Fetch kategori on mount — kalau edit jangan reset categoryId
   useEffect(() => {
-    fetchCats();
-  }, [type]);
+    fetchCats(type);
+  }, []);
+
+  const handleTypeChange = (val: string) => {
+    const newType = val as "income" | "expense" | "transfer";
+    setType(newType);
+    setCategoryId(null);
+    fetchCats(newType);
+  };
 
   const handleNumPress = (key: string) => {
     if (key === "day" || key === "acc" || key === "bank") return;
@@ -102,6 +126,36 @@ const ModalTambahTransaksi = ({
       toast.error(CONSTANT.amountRequired);
       return;
     }
+
+    // ── MODE EDIT ──────────────────────────────────────────────
+    if (isEdit) {
+      if (!categoryId) {
+        toast.error(CONSTANT.selectCategoryFirst);
+        return;
+      }
+      setLoading(true);
+      try {
+        await patch(`/transactions/${editingTransaction.id}`, {
+          type,
+          amount: Number(amount),
+          note: note || undefined,
+          date,
+          category_id: categoryId,
+          payment_method_id: paymentMethodId || undefined,
+          tag_ids: tagIds.length > 0 ? tagIds : undefined,
+        });
+        toast.success(CONSTANT.success);
+        onSuccess?.();
+        onClose();
+      } catch (err) {
+        toast.error(CONSTANT.failedUpdate, getApiError(err));
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // ── MODE CREATE ────────────────────────────────────────────
     if (type === "transfer") {
       if (!transferFromId) {
         toast.error(CONSTANT.selectSourceWallet);
@@ -131,6 +185,7 @@ const ModalTambahTransaksi = ({
       }
       return;
     }
+
     if (!categoryId) {
       toast.error(CONSTANT.selectCategoryFirst);
       return;
@@ -176,18 +231,23 @@ const ModalTambahTransaksi = ({
     setShowModalKategori(true);
   };
 
-  // konten utama — scroll hanya kalau ada isi
   const hasScrollableContent =
     type === "transfer" || categories.length > 0 || loadingCats;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Tab tipe */}
+      {/* Tab tipe — disable transfer saat edit */}
       <div className="pt-5 pb-3 mb-2 shrink-0">
         <TabFilter
           value={type}
-          onChange={(val) => setType(val as "income" | "expense" | "transfer")}
-          options={TIPE_OPTIONS}
+          onChange={(val) => {
+            if (!isEdit) handleTypeChange(val);
+          }}
+          options={
+            isEdit
+              ? TIPE_OPTIONS.filter((o) => o.value !== "transfer")
+              : TIPE_OPTIONS
+          }
           showAll={false}
         />
       </div>
@@ -223,7 +283,7 @@ const ModalTambahTransaksi = ({
         />
       </ChildModalWrapper>
 
-      {/* Konten tengah — scroll hanya jika ada isi */}
+      {/* Konten tengah */}
       <div
         className={[
           "flex-1 min-h-0",
