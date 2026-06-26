@@ -229,3 +229,14 @@
     @apply transition-all duration-100;
   }
 }
+
+body {
+  font-size: var(--base-font-size, 14px);
+}
+
+/* Nav items & sidebar text ikut scale */
+aside nav a,
+aside nav button,
+aside nav span {
+  font-size: var(--base-font-size, 14px);
+}

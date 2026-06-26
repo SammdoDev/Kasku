@@ -9,6 +9,7 @@ import { useDompetStore } from "../store/dompet-store";
 import { Field, FieldLabel } from "@/components/ui/input-component/field-1";
 import InputText from "@/components/ui/input-component/input-text/input-text";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import EmojiPicker, { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 
 export interface DompetForm {
   name: string;
@@ -34,6 +35,7 @@ const ModalTambahDompet = ({ onClose, onSuccess, editTarget }: Props) => {
   const modalOpen = useDompetStore((s) => s.modalOpen);
   const [form, setForm] = useState<DompetForm>(FORM_DEFAULT);
   const [saving, setSaving] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   const TYPE_OPTIONS = [
     { label: "Bank", value: "bank" },
@@ -45,6 +47,7 @@ const ModalTambahDompet = ({ onClose, onSuccess, editTarget }: Props) => {
 
   useEffect(() => {
     if (!modalOpen) return;
+    setShowPicker(false);
     if (editTarget) {
       setForm({
         name: editTarget.name,
@@ -124,14 +127,58 @@ const ModalTambahDompet = ({ onClose, onSuccess, editTarget }: Props) => {
         </div>
       </Field>
 
-      <InputText
-        id="dompet-icon"
-        label="ICON"
-        placeholder="Wallet"
-        value={form.icon}
-        onChange={(e) => set({ icon: e.target.value })}
-        maxLength={40}
-      />
+      {/* Icon Picker */}
+      <Field>
+        <FieldLabel>ICON</FieldLabel>
+        <button
+          type="button"
+          onClick={() => setShowPicker((v) => !v)}
+          className={[
+            "flex items-center gap-3 px-3 py-2 border-2 border-border bg-card w-full text-left transition-all",
+            showPicker
+              ? "shadow-none translate-x-[2px] translate-y-[2px]"
+              : "shadow-[3px_3px_0px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none",
+          ].join(" ")}
+        >
+          {form.icon ? (
+            <>
+              <OpenmojiImg hexcode={form.icon} size={24} alt="selected icon" />
+              <span className="text-[11px] font-black text-foreground">
+                {form.icon.toUpperCase()}
+              </span>
+            </>
+          ) : (
+            <span className="text-[11px] font-black text-foreground/40">
+              {CONSTANT.selectIcon ?? "PILIH ICON"}
+            </span>
+          )}
+          {form.icon && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                set({ icon: "" });
+                setShowPicker(false);
+              }}
+              className="ml-auto text-[9px] font-black text-foreground/40 hover:text-destructive"
+            >
+              ✕
+            </button>
+          )}
+        </button>
+
+        {showPicker && (
+          <div className="mt-1">
+            <EmojiPicker
+              value={form.icon || null}
+              onChange={(hexcode) => {
+                set({ icon: hexcode });
+                setShowPicker(false);
+              }}
+            />
+          </div>
+        )}
+      </Field>
 
       <div className="flex gap-2 pt-2">
         <Button
@@ -141,7 +188,13 @@ const ModalTambahDompet = ({ onClose, onSuccess, editTarget }: Props) => {
           className="flex-1"
         />
         <Button
-          label={saving ? CONSTANT.loading : editTarget ? CONSTANT.save : CONSTANT.add}
+          label={
+            saving
+              ? CONSTANT.loading
+              : editTarget
+                ? CONSTANT.save
+                : CONSTANT.add
+          }
           onClick={handleSubmit}
           disabled={saving}
           className="flex-1"

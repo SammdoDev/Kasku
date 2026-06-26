@@ -1,5 +1,3 @@
-// src/app/api/transactions/route.ts
-
 import { NextResponse } from "next/server";
 import {
   withAuth,
@@ -8,40 +6,10 @@ import {
   serverError,
 } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
-
-const getCycleStartDate = async (
-  supabase: ReturnType<typeof createServiceClient>,
-  userId: string,
-) => {
-  const { data } = await supabase
-    .from("users")
-    .select("cycle_start_date")
-    .eq("id", userId)
-    .single();
-  return data?.cycle_start_date ?? 1;
-};
-
-const calculateCycleDateRange = (month: string, cycleStart: number) => {
-  const [year, m] = month.split("-");
-  const yearNum = Number(year);
-  const monthNum = Number(m);
-
-  // Hitung dari cycle_start_date bulan sekarang
-  const cycleFromDate = new Date(yearNum, monthNum - 1, cycleStart);
-
-  // Hitung sampai cycle_start_date bulan depan - 1 hari
-  const cycleToDate = new Date(
-    cycleFromDate.getFullYear(),
-    cycleFromDate.getMonth() + 1,
-    cycleStart,
-  );
-  cycleToDate.setDate(cycleToDate.getDate() - 1);
-
-  const from = cycleFromDate.toISOString().split("T")[0];
-  const to = cycleToDate.toISOString().split("T")[0];
-
-  return { from, to };
-};
+import {
+  getCycleStartDate,
+  calculateCycleDateRange,
+} from "@/lib/helper/cycle-date";
 
 export const GET = withAuth(async (req: AuthedRequest) => {
   const { searchParams } = new URL(req.url);
@@ -197,7 +165,6 @@ export const POST = withAuth(async (req: AuthedRequest) => {
     return serverError("Failed to create transaction");
   }
 
-  // Update balance
   if (payment_method_id) {
     const delta = type === "income" ? Number(amount) : -Number(amount);
     const { error: balErr } = await supabase.rpc("increment_balance", {

@@ -14,8 +14,11 @@ import Link from "next/link";
 import { toast } from "@/components/layout/for-pages/toast";
 import { SessionUser, setSession } from "@/lib/helper/session";
 import InputText from "@/components/ui/input-component/input-text/input-text";
+import { useTranslate } from "@/lib/i18n/use-translate";
+import Image from "next/image";
 
 const SignUpPage = () => {
+  const CONSTANT = useTranslate();
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +28,10 @@ const SignUpPage = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Password tidak cocok", "Pastikan kedua password sama.");
+      toast.error(
+        CONSTANT.passwordMismatchTitle,
+        CONSTANT.passwordMismatchMessage,
+      );
       return;
     }
     setLoading(true);
@@ -40,10 +46,10 @@ const SignUpPage = () => {
         full_name: fullName,
       });
       setSession({ token: data.token, user: data.user });
-      toast.success("Registrasi berhasil!", data.message);
+      toast.success(CONSTANT.signUpSuccessTitle, data.message);
       window.location.replace("/");
     } catch (err) {
-      toast.error("Registrasi gagal", getApiError(err));
+      toast.error(CONSTANT.signUpFailTitle, getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -68,8 +74,8 @@ const SignUpPage = () => {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-end">
           <Link href="/" aria-label="home" className="flex gap-2 items-center">
-            <FieldLabel>Cashora</FieldLabel>
-            <img
+            <FieldLabel>{CONSTANT.brandName}</FieldLabel>
+            <Image
               src="/logo-wallet.png"
               alt="Logo"
               height={50}
@@ -84,17 +90,17 @@ const SignUpPage = () => {
             <form className="flex flex-col gap-6" onSubmit={handleSignUp}>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-1 text-center">
-                  <h1 className="text-2xl font-bold">Create an account</h1>
+                  <h1 className="text-2xl font-bold">{CONSTANT.signUpTitle}</h1>
                   <p className="text-muted-foreground text-sm text-balance">
-                    Fill in your details to get started
+                    {CONSTANT.signUpSubtitle}
                   </p>
                 </div>
 
                 <InputText
                   id="fullName"
-                  label="Full Name"
+                  label={CONSTANT.fullNameLabel}
                   type="text"
-                  placeholder="e.g. John Doe"
+                  placeholder={CONSTANT.fullNamePlaceholder}
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
@@ -102,9 +108,9 @@ const SignUpPage = () => {
 
                 <InputText
                   id="username"
-                  label="Username"
+                  label={CONSTANT.usernameLabel}
                   type="text"
-                  placeholder="e.g. john_doe"
+                  placeholder={CONSTANT.usernamePlaceholder}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -112,9 +118,9 @@ const SignUpPage = () => {
 
                 <InputText
                   id="password"
-                  label="Password"
+                  label={CONSTANT.passwordLabel}
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={CONSTANT.passwordSignUpPlaceholder}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -122,19 +128,21 @@ const SignUpPage = () => {
 
                 <InputText
                   id="confirmPassword"
-                  label="Confirm Password"
+                  label={CONSTANT.confirmPasswordLabel}
                   type="password"
-                  placeholder="Repeat your password"
+                  placeholder={CONSTANT.confirmPasswordPlaceholder}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Sign Up"}
+                  {loading
+                    ? CONSTANT.signUpButtonLoading
+                    : CONSTANT.signUpButton}
                 </Button>
 
-                <FieldSeparator>Or continue with</FieldSeparator>
+                <FieldSeparator>{CONSTANT.orContinueWith}</FieldSeparator>
 
                 <Button
                   className="w-full flex gap-2"
@@ -160,16 +168,16 @@ const SignUpPage = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  <span>Sign up with Google</span>
+                  <span>{CONSTANT.signUpWithGoogle}</span>
                 </Button>
 
                 <FieldDescription className="text-center">
-                  Already have an account?{" "}
+                  {CONSTANT.alreadyHaveAccount}{" "}
                   <a
                     href="/auth/login"
                     className="underline underline-offset-4"
                   >
-                    Login
+                    {CONSTANT.loginLink}
                   </a>
                 </FieldDescription>
               </FieldGroup>

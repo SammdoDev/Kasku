@@ -194,8 +194,11 @@ export const useTransaksiStore = create<TransaksiState>((set) => ({
 
   setFilter: (patch) =>
     set((s) => ({
-      filter: { ...s.filter, ...patch, page: 1 },
-      ...("page" in patch ? { filter: { ...s.filter, ...patch } } : {}),
+      filter: {
+        ...s.filter,
+        ...patch,
+        page: "page" in patch ? (patch.page ?? 1) : 1,
+      },
     })),
   resetFilter: () =>
     set((s) => ({

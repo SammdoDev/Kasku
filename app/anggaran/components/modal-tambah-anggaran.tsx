@@ -12,13 +12,7 @@ import DateRangePicker from "@/components/ui/input-component/calendar-component/
 import CategoryGrid, {
   type CategoryItem,
 } from "@/app/transaksi/components/category-grid";
-
-const PERIOD_OPTIONS = [
-  { label: "HARIAN", value: "daily" },
-  { label: "MINGGUAN", value: "weekly" },
-  { label: "BULANAN", value: "monthly" },
-  { label: "TAHUNAN", value: "yearly" },
-];
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface AnggaranForm {
   name: string;
@@ -45,11 +39,19 @@ interface Props {
 }
 
 const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
+  const CONSTANT = useTranslate();
   const modalOpen = useAnggaranStore((s) => s.modalOpen);
   const [form, setForm] = useState<AnggaranForm>(FORM_DEFAULT);
   const [saving, setSaving] = useState(false);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loadingCats, setLoadingCats] = useState(false);
+
+  const PERIOD_OPTIONS = [
+    { label: CONSTANT.daily.toUpperCase(), value: "daily" },
+    { label: CONSTANT.weekly.toUpperCase(), value: "weekly" },
+    { label: CONSTANT.monthly.toUpperCase(), value: "monthly" },
+    { label: CONSTANT.yearly.toUpperCase(), value: "yearly" },
+  ];
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -88,15 +90,15 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
 
   const handleSubmit = async () => {
     if (!form.name.trim()) {
-      toast.error("Nama anggaran harus diisi");
+      toast.error(CONSTANT.budgetNameRequired);
       return;
     }
     if (!form.amount || Number(form.amount) <= 0) {
-      toast.error("Jumlah harus lebih dari 0");
+      toast.error(CONSTANT.amountMustBePositive);
       return;
     }
     if (!form.start_date) {
-      toast.error("Tanggal mulai harus diisi");
+      toast.error(CONSTANT.startDateRequired);
       return;
     }
 
@@ -113,15 +115,15 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
     try {
       if (editTarget) {
         await patch(`/budgets/${editTarget.id}`, payload);
-        toast.success("Anggaran diperbarui");
+        toast.success(CONSTANT.budgetUpdated);
       } else {
         await post("/budgets", payload);
-        toast.success("Anggaran ditambahkan");
+        toast.success(CONSTANT.budgetAdded);
       }
       onSuccess?.();
       onClose();
     } catch (err) {
-      toast.error("Gagal menyimpan", getApiError(err));
+      toast.error(CONSTANT.failedSave, getApiError(err));
     } finally {
       setSaving(false);
     }
@@ -134,7 +136,7 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
     >
       <InputText
         id="anggaran-name"
-        label="NAMA ANGGARAN *"
+        label={`${CONSTANT.budgetName.toUpperCase()} *`}
         placeholder="e.g. Makan Bulanan, Transport"
         value={form.name}
         onChange={(e) => set({ name: e.target.value })}
@@ -143,7 +145,7 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
 
       <InputText
         id="anggaran-amount"
-        label="JUMLAH *"
+        label={`${CONSTANT.amount.toUpperCase()} *`}
         type="number"
         placeholder="500000"
         value={form.amount}
@@ -152,7 +154,7 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
       />
 
       <Field>
-        <FieldLabel>PERIODE</FieldLabel>
+        <FieldLabel>{CONSTANT.period.toUpperCase()}</FieldLabel>
         <div className="flex border-2 border-border">
           {PERIOD_OPTIONS.map((opt) => (
             <button
@@ -162,8 +164,8 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
               className={[
                 "flex-1 py-2 text-[10px] font-black tracking-wider transition-all duration-75 border-r-2 border-border last:border-r-0",
                 form.period === opt.value
-                  ? "bg-[#1a1a1a] text-white"
-                  : "bg-card text-black/50 hover:bg-[#f5f0e8] hover:text-black",
+                  ? "bg-foreground text-background"
+                  : "bg-card text-foreground/50 hover:bg-muted hover:text-foreground",
               ].join(" ")}
             >
               {opt.label}
@@ -174,9 +176,9 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
 
       <Field>
         <FieldLabel>
-          KATEGORI{" "}
-          <span className="text-black/30 font-medium normal-case tracking-normal text-[10px]">
-            (opsional)
+          {CONSTANT.category.toUpperCase()}{" "}
+          <span className="text-foreground/30 font-medium normal-case tracking-normal text-[10px]">
+            ({CONSTANT.optional})
           </span>
         </FieldLabel>
         <CategoryGrid
@@ -190,7 +192,7 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
       </Field>
 
       <Field>
-        <FieldLabel>PERIODE TANGGAL *</FieldLabel>
+        <FieldLabel>{CONSTANT.datePeriod.toUpperCase()} *</FieldLabel>
         <DateRangePicker
           value={{ start_date: form.start_date, end_date: form.end_date }}
           onChange={({ start_date, end_date }) => set({ start_date, end_date })}
@@ -199,13 +201,19 @@ const ModalTambahAnggaran = ({ onClose, onSuccess, editTarget }: Props) => {
 
       <div className="flex gap-2 pt-2">
         <Button
-          label="BATAL"
+          label={CONSTANT.cancel.toUpperCase()}
           variant="outline"
           onClick={onClose}
           className="flex-1"
         />
         <Button
-          label={saving ? "MENYIMPAN..." : editTarget ? "SIMPAN" : "TAMBAH"}
+          label={
+            saving
+              ? `${CONSTANT.saving}...`
+              : editTarget
+                ? CONSTANT.save.toUpperCase()
+                : CONSTANT.add.toUpperCase()
+          }
           onClick={handleSubmit}
           disabled={saving}
           className="flex-1"

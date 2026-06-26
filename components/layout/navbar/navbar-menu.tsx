@@ -76,6 +76,11 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
   const { config, update } = useThemeConfig();
   const CONSTANT = useTranslate();
 
+  const scale = SIZE_SCALES[config.size];
+  const iconSize = parseInt(scale.iconSize);
+  const fontSize = scale.baseFontSize;
+  const navFontSize = scale.navFontSize;
+
   useEffect(() => {
     setUser(getSessionUser());
   }, []);
@@ -107,146 +112,154 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
   const toggleDrawer = (type: DrawerType) =>
     setDrawer((prev) => (prev === type ? null : type));
 
+  // Button size scales with icon
+  const btnSize = iconSize + 20; // icon + padding
+
   return (
     <>
       <header
-        style={{ backgroundColor: "var(--navbar-bg)" }}
-        className="sticky top-0 z-30 flex items-center gap-3 px-4 md:px-5 border-b-[3px] border-border shrink-0"
+        style={{
+          backgroundColor: "var(--navbar-bg)",
+          height: "var(--navbar-h)",
+        }}
+        className="sticky top-0 z-30 flex items-center gap-3 px-4 md:px-5 border-b-[3px] border-border shrink-0 box-content"
       >
-        <div
-          style={{ height: "var(--navbar-h)" }}
-          className="flex items-center gap-3 w-full"
+        {/* Hamburger */}
+        <button
+          onClick={onMenuToggle}
+          aria-label={isSidebarOpen ? CONSTANT.closeMenu : CONSTANT.openMenu}
+          aria-expanded={isSidebarOpen}
+          className={[
+            "hidden md:flex lg:hidden items-center justify-center border-[3px] border-border font-black text-foreground",
+            "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
+            isSidebarOpen
+              ? "shadow-none translate-x-[2px] translate-y-[2px]"
+              : "bg-card shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
+          ].join(" ")}
+          style={{
+            width: btnSize,
+            height: btnSize,
+            ...(isSidebarOpen ? { background: "var(--accent-bg)" } : {}),
+          }}
         >
-          {/* Hamburger */}
-          <button
-            onClick={onMenuToggle}
-            aria-label={isSidebarOpen ? CONSTANT.closeMenu : CONSTANT.openMenu}
-            aria-expanded={isSidebarOpen}
-            className={[
-              "hidden md:flex lg:hidden items-center justify-center w-9 h-9 border-[3px] border-border font-black text-foreground",
-              "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
-              isSidebarOpen
-                ? "shadow-none translate-x-[2px] translate-y-[2px]"
-                : "bg-card shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
-            ].join(" ")}
-            style={isSidebarOpen ? { background: "var(--accent-bg)" } : {}}
+          {isSidebarOpen ? (
+            <X
+              size={iconSize - 3}
+              strokeWidth={3}
+              style={{ color: "var(--accent-fg)" }}
+            />
+          ) : (
+            <Menu size={iconSize - 3} strokeWidth={3} />
+          )}
+        </button>
+
+        {/* Page title */}
+        <div className="flex-1 min-w-0">
+          <h1
+            className="font-black uppercase tracking-tight text-foreground leading-none truncate"
+            style={{ fontSize: `calc(${navFontSize} + 3px)` }}
           >
-            {isSidebarOpen ? (
-              <X
-                size={17}
-                strokeWidth={3}
-                style={{ color: "var(--accent-fg)" }}
-              />
-            ) : (
-              <Menu size={17} strokeWidth={3} />
+            {pageLabel}
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Bell */}
+          <button
+            aria-label={`${CONSTANT.notification}${showBadge ? `, ${NAVBAR_CONFIG.notificationCount} baru` : ""}`}
+            style={{ width: btnSize, height: btnSize }}
+            className="relative flex items-center justify-center border-[3px] border-border bg-card text-foreground shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
+          >
+            <Bell size={iconSize - 2} strokeWidth={2.5} />
+            {showBadge && (
+              <span
+                style={{
+                  background: "var(--accent-bg)",
+                  color: "var(--accent-fg)",
+                  fontSize: `calc(${fontSize} - 4px)`,
+                }}
+                className="absolute -top-[6px] -right-[6px] min-w-[16px] h-[16px] px-[3px] border-[2px] border-border font-black flex items-center justify-center leading-none"
+              >
+                {NAVBAR_CONFIG.notificationCount > 99
+                  ? "99+"
+                  : NAVBAR_CONFIG.notificationCount}
+              </span>
             )}
           </button>
 
-          {/* Page title */}
-          <div className="flex-1 min-w-0">
-            <h1
-              className="font-black uppercase tracking-tight text-foreground leading-none truncate"
-              style={{ fontSize: "calc(var(--nav-font-size) + 3px)" }}
-            >
-              {pageLabel}
-            </h1>
-          </div>
+          {/* Theme picker button */}
+          <button
+            onClick={() => toggleDrawer("theme")}
+            aria-label={CONSTANT.appearance}
+            style={{
+              width: btnSize,
+              height: btnSize,
+              ...(drawer === "theme"
+                ? { background: "var(--accent-bg)", color: "var(--accent-fg)" }
+                : {}),
+            }}
+            className={[
+              "flex items-center justify-center border-[3px] border-border font-black",
+              "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
+              drawer === "theme"
+                ? "shadow-none translate-x-[2px] translate-y-[2px]"
+                : "bg-card shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
+            ].join(" ")}
+          >
+            <Palette size={iconSize - 2} strokeWidth={2.5} />
+          </button>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {/* Bell */}
-            <button
-              aria-label={`${CONSTANT.notification}${showBadge ? `, ${NAVBAR_CONFIG.notificationCount} baru` : ""}`}
-              className="relative flex items-center justify-center w-9 h-9 border-[3px] border-border bg-card text-foreground shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
+          {/* User chip */}
+          <button
+            onClick={() => toggleDrawer("profile")}
+            aria-label={CONSTANT.openProfile}
+            style={
+              drawer === "profile" ? { background: "var(--accent-bg)" } : {}
+            }
+            className={[
+              "flex items-center gap-2 px-2 py-1 border-[3px] border-border bg-card shadow-brutal",
+              "hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
+              "transition-all duration-100 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
+              drawer === "profile"
+                ? "shadow-none translate-x-[2px] translate-y-[2px]"
+                : "",
+            ].join(" ")}
+          >
+            <div
+              style={{
+                background:
+                  drawer === "profile"
+                    ? "var(--accent-fg)"
+                    : "var(--accent-bg)",
+                width: iconSize + 8,
+                height: iconSize + 8,
+              }}
+              className="border-[2px] border-border flex items-center justify-center shrink-0"
+              aria-hidden="true"
             >
-              <Bell size={16} strokeWidth={2.5} />
-              {showBadge && (
-                <span
-                  style={{
-                    background: "var(--accent-bg)",
-                    color: "var(--accent-fg)",
-                  }}
-                  className="absolute -top-[6px] -right-[6px] min-w-[16px] h-[16px] px-[3px] border-[2px] border-border text-[9px] font-black flex items-center justify-center leading-none"
-                >
-                  {NAVBAR_CONFIG.notificationCount > 99
-                    ? "99+"
-                    : NAVBAR_CONFIG.notificationCount}
-                </span>
-              )}
-            </button>
-
-            {/* Theme picker button */}
-            <button
-              onClick={() => toggleDrawer("theme")}
-              aria-label={CONSTANT.appearance}
-              className={[
-                "flex items-center justify-center w-9 h-9 border-[3px] border-border font-black",
-                "transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
-                drawer === "theme"
-                  ? "shadow-none translate-x-[2px] translate-y-[2px]"
-                  : "bg-card shadow-brutal hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
-              ].join(" ")}
-              style={
-                drawer === "theme"
-                  ? {
-                      background: "var(--accent-bg)",
-                      color: "var(--accent-fg)",
-                    }
-                  : {}
-              }
-            >
-              <Palette size={16} strokeWidth={2.5} />
-            </button>
-
-            {/* User chip */}
-            <button
-              onClick={() => toggleDrawer("profile")}
-              aria-label={CONSTANT.openProfile}
-              className={[
-                "flex items-center gap-2 px-2 py-1 border-[3px] border-border bg-card shadow-brutal",
-                "hover:shadow-[1px_1px_0px_hsl(var(--border))] hover:translate-x-[2px] hover:translate-y-[2px]",
-                "transition-all duration-100 select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
-                drawer === "profile"
-                  ? "shadow-none translate-x-[2px] translate-y-[2px]"
-                  : "",
-              ].join(" ")}
-              style={
-                drawer === "profile" ? { background: "var(--accent-bg)" } : {}
-              }
-            >
-              <div
-                style={{
-                  background:
-                    drawer === "profile"
-                      ? "var(--accent-fg)"
-                      : "var(--accent-bg)",
-                }}
-                className="w-6 h-6 border-[2px] border-border flex items-center justify-center shrink-0"
-                aria-hidden="true"
-              >
-                <span
-                  style={{
-                    color:
-                      drawer === "profile"
-                        ? "var(--accent-bg)"
-                        : "var(--accent-fg)",
-                    fontSize: "9px",
-                  }}
-                  className="font-black"
-                >
-                  {initials}
-                </span>
-              </div>
               <span
-                className="hidden sm:block font-black max-w-[100px] truncate"
                 style={{
-                  fontSize: "var(--nav-font-size)",
-                  color: drawer === "profile" ? "var(--accent-fg)" : undefined,
+                  color:
+                    drawer === "profile"
+                      ? "var(--accent-bg)"
+                      : "var(--accent-fg)",
+                  fontSize: `calc(${fontSize} - 4px)`,
                 }}
+                className="font-black"
               >
-                {user?.full_name ?? "—"}
+                {initials}
               </span>
-            </button>
-          </div>
+            </div>
+            <span
+              className="hidden sm:block font-black max-w-[100px] truncate"
+              style={{
+                fontSize: navFontSize,
+                color: drawer === "profile" ? "var(--accent-fg)" : undefined,
+              }}
+            >
+              {user?.full_name ?? "—"}
+            </span>
+          </button>
         </div>
       </header>
 
@@ -278,8 +291,8 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
               style={{ background: "var(--accent-bg)" }}
             >
               <span
-                className="font-black text-sm uppercase tracking-widest"
-                style={{ color: "var(--accent-fg)" }}
+                className="font-black uppercase tracking-widest"
+                style={{ fontSize, color: "var(--accent-fg)" }}
               >
                 {CONSTANT.profile}
               </span>
@@ -292,7 +305,7 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                 }}
                 aria-label={CONSTANT.close}
               >
-                <X size={14} strokeWidth={3} />
+                <X size={iconSize - 4} strokeWidth={3} />
               </button>
             </div>
 
@@ -303,17 +316,23 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                   className="w-12 h-12 border-[3px] border-border flex items-center justify-center shrink-0"
                 >
                   <span
-                    style={{ color: "var(--accent-fg)" }}
-                    className="font-black text-base"
+                    style={{ color: "var(--accent-fg)", fontSize }}
+                    className="font-black"
                   >
                     {initials}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-black text-foreground truncate leading-tight">
+                  <p
+                    className="font-black text-foreground truncate leading-tight"
+                    style={{ fontSize: `calc(${fontSize} + 1px)` }}
+                  >
                     {user?.full_name ?? "—"}
                   </p>
-                  <p className="text-[11px] text-foreground/45 font-semibold truncate mt-0.5">
+                  <p
+                    className="text-foreground/45 font-semibold truncate mt-0.5"
+                    style={{ fontSize: `calc(${fontSize} - 2px)` }}
+                  >
                     @{user?.username ?? "—"}
                   </p>
                 </div>
@@ -332,12 +351,17 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                 <Link
                   key={href}
                   href={href}
-                  className="flex items-center gap-3 px-3 py-[10px] text-[13px] font-bold text-foreground/70 border-[2px] border-transparent hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-100"
+                  className="flex items-center gap-3 px-3 py-[10px] font-bold text-foreground/70 border-[2px] border-transparent hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-100"
+                  style={{ fontSize }}
                 >
-                  <Icon size={15} strokeWidth={2.5} className="shrink-0" />
+                  <Icon
+                    size={iconSize - 2}
+                    strokeWidth={2.5}
+                    className="shrink-0"
+                  />
                   <span className="flex-1">{label}</span>
                   <ChevronRight
-                    size={13}
+                    size={iconSize - 4}
                     strokeWidth={3}
                     className="opacity-40"
                   />
@@ -351,9 +375,14 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                   clearSession();
                   window.location.href = "/auth/login";
                 }}
-                className="w-full flex items-center gap-3 px-3 py-[10px] text-[13px] font-bold border-[2px] border-transparent text-foreground/55 hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-100"
+                className="w-full flex items-center gap-3 px-3 py-[10px] font-bold border-[2px] border-transparent text-foreground/55 hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-100"
+                style={{ fontSize }}
               >
-                <LogOut size={15} strokeWidth={2.5} className="shrink-0" />
+                <LogOut
+                  size={iconSize - 2}
+                  strokeWidth={2.5}
+                  className="shrink-0"
+                />
                 <span>{CONSTANT.logout}</span>
               </button>
             </div>
@@ -368,8 +397,8 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
               style={{ background: "var(--accent-bg)" }}
             >
               <span
-                className="font-black text-sm uppercase tracking-widest"
-                style={{ color: "var(--accent-fg)" }}
+                className="font-black uppercase tracking-widest"
+                style={{ fontSize, color: "var(--accent-fg)" }}
               >
                 {CONSTANT.appearance}
               </span>
@@ -382,14 +411,17 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                 }}
                 aria-label={CONSTANT.close}
               >
-                <X size={14} strokeWidth={3} />
+                <X size={iconSize - 4} strokeWidth={3} />
               </button>
             </div>
 
             <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
               {/* Warna Aksen */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-foreground/40 mb-3">
+                <p
+                  className="font-black uppercase tracking-[0.18em] text-foreground/40 mb-3"
+                  style={{ fontSize: `calc(${fontSize} - 3px)` }}
+                >
                   {CONSTANT.accentColor}
                 </p>
                 <div className="grid grid-cols-4 gap-2">
@@ -411,7 +443,10 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
                           className="w-7 h-7 border-[2px] border-border"
                           style={{ background: color.bg }}
                         />
-                        <span className="text-[9px] font-black text-foreground/60 uppercase tracking-wide">
+                        <span
+                          className="font-black text-foreground/60 uppercase tracking-wide"
+                          style={{ fontSize: `calc(${fontSize} - 4px)` }}
+                        >
                           {color.label}
                         </span>
                       </button>
@@ -422,37 +457,44 @@ const NavbarMenu = ({ onMenuToggle, isSidebarOpen }: NavbarProps) => {
 
               {/* Ukuran */}
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.18em] text-foreground/40 mb-3">
+                <p
+                  className="font-black uppercase tracking-[0.18em] text-foreground/40 mb-3"
+                  style={{ fontSize: `calc(${fontSize} - 3px)` }}
+                >
                   {CONSTANT.size}
                 </p>
                 <div className="flex gap-2">
-                  {sizes.map(([key, scale]) => {
+                  {sizes.map(([key, s]) => {
                     const isActive = config.size === key;
                     return (
                       <button
                         key={key}
                         onClick={() => update({ size: key })}
                         className={[
-                          "flex-1 py-2 text-[11px] font-black border-[2px] transition-all duration-100",
+                          "flex-1 py-2 font-black border-[2px] transition-all duration-100",
                           isActive
                             ? "border-border shadow-brutal -translate-x-0.5 -translate-y-0.5"
                             : "border-border/40 text-foreground/50 hover:border-border hover:text-foreground",
                         ].join(" ")}
-                        style={
-                          isActive
+                        style={{
+                          fontSize: `calc(${fontSize} - 2px)`,
+                          ...(isActive
                             ? {
                                 background: "var(--accent-bg)",
                                 color: "var(--accent-fg)",
                               }
-                            : {}
-                        }
+                            : {}),
+                        }}
                       >
-                        {scale.label}
+                        {s.label}
                       </button>
                     );
                   })}
                 </div>
-                <p className="text-[10px] font-bold text-foreground/35 mt-2">
+                <p
+                  className="font-bold text-foreground/35 mt-2"
+                  style={{ fontSize: `calc(${fontSize} - 3px)` }}
+                >
                   {CONSTANT.sizeDescription}
                 </p>
               </div>

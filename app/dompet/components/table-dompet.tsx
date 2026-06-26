@@ -7,6 +7,7 @@ import {
 import { Button } from "@/components/ui/button-component/button";
 import { useDompetStore, type PaymentMethod } from "../store/dompet-store";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import { OpenmojiImg } from "@/app/kategori/components/emoji-picker";
 
 interface Props {
   onEdit: (item: PaymentMethod) => void;
@@ -28,9 +29,9 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
 
   const TABLE_HEADERS: TableHeader[] = [
     { title: CONSTANT.action ?? "Aksi", value: "_action", width: "110px" },
+    { title: "Icon", value: "icon", width: "72px" },
     { title: CONSTANT.name ?? "Nama", value: "name", width: "180px" },
     { title: CONSTANT.type ?? "Tipe", value: "type", width: "110px" },
-    { title: "Icon", value: "icon", width: "100px" },
   ];
 
   const renderCell = (item: PaymentMethod, header: TableHeader) => {
@@ -40,6 +41,7 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
           <Button
             label={CONSTANT.edit}
             variant="outline"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(item);
@@ -48,12 +50,19 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
           <Button
             label={CONSTANT.delete}
             variant="destructive"
+            size="sm"
             onClick={(e) => {
               e.stopPropagation();
               onDelete(item);
             }}
           />
         </div>
+      );
+    } else if (header.value === "icon") {
+      return item.icon ? (
+        <OpenmojiImg hexcode={item.icon} size={28} alt={item.name} />
+      ) : (
+        <span className="text-foreground/30 text-[11px] font-mono">—</span>
       );
     } else if (header.value === "name") {
       return (
@@ -65,12 +74,6 @@ const TabelDompet = ({ onEdit, onDelete }: Props) => {
       return (
         <span className="inline-flex border-2 border-border px-2 py-0.5 text-[9px] font-black tracking-widest bg-card text-foreground">
           {item.type ? (TYPE_LABEL[item.type] ?? item.type.toUpperCase()) : "—"}
-        </span>
-      );
-    } else if (header.value === "icon") {
-      return (
-        <span className="text-[11px] text-foreground/50 font-mono">
-          {item.icon ?? "—"}
         </span>
       );
     }

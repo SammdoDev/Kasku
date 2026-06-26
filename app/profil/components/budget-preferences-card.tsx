@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { get, patch, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-import { Pencil } from "lucide-react";
+import { Monitor, Moon, Pencil, Sun } from "lucide-react";
 import NbToggle from "./nb-toggle";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
 import ModalCycleStart from "./modal/modal-cycle-start";
@@ -173,13 +173,30 @@ const BudgetPreferencesCard = () => {
             {CONSTANT.darkMode}
           </span>
           {!mountedTheme ? (
-            <Skeleton className="h-5 w-9" />
+            <Skeleton className="h-7 w-[108px]" />
           ) : (
-            <NbToggle
-              checked={theme === "dark"}
-              onChange={(v) => setTheme(v ? "dark" : "light")}
-              label={CONSTANT.darkMode}
-            />
+            <div className="flex border-[2px] border-border overflow-hidden">
+              {(
+                [
+                  { value: "light", icon: Sun },
+                  { value: "system", icon: Monitor },
+                  { value: "dark", icon: Moon },
+                ] as const
+              ).map(({ value, icon: Icon }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setTheme(value)}
+                  className={`px-3 py-1.5 transition-all duration-100 ${
+                    theme === value
+                      ? "bg-foreground text-background"
+                      : "bg-card text-foreground/50 hover:text-foreground"
+                  }`}
+                >
+                  <Icon size={12} strokeWidth={2.5} />
+                </button>
+              ))}
+            </div>
           )}
         </div>
       </div>

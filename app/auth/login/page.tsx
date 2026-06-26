@@ -14,8 +14,11 @@ import Link from "next/link";
 import { toast } from "@/components/layout/for-pages/toast";
 import { SessionUser, setSession } from "@/lib/helper/session";
 import InputText from "@/components/ui/input-component/input-text/input-text";
+import { useTranslate } from "@/lib/i18n/use-translate";
+import Image from "next/image";
 
 const LoginPage = () => {
+  const CONSTANT = useTranslate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -31,10 +34,10 @@ const LoginPage = () => {
       }>("/auth/login", { username, password: window.btoa(password) });
 
       setSession({ token: data.token, user: data.user });
-      toast.success("Login berhasil!", data.message);
+      toast.success(CONSTANT.loginSuccessTitle, data.message);
       window.location.replace("/");
     } catch (err) {
-      toast.error("Login gagal", getApiError(err));
+      toast.error(CONSTANT.loginFailTitle, getApiError(err));
     } finally {
       setLoading(false);
     }
@@ -45,14 +48,14 @@ const LoginPage = () => {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
           <Link href="/" aria-label="home" className="flex gap-2 items-center">
-            <img
+            <Image
               src="/logo-wallet.png"
               alt="Logo"
               height={50}
               width={50}
               className="h-10 z-10 w-auto hidden dark:block object-contain rounded-full"
             />
-            <FieldLabel>Cashora</FieldLabel>
+            <FieldLabel>{CONSTANT.brandName}</FieldLabel>
           </Link>
         </div>
 
@@ -61,17 +64,17 @@ const LoginPage = () => {
             <form className="flex flex-col gap-6" onSubmit={handleLogin}>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-1 text-center">
-                  <h1 className="text-2xl font-bold">Login to your account</h1>
+                  <h1 className="text-2xl font-bold">{CONSTANT.loginTitle}</h1>
                   <p className="text-muted-foreground text-sm text-balance">
-                    Enter your credentials below to login
+                    {CONSTANT.loginSubtitle}
                   </p>
                 </div>
 
                 <InputText
                   id="username"
-                  label="Username"
+                  label={CONSTANT.usernameLabel}
                   type="text"
-                  placeholder="e.g. john_doe"
+                  placeholder={CONSTANT.usernamePlaceholder}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -79,19 +82,19 @@ const LoginPage = () => {
 
                 <InputText
                   id="password"
-                  label="Password"
+                  label={CONSTANT.passwordLabel}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Type your password"
+                  placeholder={CONSTANT.passwordPlaceholder}
                   required
                 />
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Loading..." : "Login"}
+                  {loading ? CONSTANT.loginButtonLoading : CONSTANT.loginButton}
                 </Button>
 
-                <FieldSeparator>Or continue with</FieldSeparator>
+                <FieldSeparator>{CONSTANT.orContinueWith}</FieldSeparator>
 
                 <Button
                   className="w-full flex gap-2"
@@ -117,16 +120,16 @@ const LoginPage = () => {
                       fill="#EA4335"
                     />
                   </svg>
-                  <span>Login with Google</span>
+                  <span>{CONSTANT.loginWithGoogle}</span>
                 </Button>
 
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account?{" "}
+                  {CONSTANT.noAccount}{" "}
                   <a
                     href="/auth/sign-up"
                     className="underline underline-offset-4"
                   >
-                    Sign up
+                    {CONSTANT.signUpLink}
                   </a>
                 </FieldDescription>
               </FieldGroup>

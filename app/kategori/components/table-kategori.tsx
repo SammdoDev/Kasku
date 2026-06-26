@@ -9,33 +9,35 @@ import { confirm } from "@/components/layout/for-pages/confirm-dialog";
 import { Button } from "@/components/ui/button-component/button";
 import { dateDisplay } from "@/lib/helper/date-format";
 import { EMOJI_OPTIONS } from "./emoji-option";
+import { useTranslate } from "@/lib/i18n/use-translate";
 
 interface TabelKategoriProps {
   onEdit: (c: Category) => void;
   onDelete: (c: Category) => void;
 }
 
-const tableHeaders: TableHeader[] = [
-  { title: "Aksi", value: "action", width: "100px" },
-  { title: "Icon", value: "icon", width: "60px" },
-  { title: "Nama", value: "name", width: "200px" },
-  { title: "Tipe", value: "type", width: "110px" },
-  { title: "Warna", value: "color", width: "90px" },
-  { title: "Dibuat", value: "createdAt", width: "120px" },
-];
-
 const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
+  const CONSTANT = useTranslate();
   const list = useKategoriStore((s) => s.list);
   const loading = useKategoriStore((s) => s.loading);
+
+  const tableHeaders: TableHeader[] = [
+    { title: CONSTANT.action, value: "action", width: "100px" },
+    { title: CONSTANT.icon, value: "icon", width: "60px" },
+    { title: CONSTANT.name, value: "name", width: "200px" },
+    { title: CONSTANT.type, value: "type", width: "110px" },
+    { title: CONSTANT.color, value: "color", width: "90px" },
+    { title: CONSTANT.createdAt, value: "createdAt", width: "120px" },
+  ];
 
   const handleDeleteClick = async (e: React.MouseEvent, cat: Category) => {
     e.stopPropagation();
     const ok = await confirm.show({
-      title: "Hapus Kategori",
-      description: "Tindakan ini tidak bisa dibatalkan.",
-      message: `Yakin ingin menghapus kategori "${cat.name}"? Semua transaksi yang menggunakan kategori ini akan terpengaruh.`,
-      confirmLabel: "YA, HAPUS",
-      cancelLabel: "BATAL",
+      title: `${CONSTANT.delete} ${CONSTANT.category}`,
+      description: CONSTANT.actionCannotBeUndone,
+      message: `${CONSTANT.deleteConfirmCategory} "${cat.name}"? ${CONSTANT.deleteAffectTransactions}`,
+      confirmLabel: CONSTANT.yesDelete.toUpperCase(),
+      cancelLabel: CONSTANT.cancel.toUpperCase(),
       variant: "danger",
     });
     if (!ok) return;
@@ -87,7 +89,9 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
               : "border-destructive text-destructive bg-destructive/10",
           ].join(" ")}
         >
-          {cat.type === "income" ? "PEMASUKAN" : "PENGELUARAN"}
+          {cat.type === "income"
+            ? CONSTANT.income.toUpperCase()
+            : CONSTANT.expense.toUpperCase()}
         </span>
       );
     } else if (header.value === "color") {
@@ -112,7 +116,7 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
       return (
         <div className="flex gap-1">
           <Button
-            label="EDIT"
+            label={CONSTANT.edit.toUpperCase()}
             onClick={(e) => {
               e.stopPropagation();
               onEdit(cat);
@@ -120,7 +124,7 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
             variant="outline"
           />
           <Button
-            label="HAPUS"
+            label={CONSTANT.delete.toUpperCase()}
             variant="destructive"
             onClick={(e) => handleDeleteClick(e, cat)}
           />
@@ -137,7 +141,7 @@ const TabelKategori: React.FC<TabelKategoriProps> = ({ onEdit, onDelete }) => {
       dataKey="id"
       loading={loading}
       loadingRows={6}
-      emptyMessage="Belum ada kategori"
+      emptyMessage={CONSTANT.noCategoryYet}
     />
   );
 };

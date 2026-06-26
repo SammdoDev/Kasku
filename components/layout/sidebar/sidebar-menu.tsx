@@ -15,6 +15,7 @@ import {
   getSessionUser,
   type SessionUser,
 } from "@/lib/helper/session";
+import { useThemeConfig } from "@/lib/hooks/use-theme-config";
 
 type SidebarProps = {
   isOpen: boolean;
@@ -37,6 +38,12 @@ function handleLogout() {
 const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const [user, setUser] = useState<SessionUser | null>(null);
+  const { config, SIZE_SCALES } = useThemeConfig();
+  const scale = SIZE_SCALES[config.size];
+
+  const iconSize = parseInt(scale.iconSize);
+  const fontSize = scale.baseFontSize;
+  const navPy = scale.spacingNav;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -56,7 +63,10 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
       )}
 
       <aside
-        style={{ backgroundColor: "var(--sidebar-bg)" }}
+        style={{
+          backgroundColor: "var(--sidebar-bg)",
+          width: "var(--sidebar-w)",
+        }}
         className={[
           "fixed top-0 left-0 z-50 h-screen flex flex-col",
           "border-r-[3px] border-border",
@@ -67,20 +77,26 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
         aria-label="Sidebar navigasi"
       >
         {/* ── Header ── */}
-        <div className="flex items-center justify-between px-5 py-[18px] border-b-[3px] border-border shrink-0">
+        <div
+          className="flex items-center justify-between gap-2 px-5 border-b-[3px] border-border shrink-0 box-content"
+          style={{ height: "var(--navbar-h)" }}
+        >
           <Link href="/" className="flex items-center gap-2 group">
             <div
               style={{ background: "var(--accent-bg)" }}
               className="w-8 h-8 border-[3px] border-border flex items-center justify-center shadow-[2px_2px_0px_#000] group-hover:shadow-none group-hover:translate-x-[2px] group-hover:translate-y-[2px] transition-all duration-100"
             >
               <span
-                style={{ color: "var(--accent-fg)" }}
-                className="font-black text-sm leading-none select-none"
+                style={{ color: "var(--accent-fg)", fontSize }}
+                className="font-black leading-none select-none"
               >
                 C
               </span>
             </div>
-            <span className="font-black text-xl tracking-tight text-foreground uppercase select-none">
+            <span
+              className="font-black tracking-tight text-foreground uppercase select-none"
+              style={{ fontSize: `calc(${fontSize} + 4px)` }}
+            >
               {SIDEBAR_CONFIG.appName}
             </span>
           </Link>
@@ -91,7 +107,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
             className="lg:hidden p-1 border-[2px] border-border bg-card text-foreground hover:bg-foreground hover:text-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
             aria-label="Tutup sidebar"
           >
-            <X size={15} strokeWidth={3} />
+            <X size={iconSize - 2} strokeWidth={3} />
           </button>
         </div>
 
@@ -102,7 +118,10 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
         >
           {NAV_GROUPS.map((group) => (
             <div key={group.title}>
-              <p className="text-[10px] font-black text-foreground/40 tracking-[0.18em] px-2 mb-2 uppercase select-none">
+              <p
+                className="font-black text-foreground/40 tracking-[0.18em] px-2 mb-2 uppercase select-none"
+                style={{ fontSize: `calc(${fontSize} - 3px)` }}
+              >
                 {group.title}
               </p>
               <ul className="space-y-[3px]" role="list">
@@ -120,35 +139,41 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
                         onClick={onClose}
                         aria-current={isActive ? "page" : undefined}
                         className={[
-                          "flex items-center gap-3 px-3 py-[9px] text-[13.5px] font-bold",
+                          "flex items-center gap-3 px-3 font-bold",
                           "border-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
                           isActive
                             ? "border-border shadow-brutal -translate-x-0.5 -translate-y-0.5"
                             : "border-transparent text-foreground/65 hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-0.5 hover:-translate-y-0.5",
                         ].join(" ")}
-                        style={
-                          isActive
+                        style={{
+                          fontSize,
+                          paddingTop: navPy,
+                          paddingBottom: navPy,
+                          ...(isActive
                             ? {
                                 background: "var(--accent-bg)",
                                 color: "var(--accent-fg)",
                               }
-                            : {}
-                        }
+                            : {}),
+                        }}
                       >
                         <Icon
-                          size={16}
+                          size={iconSize}
                           strokeWidth={2.5}
                           className="shrink-0"
                         />
                         <span className="flex-1 truncate">{item.label}</span>
                         {item.badge !== undefined && item.badge > 0 && (
-                          <span className="bg-foreground text-background text-[10px] font-black min-w-[18px] h-[18px] px-1 flex items-center justify-center border-[2px] border-border leading-none">
+                          <span
+                            className="bg-foreground text-background font-black min-w-[18px] h-[18px] px-1 flex items-center justify-center border-[2px] border-border leading-none"
+                            style={{ fontSize: `calc(${fontSize} - 3px)` }}
+                          >
                             {item.badge > 99 ? "99+" : item.badge}
                           </span>
                         )}
                         {isActive && (
                           <ChevronRight
-                            size={13}
+                            size={iconSize - 3}
                             strokeWidth={3}
                             className="shrink-0"
                           />
@@ -174,22 +199,25 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
                 onClick={onClose}
                 aria-current={isActive ? "page" : undefined}
                 className={[
-                  "flex items-center gap-3 px-3 py-[9px] text-[13.5px] font-bold",
+                  "flex items-center gap-3 px-3 font-bold",
                   "border-[2px] transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground",
                   isActive
                     ? "border-border shadow-brutal -translate-x-[1px] -translate-y-[1px]"
                     : "border-transparent text-foreground/55 hover:border-border hover:bg-card hover:shadow-[2px_2px_0px_hsl(var(--border))] hover:-translate-x-[1px] hover:-translate-y-[1px]",
                 ].join(" ")}
-                style={
-                  isActive
+                style={{
+                  fontSize,
+                  paddingTop: navPy,
+                  paddingBottom: navPy,
+                  ...(isActive
                     ? {
                         background: "var(--accent-bg)",
                         color: "var(--accent-fg)",
                       }
-                    : {}
-                }
+                    : {}),
+                }}
               >
-                <Icon size={16} strokeWidth={2.5} className="shrink-0" />
+                <Icon size={iconSize} strokeWidth={2.5} className="shrink-0" />
                 <span>{item.label}</span>
               </Link>
             );
@@ -205,17 +233,26 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
               aria-hidden="true"
             >
               <span
-                style={{ color: "var(--accent-fg)" }}
-                className="font-black text-[11px]"
+                style={{
+                  color: "var(--accent-fg)",
+                  fontSize: `calc(${fontSize} - 2px)`,
+                }}
+                className="font-black"
               >
                 {initials}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-black text-foreground truncate leading-tight">
+              <p
+                className="font-black text-foreground truncate leading-tight"
+                style={{ fontSize }}
+              >
                 {user?.full_name ?? "—"}
               </p>
-              <p className="text-[11px] text-foreground/45 font-semibold truncate">
+              <p
+                className="text-foreground/45 font-semibold truncate"
+                style={{ fontSize: `calc(${fontSize} - 2px)` }}
+              >
                 @{user?.username ?? "—"}
               </p>
             </div>
@@ -225,7 +262,7 @@ const SidebarMenu = ({ isOpen, onClose }: SidebarProps) => {
               className="p-1.5 border-[2px] border-transparent text-foreground hover:border-border hover:bg-foreground hover:text-background transition-all duration-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground"
               aria-label="Logout"
             >
-              <LogOut size={13} strokeWidth={2.5} />
+              <LogOut size={iconSize - 3} strokeWidth={2.5} />
             </button>
           </div>
         </div>

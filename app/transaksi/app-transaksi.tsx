@@ -51,8 +51,8 @@ const AppTransaksi = () => {
   const setFilter = useTransaksiStore((s) => s.setFilter);
   const openEdit = useTransaksiStore((s) => s.openEdit);
   const removeTransaction = useTransaksiStore((s) => s.removeTransaction);
-
   const { month, prevMonth, nextMonth } = useMonthFilter();
+
   const monthLabel = makeMonthLabel(month, CONSTANT);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -109,60 +109,68 @@ const AppTransaksi = () => {
     onNext: nextMonth,
   };
 
+  useEffect(() => {
+    setFilter({ month, page: 1 });
+  }, [month]);
+
   return (
     <div
-      className="card min-h-full md:m-4 p-4 md:p-6"
-      style={{ fontFamily: DASHBOARD_FONT }}
+      className="card md:m-4 p-4 md:p-6"
+      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
-      <div className="lg:hidden mb-4">
-        <SummaryHeaderMobile {...headerProps} />
-      </div>
-      <div className="hidden lg:block mb-4">
-        <SummaryCardsDesktop {...headerProps} />
-      </div>
+      <div className="px-4 pt-4 flex flex-col gap-4">
+        <div className="lg:hidden mb-4">
+          <SummaryHeaderMobile {...headerProps} />
+        </div>
+        <div className="hidden lg:block mb-4">
+          <SummaryCardsDesktop {...headerProps} />
+        </div>
 
-      <div className="mb-4 h-0.5 bg-border" />
+        <div className="mb-4 h-0.5 bg-border" />
 
-      <PageLeftRightWrapper
-        className="mb-5"
-        leftComponent={
-          <TabFilter
-            value={filter.type === "all" ? "" : filter.type}
-            onChange={(v) =>
-              setFilter({
-                type: (v || "all") as "all" | "income" | "expense",
-                page: 1,
-              })
-            }
-            options={TYPE_FILTER_OPTIONS}
-            allLabel={CONSTANT.all.toUpperCase()}
-          />
-        }
-        rightComponent={
-          <Button
-            size="sm"
-            leftIcon={<Plus size={12} />}
-            onClick={() => setModalOpen(true)}
-            label={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
-            className="w-full sm:w-auto"
-          />
-        }
-      />
-
-      <TabelTransaksi onEdit={openEdit} onDelete={handleDelete} />
-
-      <ChildModalWrapper
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
-        subtitle={CONSTANT.transactionAddSubtitle ?? "ISI DETAIL TRANSAKSI BARU"}
-        width="full"
-      >
-        <ModalTambahTransaksi
-          onClose={() => setModalOpen(false)}
-          onSuccess={fetchData}
+        <PageLeftRightWrapper
+          className="mb-5"
+          leftComponent={
+            <TabFilter
+              value={filter.type === "all" ? "" : filter.type}
+              onChange={(v) =>
+                setFilter({
+                  type: (v || "all") as "all" | "income" | "expense",
+                  page: 1,
+                })
+              }
+              options={TYPE_FILTER_OPTIONS}
+              allLabel={CONSTANT.all.toUpperCase()}
+            />
+          }
+          rightComponent={
+            <Button
+              size="sm"
+              leftIcon={<Plus size={12} />}
+              onClick={() => setModalOpen(true)}
+              label={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
+              className="w-full sm:w-auto"
+            />
+          }
         />
-      </ChildModalWrapper>
+
+        <TabelTransaksi onEdit={openEdit} onDelete={handleDelete} />
+
+        <ChildModalWrapper
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={`${CONSTANT.add} ${CONSTANT.transaction}`.toUpperCase()}
+          subtitle={
+            CONSTANT.transactionAddSubtitle ?? "ISI DETAIL TRANSAKSI BARU"
+          }
+          width="full"
+        >
+          <ModalTambahTransaksi
+            onClose={() => setModalOpen(false)}
+            onSuccess={fetchData}
+          />
+        </ChildModalWrapper>
+      </div>
     </div>
   );
 };

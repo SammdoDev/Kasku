@@ -45,7 +45,7 @@ const EmojiPicker = ({ value, onChange }: EmojiPickerProps) => {
   const GROUPS = Array.from(new Set(emojiOptions.map((e) => e.group)));
 
   return (
-    <div className="border-2 border-border bg-card max-h-64 overflow-y-auto">
+    <div className="border-2 border-border bg-card max-h-72 overflow-y-auto">
       {GROUPS.map((group) => {
         const emojis = emojiOptions.filter((e) => e.group === group);
         return (
@@ -65,7 +65,7 @@ const EmojiPicker = ({ value, onChange }: EmojiPickerProps) => {
                     title={emoji.label}
                     onClick={() => onChange(emoji.hexcode)}
                     className={[
-                      "flex flex-col items-center justify-center gap-1 p-2 border-b border-r border-border/10 transition-colors duration-75",
+                      "flex flex-col items-center justify-center gap-1.5 p-3 border-b border-r border-border/10 transition-colors duration-75",
                       isSelected
                         ? "bg-foreground"
                         : "hover:bg-foreground/5 active:bg-foreground/10",
@@ -73,7 +73,7 @@ const EmojiPicker = ({ value, onChange }: EmojiPickerProps) => {
                   >
                     <OpenmojiImg
                       hexcode={emoji.hexcode}
-                      size={22}
+                      size={36}
                       alt={emoji.label}
                       className={
                         isSelected ? "brightness-[10] dark:brightness-0" : ""

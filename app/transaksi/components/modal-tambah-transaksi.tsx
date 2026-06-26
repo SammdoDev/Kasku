@@ -99,17 +99,16 @@ const ModalTambahTransaksi = ({
 
   const handleSubmit = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      toast.error(CONSTANT.amountRequired ?? "Jumlah harus diisi dan lebih dari 0");
+      toast.error(CONSTANT.amountRequired);
       return;
     }
-
     if (type === "transfer") {
       if (!transferFromId) {
-        toast.error(CONSTANT.selectSourceWallet ?? "Pilih dompet asal");
+        toast.error(CONSTANT.selectSourceWallet);
         return;
       }
       if (!transferToId) {
-        toast.error(CONSTANT.selectDestWallet ?? "Pilih dompet tujuan");
+        toast.error(CONSTANT.selectDestWallet);
         return;
       }
       setLoading(true);
@@ -121,7 +120,7 @@ const ModalTambahTransaksi = ({
           note: note || undefined,
           date,
         });
-        toast.success(CONSTANT.transferSuccess ?? "Transfer berhasil dicatat");
+        toast.success(CONSTANT.transferSuccess);
         reset();
         onSuccess?.();
         onClose();
@@ -132,12 +131,10 @@ const ModalTambahTransaksi = ({
       }
       return;
     }
-
     if (!categoryId) {
-      toast.error(CONSTANT.selectCategoryFirst ?? "Pilih kategori terlebih dahulu");
+      toast.error(CONSTANT.selectCategoryFirst);
       return;
     }
-
     setLoading(true);
     try {
       await post("/transactions", {
@@ -149,7 +146,7 @@ const ModalTambahTransaksi = ({
         payment_method_id: paymentMethodId || undefined,
         tag_ids: tagIds.length > 0 ? tagIds : undefined,
       });
-      toast.success(CONSTANT.transactionAdded ?? "Transaksi ditambahkan");
+      toast.success(CONSTANT.transactionAdded);
       reset();
       onSuccess?.();
       onClose();
@@ -179,9 +176,14 @@ const ModalTambahTransaksi = ({
     setShowModalKategori(true);
   };
 
+  // konten utama — scroll hanya kalau ada isi
+  const hasScrollableContent =
+    type === "transfer" || categories.length > 0 || loadingCats;
+
   return (
     <div className="flex flex-col h-full">
-      <div className="pt-5 pb-3 mb-2">
+      {/* Tab tipe */}
+      <div className="pt-5 pb-3 mb-2 shrink-0">
         <TabFilter
           value={type}
           onChange={(val) => setType(val as "income" | "expense" | "transfer")}
@@ -221,7 +223,13 @@ const ModalTambahTransaksi = ({
         />
       </ChildModalWrapper>
 
-      <div className="flex-1 overflow-y-auto">
+      {/* Konten tengah — scroll hanya jika ada isi */}
+      <div
+        className={[
+          "flex-1 min-h-0",
+          hasScrollableContent ? "overflow-y-auto" : "overflow-hidden",
+        ].join(" ")}
+      >
         {type === "transfer" ? (
           <TransferPanel
             fromId={transferFromId}
@@ -242,7 +250,6 @@ const ModalTambahTransaksi = ({
         {type !== "transfer" && (
           <TagChips selected={tagIds} onChange={setTagIds} />
         )}
-        <div className="h-[220px]" />
       </div>
 
       <CalendarDialog
@@ -252,7 +259,8 @@ const ModalTambahTransaksi = ({
         onClose={() => setCalendarDialogOpen(false)}
       />
 
-      <div className="sticky bottom-0 left-0 right-0 z-50 border-t-2 border-border">
+      {/* Bottom sticky */}
+      <div className="shrink-0 border-t-2 border-border">
         <TransactionBar
           amount={amount}
           note={note}

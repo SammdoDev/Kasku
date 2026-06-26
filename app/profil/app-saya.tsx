@@ -1,5 +1,6 @@
 "use client";
 
+import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import AccountStatStrip from "./components/account-stat-strip";
 import BudgetPreferencesCard from "./components/budget-preferences-card";
 import DangerZoneCard from "./components/danger-zone-card";
@@ -12,8 +13,11 @@ import TermsAccordion from "./components/terms-accordion";
 
 const AppSaya = () => {
   return (
-    <div className="mx-auto bg-background min-h-screen">
-      <div className="flex flex-col gap-5 p-6">
+    <div
+      className="card md:m-4 p-4 md:p-6"
+      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
+    >
+      <div className="px-4 pt-4 flex flex-col gap-4">
         <AccountStatStrip />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

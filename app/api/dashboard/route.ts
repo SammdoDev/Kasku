@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { withAuth, AuthedRequest, serverError } from "@/lib/helper/auth";
 import { createServiceClient } from "@/lib/supabase/client";
+import {
+  getCycleStartDate,
+  calculateCycleDateRange,
+  getCurrentMonth,
+} from "@/lib/helper/cycle-date";
 
 type CategoryRow = {
   id: string;
@@ -11,21 +16,17 @@ type CategoryRow = {
 
 export const GET = withAuth(async (req: AuthedRequest) => {
   const { searchParams } = new URL(req.url);
-
   const monthParam = searchParams.get("month");
-  const now = new Date();
-  const year = monthParam
-    ? parseInt(monthParam.split("-")[0])
-    : now.getFullYear();
-  const month = monthParam
-    ? parseInt(monthParam.split("-")[1])
-    : now.getMonth() + 1;
+  const month = monthParam ?? getCurrentMonth();
 
-  const dateFrom = `${year}-${String(month).padStart(2, "0")}-01`;
-  const dateTo = new Date(year, month, 0).toISOString().split("T")[0];
+  const yearNum = Number(month.split("-")[0]);
+  const monthNum = Number(month.split("-")[1]);
 
   const supabase = createServiceClient();
   const userId = req.user.sub;
+
+  const cycleStart = await getCycleStartDate(supabase, userId);
+  const { from: dateFrom, to: dateTo } = calculateCycleDateRange(month, cycleStart);
 
   // ── 1. Monthly summary (exclude transfer) ─────────────────
   const { data: monthlyTxns, error: monthlyError } = await supabase
@@ -34,7 +35,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .eq("user_id", userId)
     .gte("date", dateFrom)
     .lte("date", dateTo)
-    .is("transfer_pair_id", null); // ✅ exclude transfer
+    .is("transfer_pair_id", null);
 
   if (monthlyError) {
     console.error("[dashboard] monthly totals error:", monthlyError);
@@ -49,12 +50,12 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .filter((t) => t.type === "expense")
     .reduce((sum, t) => sum + Number(t.amount), 0);
 
-  // ── 2. All-time balance (tetap include transfer, karena balance payment method sudah bener) ──
+  // ── 2. All-time balance ────────────────────────────────────
   const { data: allTxns } = await supabase
     .from("transactions")
     .select("type, amount")
     .eq("user_id", userId)
-    .is("transfer_pair_id", null); // ✅ exclude transfer, balance sudah di-handle RPC
+    .is("transfer_pair_id", null);
 
   const balance =
     (allTxns ?? [])
@@ -72,7 +73,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .eq("type", "expense")
     .gte("date", dateFrom)
     .lte("date", dateTo)
-    .is("transfer_pair_id", null); // ✅ exclude transfer
+    .is("transfer_pair_id", null);
 
   const categoryMap: Record<string, CategoryRow & { total: number }> = {};
 
@@ -110,7 +111,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .eq("user_id", userId)
     .gte("date", dateFrom)
     .lte("date", dateTo)
-    .is("transfer_pair_id", null) // ✅ exclude transfer
+    .is("transfer_pair_id", null)
     .order("date");
 
   const dailyMap: Record<string, { income: number; expense: number }> = {};
@@ -126,16 +127,30 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     net: v.income - v.expense,
   }));
 
-  // ── 5. Last 6 months trend (exclude transfer) ────────────
-  const sixMonthsAgo = new Date(year, month - 7, 1).toISOString().split("T")[0];
+  // ── 5. Last 6 months trend (cycle-aware) ─────────────────
+  // Mulai dari cycle start 6 bulan lalu
+  const sixMonthsAgo = calculateCycleDateRange(
+    `${yearNum}-${String(monthNum - 5 <= 0 ? monthNum - 5 + 12 : monthNum - 5).padStart(2, "0")}`,
+    cycleStart,
+  ).from;
+  // Edge case: kalau monthNum - 5 <= 0, tahunnya mundur
+  const trendFrom = (() => {
+    let y = yearNum;
+    let m = monthNum - 5;
+    if (m <= 0) { m += 12; y -= 1; }
+    return calculateCycleDateRange(
+      `${y}-${String(m).padStart(2, "0")}`,
+      cycleStart,
+    ).from;
+  })();
 
   const { data: trendTxns } = await supabase
     .from("transactions")
     .select("type, amount, date")
     .eq("user_id", userId)
-    .gte("date", sixMonthsAgo)
+    .gte("date", trendFrom)
     .lte("date", dateTo)
-    .is("transfer_pair_id", null); // ✅ exclude transfer
+    .is("transfer_pair_id", null);
 
   const monthlyMap: Record<string, { income: number; expense: number }> = {};
   for (const txn of trendTxns ?? []) {
@@ -169,7 +184,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
         .eq("type", "expense")
         .gte("date", dateFrom)
         .lte("date", dateTo)
-        .is("transfer_pair_id", null); // ✅ exclude transfer
+        .is("transfer_pair_id", null);
 
       if (b.category_id) q = q.eq("category_id", b.category_id);
 
@@ -192,15 +207,13 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     }),
   );
 
-  // ── 7. Recent transactions (tetap include transfer, biar keliatan di list) ──
+  // ── 7. Recent transactions (include transfer) ─────────────
   const { data: recentTxns } = await supabase
     .from("transactions")
     .select(
-      `
-      id, type, amount, note, date,
+      `id, type, amount, note, date,
       category:categories(id, name, icon, color),
-      payment_method:payment_methods(id, name, icon)
-    `,
+      payment_method:payment_methods(id, name, icon)`,
     )
     .eq("user_id", userId)
     .order("date", { ascending: false })
@@ -208,7 +221,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .limit(5);
 
   return NextResponse.json({
-    period: { year, month, date_from: dateFrom, date_to: dateTo },
+    period: { year: yearNum, month: monthNum, date_from: dateFrom, date_to: dateTo },
     summary: {
       balance,
       total_income: totalIncome,

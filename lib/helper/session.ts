@@ -31,7 +31,7 @@ function isTokenExpired(token: string): boolean {
 export const getSession = (): Session | null => {
   if (typeof window === "undefined") return null;
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const session = JSON.parse(raw) as Session;
     if (isTokenExpired(session.token)) {
@@ -46,12 +46,12 @@ export const getSession = (): Session | null => {
 
 export const setSession = (data: Session): void => {
   if (typeof window === "undefined") return;
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+  localStorage.setItem(SESSION_KEY, JSON.stringify(data));
 };
 
 export const clearSession = (): void => {
   if (typeof window === "undefined") return;
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
 };
 
 export const getSessionUser = (): SessionUser | null => {

@@ -169,7 +169,7 @@ const DEFAULT: ThemeConfig = { accentId: "yellow", size: "md" };
 function loadConfig(): ThemeConfig {
   if (typeof window === "undefined") return DEFAULT;
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return DEFAULT;
     return { ...DEFAULT, ...JSON.parse(raw) };
   } catch {
@@ -234,7 +234,7 @@ export function useThemeConfig() {
       const next = { ...prev, ...partial };
       const isDark = document.documentElement.classList.contains("dark");
       applyConfig(next, isDark);
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(next));
+      localStorage.setItem(SESSION_KEY, JSON.stringify(next));
       return next;
     });
   }, []);

@@ -88,7 +88,7 @@ const TabelAnggaran = ({ onEdit, onDelete }: Props) => {
           {item.category.icon && (
             <OpenmojiImg
               hexcode={item.category.icon}
-              size={16}
+              size={30}
               alt={item.category.name}
             />
           )}

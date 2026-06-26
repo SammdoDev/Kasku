@@ -64,47 +64,47 @@ const AppAnggaran = () => {
   return (
     <div
       className="card md:m-4 p-4 md:p-6"
-      style={{ fontFamily: DASHBOARD_FONT }}
+      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
-      <PageLeftRightWrapper
-        className="mb-5"
-        leftComponent={
-          <div>
-            <h1 className="text-lg font-black tracking-tight">ANGGARAN</h1>
-            <p className="text-[11px] text-black/50 font-medium">
-              Kelola batas pengeluaran kamu per kategori
-            </p>
-          </div>
-        }
-        rightComponent={
-          <Button
-            size="sm"
-            leftIcon={<Plus size={12} />}
-            onClick={openCreate}
-            label="TAMBAH ANGGARAN"
-          />
-        }
-      />
-
-      <div className="mb-4 h-0.5 bg-[#1a1a1a]" />
-
-      <TabelAnggaran onEdit={openEdit} onDelete={handleDelete} />
-
-      <ChildModalWrapper
-        open={modalOpen}
-        onClose={closeModal}
-        title={editTarget ? "EDIT ANGGARAN" : "TAMBAH ANGGARAN"}
-        subtitle={
-          editTarget ? "UBAH DETAIL ANGGARAN" : "ISI DETAIL ANGGARAN BARU"
-        }
-        width="sm"
-      >
-        <ModalTambahAnggaran
-          onClose={closeModal}
-          onSuccess={fetchData}
-          editTarget={editTarget}
+      <div className="px-4 pt-4 flex flex-col gap-4">
+        <PageLeftRightWrapper
+          className="mb-5"
+          leftComponent={
+            <div>
+              <h1 className="text-lg font-black tracking-tight">ANGGARAN</h1>
+              <p className="text-[11px] text-foreground/40 font-medium">
+                Kelola batas pengeluaran kamu per kategori
+              </p>
+            </div>
+          }
+          rightComponent={
+            <Button
+              size="sm"
+              leftIcon={<Plus size={12} />}
+              onClick={openCreate}
+              label="TAMBAH ANGGARAN"
+            />
+          }
         />
-      </ChildModalWrapper>
+
+        <TabelAnggaran onEdit={openEdit} onDelete={handleDelete} />
+
+        <ChildModalWrapper
+          open={modalOpen}
+          onClose={closeModal}
+          title={editTarget ? "EDIT ANGGARAN" : "TAMBAH ANGGARAN"}
+          subtitle={
+            editTarget ? "UBAH DETAIL ANGGARAN" : "ISI DETAIL ANGGARAN BARU"
+          }
+          width="sm"
+        >
+          <ModalTambahAnggaran
+            onClose={closeModal}
+            onSuccess={fetchData}
+            editTarget={editTarget}
+          />
+        </ChildModalWrapper>
+      </div>
     </div>
   );
 };

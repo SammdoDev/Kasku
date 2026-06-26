@@ -68,55 +68,57 @@ const AppDompet = () => {
   return (
     <div
       className="card md:m-4 p-4 md:p-6"
-      style={{ fontFamily: DASHBOARD_FONT }}
+      style={{ fontFamily: DASHBOARD_FONT, background: "transparent" }}
     >
-      <PageLeftRightWrapper
-        className="mb-5"
-        leftComponent={
-          <div>
-            <h1 className="text-lg font-black tracking-tight">
-              {CONSTANT.wallet.toUpperCase()}
-            </h1>
-            <p className="text-[11px] text-foreground/50 font-medium">
-              {CONSTANT.walletSubtitle ?? "Kelola metode pembayaran kamu"}
-            </p>
-          </div>
-        }
-        rightComponent={
-          <Button
-            size="sm"
-            leftIcon={<Plus size={12} />}
-            onClick={openCreate}
-            label={`${CONSTANT.add} ${CONSTANT.wallet}`.toUpperCase()}
-          />
-        }
-      />
-
-      <div className="mb-4 h-0.5 bg-border" />
-
-      <TabelDompet onEdit={openEdit} onDelete={handleDelete} />
-
-      <ChildModalWrapper
-        open={modalOpen}
-        onClose={closeModal}
-        title={
-          editTarget
-            ? `${CONSTANT.edit} ${CONSTANT.wallet}`.toUpperCase()
-            : `${CONSTANT.add} ${CONSTANT.wallet}`.toUpperCase()
-        }
-        subtitle={
-          editTarget
-            ? (CONSTANT.walletEditSubtitle ?? "UBAH DETAIL DOMPET")
-            : (CONSTANT.walletAddSubtitle ?? "ISI DETAIL DOMPET BARU")
-        }
-        width="sm"
-      >
-        <ModalTambahDompet
-          onClose={closeModal}
-          onSuccess={fetchData}
-          editTarget={editTarget}
+      <div className="px-4 pt-4 flex flex-col gap-4">
+        <PageLeftRightWrapper
+          className="mb-5"
+          leftComponent={
+            <div>
+              <h1 className="text-lg font-black tracking-tight">
+                {CONSTANT.wallet.toUpperCase()}
+              </h1>
+              <p className="text-[11px] text-foreground/50 font-medium">
+                {CONSTANT.walletSubtitle ?? "Kelola metode pembayaran kamu"}
+              </p>
+            </div>
+          }
+          rightComponent={
+            <Button
+              size="sm"
+              leftIcon={<Plus size={12} />}
+              onClick={openCreate}
+              label={`${CONSTANT.add} ${CONSTANT.wallet}`.toUpperCase()}
+            />
+          }
         />
-      </ChildModalWrapper>
+
+        <div className="mb-4 h-0.5 bg-border" />
+
+        <TabelDompet onEdit={openEdit} onDelete={handleDelete} />
+
+        <ChildModalWrapper
+          open={modalOpen}
+          onClose={closeModal}
+          title={
+            editTarget
+              ? `${CONSTANT.edit} ${CONSTANT.wallet}`.toUpperCase()
+              : `${CONSTANT.add} ${CONSTANT.wallet}`.toUpperCase()
+          }
+          subtitle={
+            editTarget
+              ? (CONSTANT.walletEditSubtitle ?? "UBAH DETAIL DOMPET")
+              : (CONSTANT.walletAddSubtitle ?? "ISI DETAIL DOMPET BARU")
+          }
+          width="sm"
+        >
+          <ModalTambahDompet
+            onClose={closeModal}
+            onSuccess={fetchData}
+            editTarget={editTarget}
+          />
+        </ChildModalWrapper>
+      </div>
     </div>
   );
 };
