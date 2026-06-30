@@ -343,5 +343,14 @@
   "passwordSignUpPlaceholder": "Enter your password",
   "confirmPasswordLabel": "Confirm Password",
   "confirmPasswordPlaceholder": "Repeat your password",
-  "selectIcon": "Select Icon"
+  "selectIcon": "Select Icon",
+  "netBalance": "Net Balance",
+  "walletBalance": "Wallet Balance",
+  "incomeExpenseTrend": "Income vs Expense Trend",
+  "last6Months": "Last 6 Months",
+  "categoryBreakdown": "Category Breakdown",
+  "uncategorized": "Uncategorized",
+  "chartLine": "LINE",
+  "chartBar": "BAR",
+  "noDataPeriod": "No data for this period yet"
 }

@@ -343,5 +343,14 @@
   "passwordSignUpPlaceholder": "Masukkan passwordmu",
   "confirmPasswordLabel": "Konfirmasi Password",
   "confirmPasswordPlaceholder": "Ulangi passwordmu",
-  "selectIcon": "Pilih Ikon"
+  "selectIcon": "Pilih Ikon",
+  "netBalance": "Selisih",
+  "walletBalance": "Saldo Dompet",
+  "incomeExpenseTrend": "Tren Pemasukan vs Pengeluaran",
+  "last6Months": "6 Bulan Terakhir",
+  "categoryBreakdown": "Rincian per Kategori",
+  "uncategorized": "Tanpa Kategori",
+  "chartLine": "LINE",
+  "chartBar": "BAR",
+  "noDataPeriod": "Belum ada data untuk periode ini"
 }

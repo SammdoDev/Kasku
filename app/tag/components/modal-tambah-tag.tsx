@@ -8,20 +8,25 @@ import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import { useTagStore } from "../store/tag-store";
 import { Field, FieldLabel } from "@/components/ui/input-component/field-1";
 import InputText from "@/components/ui/input-component/input-text/input-text";
+import { Hash } from "lucide-react";
 
 const PRESET_COLORS = [
-  "#f97316",
   "#ef4444",
+  "#f97316",
+  "#f59e0b",
   "#eab308",
+  "#84cc16",
   "#22c55e",
+  "#10b981",
+  "#14b8a6",
   "#06b6d4",
   "#3b82f6",
-  "#8b5cf6",
-  "#ec4899",
-  "#14b8a6",
-  "#f59e0b",
-  "#84cc16",
   "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#ec4899",
+  "#f43f5e",
+  "#64748b",
 ];
 
 export interface TagForm {
@@ -82,7 +87,7 @@ const ModalTambahTag = ({ onClose, onSuccess, editTarget }: Props) => {
 
   return (
     <div
-      className="flex flex-col gap-4 pt-4"
+      className="flex flex-col gap-5 pt-4 font-mono"
       style={{ fontFamily: DASHBOARD_FONT }}
     >
       <InputText
@@ -92,69 +97,83 @@ const ModalTambahTag = ({ onClose, onSuccess, editTarget }: Props) => {
         value={form.name}
         onChange={(e) => set({ name: e.target.value })}
         maxLength={50}
+        fieldClassName="flex flex-col gap-1"
       />
 
-      <Field>
+      <div className="flex flex-col gap-1">
         <FieldLabel>WARNA</FieldLabel>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
           {PRESET_COLORS.map((c) => (
             <button
               key={c}
               type="button"
               onClick={() => set({ color: c })}
               className={[
-                "w-7 h-7 border-2 transition-all",
+                "w-7 h-7 border-2 transition-all duration-100",
                 form.color === c
-                  ? "border-border scale-110 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  ? "border-border scale-110 shadow-[2px_2px_0px_hsl(var(--border))]"
                   : "border-transparent hover:border-border/40",
               ].join(" ")}
               style={{ background: c }}
             />
           ))}
+          <div className="relative">
+            <input
+              type="color"
+              value={form.color}
+              onChange={(e) => set({ color: e.target.value })}
+              className="w-7 h-7 border-2 border-border cursor-pointer opacity-0 absolute inset-0"
+            />
+            <div
+              className="w-7 h-7 border-2 border-border border-dashed flex items-center justify-center text-[8px] font-black"
+              style={{ background: form.color }}
+            >
+              +
+            </div>
+          </div>
+          <span className="text-[10px] font-mono font-black text-foreground/40 uppercase">
+            {form.color}
+          </span>
         </div>
-        <div className="flex items-center gap-2 mt-1">
-          <div
-            className="w-8 h-8 border-2 border-border flex-shrink-0"
-            style={{ background: form.color }}
-          />
-          <InputText
-            id="tag-color"
-            label=""
-            placeholder="#6366f1"
-            value={form.color}
-            onChange={(e) => set({ color: e.target.value })}
-            maxLength={7}
-            fieldClassName="flex-1"
-          />
-        </div>
-      </Field>
+      </div>
 
       <Field>
         <FieldLabel>PREVIEW</FieldLabel>
-        <span
-          className="w-fit px-2.5 py-1 border-2 text-[11px] font-black tracking-wider"
-          style={{
-            borderColor: form.color,
-            color: form.color,
-            background: form.color + "18",
-          }}
+        <div
+          className="flex items-center gap-3 border-2 border-border p-3"
+          style={{ background: form.color + "11" }}
         >
-          #{form.name || "tag"}
-        </span>
+          <div
+            className="w-9 h-9 border-2 border-border flex items-center justify-center shrink-0"
+            style={{ background: form.color + "33" }}
+          >
+            <Hash size={16} strokeWidth={3} style={{ color: form.color }} />
+          </div>
+          <span
+            className="px-2.5 py-1 border-2 text-[11px] font-black tracking-wider shadow-[2px_2px_0px_0px_hsl(var(--border))]"
+            style={{
+              borderColor: form.color,
+              color: form.color,
+              background: form.color + "18",
+            }}
+          >
+            #{form.name || "tag"}
+          </span>
+        </div>
       </Field>
 
-      <div className="flex gap-2 pt-2">
+      <div className="flex flex-col sm:flex-row gap-2 pt-1">
         <Button
           label="BATAL"
           variant="outline"
           onClick={onClose}
-          className="flex-1"
+          className="w-full sm:flex-1"
         />
         <Button
           label={saving ? "MENYIMPAN..." : editTarget ? "SIMPAN" : "TAMBAH"}
           onClick={handleSubmit}
           disabled={saving}
-          className="flex-1"
+          className="w-full sm:flex-1"
         />
       </div>
     </div>

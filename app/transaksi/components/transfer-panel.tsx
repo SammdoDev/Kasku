@@ -66,7 +66,7 @@ const WalletButton = ({
       onClick={onClick}
       disabled={dimmed}
       className={[
-        "relative flex items-center gap-2.5 px-3 py-2.5 border-2 transition-all duration-75 min-w-[130px] text-left",
+        "relative flex items-center gap-2 px-2.5 py-2.5 border-2 transition-all duration-75 w-full sm:w-auto sm:min-w-[130px] text-left",
         selected
           ? "border-border bg-foreground text-background shadow-none translate-x-[2px] translate-y-[2px]"
           : dimmed
@@ -88,10 +88,10 @@ const WalletButton = ({
         />
       </div>
       <div className="flex flex-col gap-0.5 min-w-0">
-        <span className="text-[12px] font-black truncate">{wallet.name}</span>
+        <span className="text-[11px] font-black truncate">{wallet.name}</span>
         <span
           className={[
-            "text-[9px] font-bold font-mono",
+            "text-[9px] font-bold font-mono truncate",
             selected
               ? "text-background/60"
               : dimmed
@@ -104,7 +104,7 @@ const WalletButton = ({
       </div>
       {!selected && !dimmed && (
         <span
-          className="absolute -top-1.5 -right-1.5 text-[7px] font-black px-1 py-0.5 border-2 border-border tracking-wider"
+          className="absolute -top-1.5 -right-1.5 text-[6px] sm:text-[7px] font-black px-1 py-0.5 border-2 border-border tracking-wider"
           style={{ background: meta.color, color: "#fff" }}
         >
           {meta.label}
@@ -115,11 +115,11 @@ const WalletButton = ({
 };
 
 const SkeletonWallet = () => (
-  <div className="flex gap-2 flex-wrap">
-    {Array.from({ length: 3 }).map((_, i) => (
+  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
+    {Array.from({ length: 4 }).map((_, i) => (
       <div
         key={i}
-        className="w-32 h-14 bg-foreground/10 border-2 border-border/20 animate-pulse"
+        className="w-full sm:w-32 h-14 bg-foreground/10 border-2 border-border/20 animate-pulse"
       />
     ))}
   </div>
@@ -171,7 +171,7 @@ const TransferPanel = ({
             {CONSTANT.walletEmpty}
           </p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             {wallets.map((w) => (
               <WalletButton
                 key={w.id}
@@ -209,7 +209,7 @@ const TransferPanel = ({
         {loading ? (
           <SkeletonWallet />
         ) : wallets.length === 0 ? null : (
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             {wallets.map((w) => (
               <WalletButton
                 key={w.id}
