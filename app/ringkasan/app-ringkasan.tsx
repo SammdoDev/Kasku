@@ -18,6 +18,14 @@ import { useCurrency } from "@/lib/helper/currency-format";
 import { useTranslate } from "@/lib/i18n/use-translate";
 import TabFilter from "@/components/ui/input-component/tab-filter.tsx/tab-filter";
 import ChartCard, { ChartDataset } from "@/components/ui/chart-card/chart-card";
+import {
+  calculateCycleDateRange,
+  getCurrentMonth,
+  lastNMonthKeys,
+  formatMonthLabel,
+  formatCycleLabel,
+} from "@/lib/helper/cycle-date";
+import { useCycleStart } from "@/lib/helper/use-cycle-start";
 
 interface CategoryRef {
   id: string;
@@ -62,42 +70,15 @@ const WALLET_TYPE_META: Record<
 const getWalletMeta = (type: string | null) =>
   WALLET_TYPE_META[type ?? "other"] ?? WALLET_TYPE_META.other;
 
-const MONTH_LABELS = [
-  "JAN",
-  "FEB",
-  "MAR",
-  "APR",
-  "MEI",
-  "JUN",
-  "JUL",
-  "AGU",
-  "SEP",
-  "OKT",
-  "NOV",
-  "DES",
-];
-
-function lastNMonths(n: number) {
-  const now = new Date();
-  const result: { key: string; label: string; year: number; month: number }[] =
-    [];
-  for (let i = n - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    result.push({
-      key: `${d.getFullYear()}-${d.getMonth()}`,
-      label: MONTH_LABELS[d.getMonth()],
-      year: d.getFullYear(),
-      month: d.getMonth(),
-    });
-  }
-  return result;
-}
-
 const CATEGORY_FALLBACK_COLOR = "#64748b";
+
+const isWithinRange = (dateStr: string, from: string, to: string) =>
+  dateStr >= from && dateStr <= to;
 
 const AppRingkasan = () => {
   const CONSTANT = useTranslate();
   const { format } = useCurrency();
+  const { cycleStartDay, loading: loadingCycle } = useCycleStart();
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [wallets, setWallets] = useState<WalletItem[]>([]);
@@ -130,8 +111,24 @@ const AppRingkasan = () => {
     fetchAll();
   }, [CONSTANT]);
 
-  // ── Trend 6 bulan terakhir ──────────────────────────────────
-  const monthBuckets = useMemo(() => lastNMonths(6), []);
+  // ── Cycle bulan ini (sinkron sama backend) ───────────────────
+  const currentMonth = useMemo(() => getCurrentMonth(), []);
+  const currentCycleRange = useMemo(
+    () => calculateCycleDateRange(currentMonth, cycleStartDay),
+    [currentMonth, cycleStartDay],
+  );
+
+  // ── 6 bucket bulan terakhir → masing-masing punya cycle range sendiri ──
+  const monthKeys = useMemo(() => lastNMonthKeys(6), []);
+  const cycleBuckets = useMemo(
+    () =>
+      monthKeys.map((month) => ({
+        key: month,
+        label: formatMonthLabel(month),
+        range: calculateCycleDateRange(month, cycleStartDay),
+      })),
+    [monthKeys, cycleStartDay],
+  );
 
   const trendDatasets = useMemo<ChartDataset[]>(() => {
     const incomeByKey = new Map<string, number>();
@@ -139,51 +136,47 @@ const AppRingkasan = () => {
 
     for (const tx of transactions) {
       if (tx.type === "transfer") continue;
-      const d = new Date(tx.date);
-      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const bucket = cycleBuckets.find((b) =>
+        isWithinRange(tx.date, b.range.from, b.range.to),
+      );
+      if (!bucket) continue;
       const map = tx.type === "income" ? incomeByKey : expenseByKey;
-      map.set(key, (map.get(key) ?? 0) + Number(tx.amount));
+      map.set(bucket.key, (map.get(bucket.key) ?? 0) + Number(tx.amount));
     }
 
     return [
       {
         label: CONSTANT.income.toUpperCase(),
-        data: monthBuckets.map((b) => incomeByKey.get(b.key) ?? 0),
+        data: cycleBuckets.map((b) => incomeByKey.get(b.key) ?? 0),
         color: "#10b981",
         fill: true,
       },
       {
         label: CONSTANT.expense.toUpperCase(),
-        data: monthBuckets.map((b) => expenseByKey.get(b.key) ?? 0),
+        data: cycleBuckets.map((b) => expenseByKey.get(b.key) ?? 0),
         color: "#ef4444",
         fill: true,
       },
     ];
-  }, [transactions, monthBuckets, CONSTANT]);
+  }, [transactions, cycleBuckets, CONSTANT]);
 
-  // ── Ringkasan bulan ini ─────────────────────────────────────
+  // ── Ringkasan cycle berjalan ──────────────────────────────────
   const { totalIncome, totalExpense } = useMemo(() => {
-    const now = new Date();
     let income = 0;
     let expense = 0;
     for (const tx of transactions) {
-      const d = new Date(tx.date);
-      if (
-        d.getFullYear() !== now.getFullYear() ||
-        d.getMonth() !== now.getMonth()
-      )
+      if (!isWithinRange(tx.date, currentCycleRange.from, currentCycleRange.to))
         continue;
       if (tx.type === "income") income += Number(tx.amount);
       if (tx.type === "expense") expense += Number(tx.amount);
     }
     return { totalIncome: income, totalExpense: expense };
-  }, [transactions]);
+  }, [transactions, currentCycleRange]);
 
   const netBalance = totalIncome - totalExpense;
 
-  // ── Breakdown per kategori (bulan ini) ─────────────────────
+  // ── Breakdown per kategori (cycle berjalan) ───────────────────
   const categoryBreakdown = useMemo<ChartDataset[]>(() => {
-    const now = new Date();
     const totals = new Map<
       string,
       { name: string; color: string; total: number }
@@ -191,11 +184,7 @@ const AppRingkasan = () => {
 
     for (const tx of transactions) {
       if (tx.type !== breakdownType) continue;
-      const d = new Date(tx.date);
-      if (
-        d.getFullYear() !== now.getFullYear() ||
-        d.getMonth() !== now.getMonth()
-      )
+      if (!isWithinRange(tx.date, currentCycleRange.from, currentCycleRange.to))
         continue;
       const id = tx.category?.id ?? "uncategorized";
       const name = tx.category?.name ?? CONSTANT.uncategorized;
@@ -215,7 +204,9 @@ const AppRingkasan = () => {
       data: [c.total],
       color: c.color,
     }));
-  }, [transactions, breakdownType, CONSTANT]);
+  }, [transactions, breakdownType, currentCycleRange, CONSTANT]);
+
+  const cycleLabel = formatCycleLabel(currentCycleRange);
 
   return (
     <div className="flex flex-col gap-5 p-4 font-mono">
@@ -224,7 +215,7 @@ const AppRingkasan = () => {
           {CONSTANT.summary}
         </h1>
         <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">
-          {CONSTANT.thisMonth}
+          {loadingCycle ? CONSTANT.thisMonth : cycleLabel}
         </p>
       </div>
 
@@ -351,7 +342,13 @@ const AppRingkasan = () => {
       <ChartCard
         title={CONSTANT.incomeExpenseTrend}
         subtitle={CONSTANT.last6Months}
-        labels={monthBuckets.map((b) => b.label)}
+        labels={cycleBuckets.map(
+          (b: {
+            key: string;
+            label: string;
+            range: { from: string; to: string };
+          }) => b.label,
+        )}
         datasets={trendDatasets}
         chartType="line"
         accentColor="#3b82f6"
@@ -365,7 +362,7 @@ const AppRingkasan = () => {
               {CONSTANT.categoryBreakdown}
             </div>
             <div className="text-[9px] text-foreground/40 mt-0.5 tracking-[0.5px] uppercase">
-              {CONSTANT.thisMonth}
+              {loadingCycle ? CONSTANT.thisMonth : cycleLabel}
             </div>
           </div>
           <TabFilter

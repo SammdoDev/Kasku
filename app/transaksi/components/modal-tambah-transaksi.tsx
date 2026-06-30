@@ -235,7 +235,7 @@ const ModalTambahTransaksi = ({
     type === "transfer" || categories.length > 0 || loadingCats;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0 overflow-hidden">
       {/* Tab tipe — disable transfer saat edit */}
       <div className="pt-5 pb-3 mb-2 shrink-0">
         <TabFilter
@@ -283,7 +283,7 @@ const ModalTambahTransaksi = ({
         />
       </ChildModalWrapper>
 
-      {/* Konten tengah */}
+      {/* Konten tengah — INI yang scroll, NumPad & TransactionBar tetap fixed di bawah */}
       <div
         className={[
           "flex-1 min-h-0",
@@ -319,7 +319,7 @@ const ModalTambahTransaksi = ({
         onClose={() => setCalendarDialogOpen(false)}
       />
 
-      {/* Bottom sticky */}
+      {/* Bottom sticky — NumPad & TransactionBar gak ikut scroll */}
       <div className="shrink-0 border-t-2 border-border">
         <TransactionBar
           amount={amount}
