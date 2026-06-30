@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { get, del, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import {
@@ -27,6 +27,13 @@ import {
 } from "@/components/ui/card/summary-header";
 import { useTranslate } from "@/lib/i18n/use-translate";
 
+interface DashboardSummary {
+  balance: number;
+  total_income: number;
+  total_expense: number;
+  net: number;
+}
+
 function buildQuery(
   filter: ReturnType<typeof useTransaksiStore.getState>["filter"],
 ) {
@@ -43,7 +50,6 @@ function buildQuery(
 const AppTransaksi = () => {
   const CONSTANT = useTranslate();
   const filter = useTransaksiStore((s) => s.filter);
-  const summary = useTransaksiStore((s) => s.summary);
   const loading = useTransaksiStore((s) => s.loading);
   const setList = useTransaksiStore((s) => s.setList);
   const setLoading = useTransaksiStore((s) => s.setLoading);
@@ -59,10 +65,27 @@ const AppTransaksi = () => {
 
   const monthLabel = makeMonthLabel(month, CONSTANT);
 
+  const [dashSummary, setDashSummary] = useState<DashboardSummary | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+
   const TYPE_FILTER_OPTIONS = [
     { label: CONSTANT.expense.toUpperCase(), value: "expense" },
     { label: CONSTANT.income.toUpperCase(), value: "income" },
   ];
+
+  const fetchSummary = useCallback(async (m: string) => {
+    setSummaryLoading(true);
+    try {
+      const res = await get<{ summary: DashboardSummary }>(
+        `/dashboard?month=${m}`,
+      );
+      setDashSummary(res.summary);
+    } catch {
+      // silent — list tetap jalan
+    } finally {
+      setSummaryLoading(false);
+    }
+  }, []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -80,8 +103,16 @@ const AppTransaksi = () => {
   }, [filter, setList, setLoading, setError, CONSTANT]);
 
   useEffect(() => {
+    fetchSummary(month);
+  }, [month]);
+
+  useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    setFilter({ month, page: 1 });
+  }, [month]);
 
   const handleDelete = async (t: Transaction) => {
     const ok = await confirm.show({
@@ -96,25 +127,19 @@ const AppTransaksi = () => {
       await del(`/transactions/${t.id}`);
       toast.success(CONSTANT.success);
       removeTransaction(t.id);
+      fetchSummary(month);
     } catch (err) {
       toast.error(CONSTANT.failedUpdate, getApiError(err));
     }
   };
 
-  const summaryForHeader = summary
-    ? { ...summary, balance: summary.net }
-    : null;
   const headerProps = {
     monthLabel,
-    summary: summaryForHeader,
-    loading,
+    summary: dashSummary,
+    loading: loading || summaryLoading,
     onPrev: prevMonth,
     onNext: nextMonth,
   };
-
-  useEffect(() => {
-    setFilter({ month, page: 1 });
-  }, [month]);
 
   return (
     <div

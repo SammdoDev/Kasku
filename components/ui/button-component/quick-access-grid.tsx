@@ -83,7 +83,7 @@ const QuickAccessGrid = ({ items, loading = false }: Props) => {
                     alt=""
                     width={48}
                     height={48}
-                    className="w-[88%] h-[88%] lg:w-5 lg:h-5 object-contain rotate-350 relative left-2 top-2 drop-shadow-sm select-none"
+                    className="w-[88%] h-[88%] lg:w-5 lg:h-5 object-contain drop-shadow-sm select-none"
                     draggable={false}
                   />
                   {item.badge !== undefined && item.badge > 0 && (
