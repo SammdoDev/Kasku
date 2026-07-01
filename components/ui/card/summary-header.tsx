@@ -8,6 +8,12 @@ import {
 } from "lucide-react";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
 import MonthFilter from "../input-component/month-filter/month-filter";
+import { useMonthFilter } from "../input-component/month-filter/store/month-filter-store";
+import {
+  calculateCycleDateRange,
+  formatCycleLabel,
+  formatMonthLabel,
+} from "@/lib/helper/cycle-date";
 import { useTranslate } from "@/lib/i18n/use-translate";
 import { useCurrency } from "@/lib/helper/currency-format";
 
@@ -19,25 +25,22 @@ interface SummaryData {
 }
 
 type Props = {
-  monthLabel: string;
   summary?: SummaryData | null;
   loading?: boolean;
-  onPrev: () => void;
-  onNext: () => void;
 };
 
 const Skeleton = ({ className }: { className?: string }) => (
   <div className={`rounded-lg bg-foreground/10 animate-pulse ${className}`} />
 );
 
-export const SummaryHeaderMobile = ({
-  monthLabel,
-  summary,
-  loading,
-}: Props) => {
+export const SummaryHeaderMobile = ({ summary, loading }: Props) => {
   const CONSTANT = useTranslate();
   const { format } = useCurrency();
-  const month = monthLabel.split(" ")[0];
+  const { month } = useMonthFilter();
+
+  // Label singkat buat "JUN · Expense" — bukan rentang cycle penuh,
+  // itu udah ditampilin di <MonthFilter />.
+  const monthShort = formatMonthLabel(month);
 
   return (
     <div style={{ fontFamily: DASHBOARD_FONT }}>
@@ -54,7 +57,7 @@ export const SummaryHeaderMobile = ({
               style={{ color: "var(--color-danger)" }}
             />
             <span className="text-[10px] font-bold text-foreground/50">
-              {month} · {CONSTANT.expense}
+              {monthShort} · {CONSTANT.expense}
             </span>
           </div>
           {loading ? (
@@ -74,7 +77,7 @@ export const SummaryHeaderMobile = ({
               style={{ color: "var(--color-success)" }}
             />
             <span className="text-[10px] font-bold text-foreground/50">
-              {month} · {CONSTANT.income}
+              {monthShort} · {CONSTANT.income}
             </span>
           </div>
           {loading ? (
@@ -101,14 +104,14 @@ export const SummaryHeaderMobile = ({
   );
 };
 
-export const SummaryCardsDesktop = ({
-  monthLabel,
-  summary,
-  loading,
-  onPrev,
-  onNext,
-}: Props) => {
+export const SummaryCardsDesktop = ({ summary, loading }: Props) => {
   const CONSTANT = useTranslate();
+  const { month, cycleStart, prevMonth, nextMonth } = useMonthFilter();
+
+  // Rentang cycle aktual, sama persis kayak yang dipakai <MonthFilter />
+  // biar dua-duanya selalu konsisten (mis. "25 JUN - 24 JUL 2026").
+  const range = calculateCycleDateRange(month, cycleStart);
+  const cycleLabel = formatCycleLabel(range).toUpperCase();
 
   return (
     <div style={{ fontFamily: DASHBOARD_FONT }}>
@@ -118,25 +121,25 @@ export const SummaryCardsDesktop = ({
             {CONSTANT.dashboard}
           </h1>
           <p className="mt-1 text-[9px] tracking-wide text-foreground/40 uppercase">
-            {loading ? CONSTANT.loading : `${monthLabel} · Cashora`}
+            {loading ? CONSTANT.loading : `${cycleLabel} · Cashora`}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           <button
-            onClick={onPrev}
+            onClick={prevMonth}
             className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             aria-label="Bulan sebelumnya"
           >
             <ChevronLeft size={14} strokeWidth={3} />
           </button>
           <div className="h-8 px-4 border-[2.5px] border-border bg-card flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))]">
-            <span className="text-[11px] font-black uppercase tracking-widest text-foreground">
-              {monthLabel}
+            <span className="text-[11px] font-black uppercase tracking-widest text-foreground whitespace-nowrap">
+              {cycleLabel}
             </span>
           </div>
           <button
-            onClick={onNext}
+            onClick={nextMonth}
             className="w-8 h-8 border-[2.5px] border-border bg-card text-foreground flex items-center justify-center shadow-[2px_2px_0px_hsl(var(--border))] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
             aria-label="Bulan berikutnya"
           >

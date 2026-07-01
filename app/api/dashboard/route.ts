@@ -4,7 +4,7 @@ import { createServiceClient } from "@/lib/supabase/client";
 import {
   getCycleStartDate,
   calculateCycleDateRange,
-  getCurrentMonth,
+  getCurrentCycleMonth,
 } from "@/lib/helper/cycle-date";
 
 type CategoryRow = {
@@ -17,16 +17,22 @@ type CategoryRow = {
 export const GET = withAuth(async (req: AuthedRequest) => {
   const { searchParams } = new URL(req.url);
   const monthParam = searchParams.get("month");
-  const month = monthParam ?? getCurrentMonth();
-
-  const yearNum = Number(month.split("-")[0]);
-  const monthNum = Number(month.split("-")[1]);
 
   const supabase = createServiceClient();
   const userId = req.user.sub;
 
+  // cycleStart harus diambil DULU sebelum nentuin default month,
+  // karena "current month" itu cycle-aware (tergantung cycleStart).
   const cycleStart = await getCycleStartDate(supabase, userId);
-  const { from: dateFrom, to: dateTo } = calculateCycleDateRange(month, cycleStart);
+  const month = monthParam ?? getCurrentCycleMonth(cycleStart);
+
+  const yearNum = Number(month.split("-")[0]);
+  const monthNum = Number(month.split("-")[1]);
+
+  const { from: dateFrom, to: dateTo } = calculateCycleDateRange(
+    month,
+    cycleStart,
+  );
 
   // ── 1. Monthly summary (exclude transfer) ─────────────────
   const { data: monthlyTxns, error: monthlyError } = await supabase
@@ -129,15 +135,13 @@ export const GET = withAuth(async (req: AuthedRequest) => {
 
   // ── 5. Last 6 months trend (cycle-aware) ─────────────────
   // Mulai dari cycle start 6 bulan lalu
-  const sixMonthsAgo = calculateCycleDateRange(
-    `${yearNum}-${String(monthNum - 5 <= 0 ? monthNum - 5 + 12 : monthNum - 5).padStart(2, "0")}`,
-    cycleStart,
-  ).from;
-  // Edge case: kalau monthNum - 5 <= 0, tahunnya mundur
   const trendFrom = (() => {
     let y = yearNum;
     let m = monthNum - 5;
-    if (m <= 0) { m += 12; y -= 1; }
+    if (m <= 0) {
+      m += 12;
+      y -= 1;
+    }
     return calculateCycleDateRange(
       `${y}-${String(m).padStart(2, "0")}`,
       cycleStart,
@@ -221,7 +225,12 @@ export const GET = withAuth(async (req: AuthedRequest) => {
     .limit(5);
 
   return NextResponse.json({
-    period: { year: yearNum, month: monthNum, date_from: dateFrom, date_to: dateTo },
+    period: {
+      year: yearNum,
+      month: monthNum,
+      date_from: dateFrom,
+      date_to: dateTo,
+    },
     summary: {
       balance,
       total_income: totalIncome,

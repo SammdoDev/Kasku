@@ -5,7 +5,7 @@ import { del, get, getApiError } from "@/lib/helper/apiService";
 import { toast } from "@/components/layout/for-pages/toast";
 import { X } from "lucide-react";
 import { DASHBOARD_FONT } from "@/lib/helper/layout-helper";
-import { makeMonthLabel, useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
+import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
 import { useTranslate } from "@/lib/i18n/use-translate";
 
 import CategorySpendCard from "@/components/ui/button-component/category-spend-card";
@@ -112,9 +112,8 @@ const ErrorBanner = ({
 };
 
 const AppDashboard = () => {
-  const { month, prevMonth, nextMonth } = useMonthFilter();
+  const { month, cycleStart } = useMonthFilter();
   const CONSTANT = useTranslate();
-  const monthLabel = makeMonthLabel(month, CONSTANT);
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -159,7 +158,7 @@ const AppDashboard = () => {
   useEffect(() => {
     fetchDashboard(month);
     fetchTransactions(month, txLimit);
-  }, [month]);
+  }, [month, cycleStart]);
 
   useEffect(() => {
     fetchTransactions(month, txLimit);
@@ -175,13 +174,7 @@ const AppDashboard = () => {
   }, [month, txLimit]);
 
   const summary = data?.summary;
-  const monthNavProps = {
-    monthLabel,
-    summary,
-    loading,
-    onPrev: prevMonth,
-    onNext: nextMonth,
-  };
+  const headerProps = { summary, loading };
 
   const recentTransactions: RecentTransaction[] = transactions.map((t) => ({
     id: t.id,
@@ -220,12 +213,12 @@ const AppDashboard = () => {
         {error && !loading && (
           <ErrorBanner onRetry={() => fetchDashboard(month)} mobile />
         )}
-        <SummaryHeaderMobile {...monthNavProps} />
+        <SummaryHeaderMobile {...headerProps} />
         <QuickAccessGrid loading={loading} />
         {txCard}
         <CategorySpendCard
           categories={data?.spending_by_category ?? []}
-          monthLabel={monthLabel}
+          monthLabel={month}
           loading={loading}
         />
         <BudgetSummaryCard
@@ -235,7 +228,7 @@ const AppDashboard = () => {
       </div>
 
       <div className="hidden lg:block px-6 py-6">
-        <SummaryCardsDesktop {...monthNavProps} />
+        <SummaryCardsDesktop {...headerProps} />
         {error && !loading && (
           <ErrorBanner onRetry={() => fetchDashboard(month)} />
         )}
@@ -244,7 +237,7 @@ const AppDashboard = () => {
           <div className="col-span-1 flex flex-col gap-3 sticky top-19.75">
             <CategorySpendCard
               categories={data?.spending_by_category ?? []}
-              monthLabel={monthLabel}
+              monthLabel={month}
               loading={loading}
             />
             <BudgetSummaryCard

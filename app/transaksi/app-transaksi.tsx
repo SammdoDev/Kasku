@@ -8,10 +8,7 @@ import {
   type Transaction,
   type TransactionListResponse,
 } from "./store/transaksi-store";
-import {
-  useMonthFilter,
-  makeMonthLabel,
-} from "@/components/ui/input-component/month-filter/store/month-filter-store";
+import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
 import TabelTransaksi from "./components/table-transaksi";
 import { Plus } from "lucide-react";
 import ChildModalWrapper from "@/components/layout/for-pages/child-modal-wrapper";
@@ -61,9 +58,7 @@ const AppTransaksi = () => {
   const modalOpen = useTransaksiStore((s) => s.modalOpen);
   const editingTransaction = useTransaksiStore((s) => s.editingTransaction);
   const removeTransaction = useTransaksiStore((s) => s.removeTransaction);
-  const { month, prevMonth, nextMonth } = useMonthFilter();
-
-  const monthLabel = makeMonthLabel(month, CONSTANT);
+  const { month, cycleStart } = useMonthFilter();
 
   const [dashSummary, setDashSummary] = useState<DashboardSummary | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
@@ -104,7 +99,7 @@ const AppTransaksi = () => {
 
   useEffect(() => {
     fetchSummary(month);
-  }, [month]);
+  }, [month, cycleStart]);
 
   useEffect(() => {
     fetchData();
@@ -112,7 +107,7 @@ const AppTransaksi = () => {
 
   useEffect(() => {
     setFilter({ month, page: 1 });
-  }, [month]);
+  }, [month, cycleStart]);
 
   const handleDelete = async (t: Transaction) => {
     const ok = await confirm.show({
@@ -134,11 +129,8 @@ const AppTransaksi = () => {
   };
 
   const headerProps = {
-    monthLabel,
     summary: dashSummary,
     loading: loading || summaryLoading,
-    onPrev: prevMonth,
-    onNext: nextMonth,
   };
 
   return (

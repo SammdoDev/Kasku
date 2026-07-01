@@ -1,5 +1,3 @@
-// src/components/settings/modal/modal-cycle-start.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +6,7 @@ import { toast } from "@/components/layout/for-pages/toast";
 import { Button } from "@/components/ui/button-component/button";
 import CalendarPicker from "@/components/ui/input-component/calendar-component/calendar-picker";
 import { useTranslate } from "@/lib/i18n/use-translate";
+import { useMonthFilter } from "@/components/ui/input-component/month-filter/store/month-filter-store";
 
 interface Props {
   current: number;
@@ -23,14 +22,11 @@ const toDateStr = (day: number) => {
   return `${y}-${m}-${d}`;
 };
 
-export default function ModalCycleStart({
-  current,
-  onClose,
-  onSuccess,
-}: Props) {
+const ModalCycleStart = ({ current, onClose, onSuccess }: Props) => {
   const CONSTANT = useTranslate();
   const [dateStr, setDateStr] = useState(toDateStr(current));
   const [loading, setLoading] = useState(false);
+  const setCycleStart = useMonthFilter((s) => s.setCycleStart);
 
   const selectedDay = parseInt(dateStr.split("-")[2]);
   const isOver28 = selectedDay > 28;
@@ -51,6 +47,10 @@ export default function ModalCycleStart({
     try {
       await patch("/auth/cycle-start", { cycle_start_date: selectedDay });
       toast.success(CONSTANT.success);
+      // Update store GLOBAL, bukan cuma state lokal — biar MonthFilter,
+      // SummaryCardsDesktop, AppDashboard, AppTransaksi semua langsung
+      // ke-refresh pakai cycleStart baru tanpa perlu reload.
+      setCycleStart(selectedDay);
       onSuccess(selectedDay);
       onClose();
     } catch (err) {
@@ -68,9 +68,7 @@ export default function ModalCycleStart({
         <span className="text-[10px] font-bold">{CONSTANT.chooseDate}</span>
         <span className="text-[13px] font-black ml-auto">{selectedDay}</span>
         {isOver28 && (
-          <span className="text-[9px] uppercase tracking-wide">
-            Maks. 28
-          </span>
+          <span className="text-[9px] uppercase tracking-wide">Maks. 28</span>
         )}
       </div>
 
@@ -93,4 +91,6 @@ export default function ModalCycleStart({
       </div>
     </div>
   );
-}
+};
+
+export default ModalCycleStart;
