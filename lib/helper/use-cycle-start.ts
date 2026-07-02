@@ -13,7 +13,7 @@ interface ProfileResponse {
 
 const DEFAULT_CYCLE_START = 1;
 
-const PUBLIC_PATHS = ["/login", "/sign-up"];
+const PUBLIC_PATHS = ["/auth/login", "/auth/sign-up"];
 
 export function useCycleStart() {
   const [cycleStartDay, setCycleStartDay] =
