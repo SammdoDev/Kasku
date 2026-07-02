@@ -9,6 +9,7 @@ import { createServiceClient } from "@/lib/supabase/client";
 import {
   getCycleStartDate,
   calculateCycleDateRange,
+  getCurrentCycleMonth,
 } from "@/lib/helper/cycle-date";
 
 export const GET = withAuth(async (req: AuthedRequest) => {
@@ -18,7 +19,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   const category_id = searchParams.get("category_id");
   const payment_method_id = searchParams.get("payment_method_id");
   const tag_id = searchParams.get("tag_id");
-  const month = searchParams.get("month");
+  const monthParam = searchParams.get("month");
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1"));
   const limit = Math.min(
     100,
@@ -28,6 +29,8 @@ export const GET = withAuth(async (req: AuthedRequest) => {
 
   const supabase = createServiceClient();
   const cycleStart = await getCycleStartDate(supabase, req.user.sub);
+
+  const month = monthParam ?? getCurrentCycleMonth(cycleStart);
 
   let query = supabase
     .from("transactions")
@@ -48,10 +51,9 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   if (payment_method_id)
     query = query.eq("payment_method_id", payment_method_id);
 
-  if (month) {
-    const { from, to } = calculateCycleDateRange(month, cycleStart);
-    query = query.gte("date", from).lte("date", to);
-  }
+  // Selalu filter by cycle date range sekarang (gak lagi kondisional `if (month)`)
+  const { from, to } = calculateCycleDateRange(month, cycleStart);
+  query = query.gte("date", from).lte("date", to);
 
   if (tag_id) {
     const { data: taggedTxns } = await supabase
@@ -83,6 +85,7 @@ export const GET = withAuth(async (req: AuthedRequest) => {
   return NextResponse.json({
     transactions,
     pagination: { page, limit, total, total_pages: Math.ceil(total / limit) },
+    period: { month, date_from: from, date_to: to },
   });
 });
 
